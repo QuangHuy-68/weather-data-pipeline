@@ -1,5 +1,7 @@
+import logging
 import requests
 import json 
+
 from datetime import datetime
 from pathlib import Path
 
@@ -10,6 +12,8 @@ from config.config import (
     TIMEZONE,
     RAW_DATA_DIR
 )
+
+logger = logging.getLogger(__name__)
 
 
 # ==========================================
@@ -33,15 +37,30 @@ params = {
 # 2. Call API
 # ==========================================
 
-response = requests.get(
-    API_URL,
-    params=params
+logger.info(
+    f"Calling weather API for "
+    f"latitude={LATITUDE}, longitude={LONGITUDE}"
 )
 
-print(response.status_code)
+try: 
+    response = requests.get(
+        API_URL,
+        params=params
+    )
 
-response.raise_for_status()
+    logger.info(
+        f"API response: {response.status_code}"
+    )
 
+    response.raise_for_status()
+
+except requests.RequestException as error: 
+
+    logger.error(
+        f"Weather API request failed: {error}"
+    )
+
+    raise
 
 # ==========================================
 # 3. Convert JSON to Python dictionary
@@ -94,5 +113,9 @@ with open(
         file,
         indent=4
     )
+
+logger.info(
+    f"Raw data saved to: {filepath}"
+)
 
 print(f"Raw data saved to: {filepath}")
