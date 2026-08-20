@@ -1,5 +1,18 @@
+# Virtual environment
 .venv/
-__pycache__/
+
+# Environment variables
 .env
-.ipynb_checkpoints/
+
+# Python cache
+__pycache__/
 *.pyc
+
+# Logs
+logs/
+
+# Raw data
+data/raw/
+
+# Generated reports
+reports/charts/
