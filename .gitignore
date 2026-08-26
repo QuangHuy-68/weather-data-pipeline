@@ -16,3 +16,10 @@ data/raw/
 
 # Generated reports
 reports/charts/
+
+# Database
+database/
+
+# Processed data
+data/process/
+data/output/

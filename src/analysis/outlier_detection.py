@@ -56,7 +56,7 @@ print("Lower bound:", lower)
 
 print("Upper bound:", upper)
 
-print("Number of outlierss", len(outliers))
+print("Number of outliers", len(outliers))
 
 print(
     outliers[
@@ -153,5 +153,10 @@ print(
 
 print(
     "Invalid wind speed:", 
+    len(invalid_wind)
+)
+
+print(
+    "Invalid precipitation:", 
     len(invalid_precipitation)
 )

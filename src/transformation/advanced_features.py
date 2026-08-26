@@ -1,157 +1,195 @@
 import pandas as pd
+import logging
 
-# ==========================================
-# 1. Load final dataset
-# ==========================================
+from config.config import FEATURES_V2_FILE, FINAL_DATA_FILE
 
-df = pd.read_csv(
-    "data/process/weather_final.csv"
-)
+logger = logging.getLogger(__name__)
 
-df["time"] = pd.to_datetime(df["time"])
+def create_advanced_features():
 
-print("Original columns:")
-print(df.columns.tolist())
+    try:
 
+        # ==========================================
+        # 1. Load final dataset
+        # ==========================================
 
-# ==========================================
-# 2. Temperature-Humidity Index
-# ==========================================
+        logger.info("Starting advanced feature engineering")
 
-df["temp_humidity_index"] = (
-    df["temperature"]
-    + 0.1 * df["humidity"]
-)
+        df = pd.read_csv(FINAL_DATA_FILE)
 
+        df["time"] = pd.to_datetime(df["time"])
 
-# ==========================================
-# 3. Wind Category
-# ==========================================
+        logger.info(f"Loaded final dataset: {len(df)} rows")
 
-def classify_wind(speed):
-
-    if speed < 10: 
-        return "Low"
-
-    elif speed < 20: 
-        return "Moderate"
-
-    else: 
-        return "High"
-
-df["wind_category"] = (
-    df["wind_speed"]
-    .apply(classify_wind)
-)
+        print("Original columns:")
+        print(df.columns.tolist())
 
 
-# ==========================================
-# 4. Rain Intensity
-# ==========================================
+        # ==========================================
+        # 2. Temperature-Humidity Index
+        # ==========================================
 
-def classify_rain(rain):
+        df["temp_humidity_index"] = (
+            df["temperature"]
+            + 0.1 * df["humidity"]
+        )
 
-    if rain == 0:
-        return "No Rain"
+        logger.info("created feature: temp_humidity_index")
 
-    elif rain < 2.5:
-        return "Light"
+        # ==========================================
+        # 3. Wind Category
+        # ==========================================
 
-    elif rain < 10: 
-        return "Moderate"
+        def classify_wind(speed):
 
-    else: 
-        return "Heavy"
+            if speed < 10: 
+                return "Low"
 
-df["rain_intensity"] = (
-    df["precipitation"]
-    .apply(classify_rain)
-)
+            elif speed < 20: 
+                return "Moderate"
 
+            else: 
+                return "High"
 
-# ==========================================
-# 5. Is Hot
-# ==========================================
+        df["wind_category"] = (
+            df["wind_speed"]
+            .apply(classify_wind)
+        )
 
-df["is_hot"] = (
-    df["temperature"] >= 32
-)
+        logger.info("Created feature: wind_category")
 
+        # ==========================================
+        # 4. Rain Intensity
+        # ==========================================
 
-# ==========================================
-# 6. Show new features
-# ==========================================
+        def classify_rain(rain):
 
-print("\n===== NEW FEATURES =====")
+            if rain == 0:
+                return "No Rain"
 
-print(
-    df[
-        [
-            "temperature",
-            "humidity",
-            "wind_speed",
-            "precipitation", 
-            "temp_humidity_index",
-            "wind_category",
-            "rain_intensity",
-            "is_hot"
-        ]
-    ].head(10)
-)
+            elif rain < 2.5:
+                return "Light"
 
+            elif rain < 10: 
+                return "Moderate"
 
-# ==========================================
-# 7. Hot hours
-# ==========================================
+            else: 
+                return "Heavy"
 
-hot_hours = (
-    df["is_hot"]
-    .sum()
-)
+        df["rain_intensity"] = (
+            df["precipitation"]
+            .apply(classify_rain)
+        )
 
-print(
-    "\nHot hours:",
-    hot_hours
-)
+        logger.info("Created feature: rain_intensity")
 
+        # ==========================================
+        # 5. Is Hot
+        # ==========================================
 
-# ==========================================
-# 8. Wind category
-# ==========================================
+        df["is_hot"] = (
+            df["temperature"] >= 32
+        )
 
-print("\n===== WIND CATEGORY =====")
+        logger.info("Created feature: í_hot")
 
-print(
-    df["wind_category"]
-    .value_counts()
-)
+        # ==========================================
+        # 6. Show new features
+        # ==========================================
 
+        print("\n===== NEW FEATURES =====")
 
-# ==========================================
-# 9. Rain intensity
-# ==========================================
-
-print("\n===== RAIN INTENSITY =====")
-
-print(
-    df["rain_intensity"]
-    .value_counts()
-)
+        print(
+            df[
+                [
+                    "temperature",
+                    "humidity",
+                    "wind_speed",
+                    "precipitation", 
+                    "temp_humidity_index",
+                    "wind_category",
+                    "rain_intensity",
+                    "is_hot"
+                ]
+            ].head(10)
+        )
 
 
-# ==========================================
-# 10. Save
-# ==========================================
+        # ==========================================
+        # 7. Hot hours
+        # ==========================================
 
-output_file = (
-    "data/process/weather_features_v2.csv"
-)
+        hot_hours = (
+            df["is_hot"]
+            .sum()
+        )
 
-df.to_csv(
-    output_file,
-    index=False
-)
+        print(
+            "\nHot hours:",
+            hot_hours
+        )
 
-print(
-    f"\nFeature dataset saved to: {output_file}"
-)
+        logger.info(f"Hot hours: {hot_hours}")
+
+        # ==========================================
+        # 8. Wind category
+        # ==========================================
+
+        print("\n===== WIND CATEGORY =====")
+
+        print(
+            df["wind_category"]
+            .value_counts()
+        )
+
+        logger.info(
+            f"Wind category distribution:\n"
+            f"{df['wind_category'].value_counts()}"
+        )
+
+        # ==========================================
+        # 9. Rain intensity
+        # ==========================================
+
+        print("\n===== RAIN INTENSITY =====")
+
+        print(
+            df["rain_intensity"]
+            .value_counts()
+        )
+
+        logger.info(
+            f"Rain intensity distribution:\n"
+            f"{df['rain_intensity'].value_counts()}"
+        )
+
+        # ==========================================
+        # 10. Save
+        # ==========================================
+
+        df.to_csv(
+            FEATURES_V2_FILE,
+            index=False
+        )
+
+        logger.info(
+            f"Advanced features saved to:"
+            f"{FEATURES_V2_FILE}"
+        )
+
+        print(
+            f"\nFeature dataset saved to: {FEATURES_V2_FILE}"
+        )
+
+        return df
+
+    except FileNotFoundError as e:
+        logger.error(f"Input file not found: {e}")
+        raise
+
+    except Exception as e:
+        logger.error(f"Advanced feature engineering failed: {e}")
+        raise
+
+if __name__ == "__main__":
+    create_advanced_features()

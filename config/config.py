@@ -28,3 +28,17 @@ CHART_DIR = "reports/charts"
 LOG_DIR = "logs"
 
 LOG_FILE = "logs/pipeline.log"
+
+# === Data file paths ===
+
+CLEANED_DATA_FILE = "data/process/weather_cleaned.csv"
+FEATURES_FILE = "data/process/weather_features.csv"
+FINAL_DATA_FILE = "data/process/weather_final.csv"
+FEATURES_V2_FILE = "data/process/weather_features_v2.csv"
+DAILY_SUMMARY_FILE = "data/process/weather_daily_summary.csv"
+
+# === Database ===
+DB_PATH = "database/weather.db"
+
+# === Output ===
+OUTPUT_DATA_DIR = "data/output"

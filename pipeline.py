@@ -45,6 +45,16 @@ pipeline_steps = [
     ),
 
     (
+        "Feature Engineering",
+        "src/transformation/feature_engineering.py"
+    ),
+
+    (
+        "Prepare Final Dataset",
+        "src/transformation/prepare_final_dataset.py"
+    ),
+
+    (
         "Advanced Feature Engineering", 
         "src/transformation/advanced_features.py"
     ),
@@ -57,6 +67,11 @@ pipeline_steps = [
     (
         "Daily Dashboard",
         "src/analysis/daily_dashboard.py"
+    ),
+
+    (
+        "Database Storage",
+        "src/storage/database.py"
     )
 ]
 

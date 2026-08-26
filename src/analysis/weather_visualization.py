@@ -55,7 +55,7 @@ plt.title("Humidity Over Time")
 
 plt.xticks(rotation=45)
 
-plt.tight_layout
+plt.tight_layout()
 
 plt.show()
 

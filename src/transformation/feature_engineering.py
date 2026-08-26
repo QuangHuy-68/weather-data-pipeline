@@ -1,79 +1,128 @@
 import pandas as pd
+import logging
+from pathlib import Path
 
-# ==========================================
-# 1. Load cleaned data
-# ==========================================
+from config.config import CLEANED_DATA_FILE, FEATURES_FILE
 
-df = pd.read_csv(
-    "data/process/weather_cleaned.csv"
-)
+logger = logging.getLogger(__name__)
 
-df["time"] = pd.to_datetime(df["time"])
+def engineer_features():
 
+    try: 
+        # ==========================================
+        # 1. Load cleaned data
+        # ==========================================
 
-# ==========================================
-# 2. Time features
-# ==========================================
+        df = pd.read_csv(CLEANED_DATA_FILE)
 
-df["hour"] = df["time"].dt.hour
-df["day"] = df["time"].dt.day
-df["month"] = df["time"].dt.month
-df["day_of_week"] = (df["time"].dt.dayofweek)
-df["day_name"] = (df["time"].dt.day_name())
-df["is_weekend"] = (df["day_of_week"] >= 5)
+        logger.info(f"Loaded cleaned data: {len(df)} rows")
 
+        df["time"] = pd.to_datetime(df["time"], errors="coerce")
 
-# ==========================================
-# 3. Weather features
-# ==========================================
+        invalid_time = (
+            df["time"].isnull().sum()
+        )
 
-df["is_rainy"] = (df["precipitation"] > 0)
+        if invalid_time > 0:
 
-def categorize_temperature(temp): 
+            logger.warning(f"Found {invalid_time} invalid timestamps")
 
-    if temp < 20: 
-        return "Cold"
+        # ==========================================
+        # 2. Time features
+        # ==========================================
 
-    elif temp <= 30:
-        return "Moderate"
-
-    else: 
-        return "Hot"
-
-df["temperature_category"] = (
-    df["temperature"]
-    .apply(categorize_temperature)
-)
+        df["hour"] = df["time"].dt.hour
+        df["day"] = df["time"].dt.day
+        df["month"] = df["time"].dt.month
+        df["day_of_week"] = (df["time"].dt.dayofweek)
+        df["day_name"] = (df["time"].dt.day_name())
+        df["is_weekend"] = (df["day_of_week"] >= 5)
 
 
-# ==========================================
-# 4. Display result
-# ==========================================
+        # ==========================================
+        # 3. Weather features
+        # ==========================================
 
-print("===== FEATURE ENGINEERING =====")
+        df["is_rainy"] = (df["precipitation"] > 0)
 
-print(df.head())
+        def categorize_temperature(temp): 
 
-print("\nColumns:")
-print(df.columns)
+            if temp < 20: 
+                return "Cold"
 
-print("\nData types:")
-print(df.dtypes)
+            elif temp <= 30:
+                return "Moderate"
+
+            else: 
+                return "Hot"
+
+        df["temperature_category"] = (
+            df["temperature"]
+            .apply(categorize_temperature)
+        )
 
 
-# ==========================================
-# 5. Save feature dataset
-# ==========================================
+        # ==========================================
+        # 4. Display result
+        # ==========================================
 
-output_file = (
-    "data/process/weather_features.csv"
-)
+        print("===== FEATURE ENGINEERING =====")
 
-df.to_csv(
-    output_file,
-    index=False
-)
+        print(df.head())
 
-print(
-    f"\nFeature dataset saved to: {output_file}"
-)
+        print("\nColumns:")
+        print(df.columns)
+
+        print("\nData types:")
+        print(df.dtypes)
+
+
+        # ==========================================
+        # 5. Save feature dataset
+        # ==========================================
+
+        output_file = Path(
+            FEATURES_FILE
+        )
+
+        output_file.parent.mkdir(
+            parents=True,
+            exist_ok=True
+        )
+
+        df.to_csv(
+            FEATURES_FILE, 
+            index=False
+        )
+
+        logger.info(f"Feature dataset saved to: {output_file}")
+        
+        print(
+            f"\nFeature dataset saved to: {FEATURES_FILE}"
+        )
+
+        return df
+
+    except FileNotFoundError as e:
+
+        logger.error(
+            f"Input file not found: {e}"
+        )
+        raise
+
+    except KeyError as e: 
+
+        logger.error(
+            f"Missing required column: {e}"
+        )
+        raise
+
+    except Exception as e: 
+
+        logger.error(
+            f"Feature engineering failed: {e}"
+        )
+        raise
+    
+if __name__ == "__main__":
+    engineer_features()

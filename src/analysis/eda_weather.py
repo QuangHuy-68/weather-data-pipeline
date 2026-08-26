@@ -138,7 +138,7 @@ plt.ylabel("Temperature (°C)")
 plt.title("Temperature Over Time")
 
 plt.xticks(rotation=45)
-plt.tight_layout
+plt.tight_layout()
 
 plt.show()
 
@@ -217,6 +217,6 @@ correlation_matrix = df[
     ]
 ].corr()
 
-print("\n===== CORRELATION MATTRIX =====")
+print("\n===== CORRELATION MATRIX =====")
 
 print(correlation_matrix)
