@@ -42,3 +42,18 @@ DB_PATH = "database/weather.db"
 
 # === Output ===
 OUTPUT_DATA_DIR = "data/output"
+
+def get_locations() -> list:
+
+    locations_str = os.getenv("LOCATION", "HCM: 10.8231:106.6297")
+    locations = []
+
+    for loc in locations_str.split(","):
+        parts = loc.strip().split(":")
+        locations.append({
+            "name": parts[0],
+            "latitude": float(parts[1]),
+            "longitude": float(parts[2])
+        })
+
+    return locations

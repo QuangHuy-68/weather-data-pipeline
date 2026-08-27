@@ -13,6 +13,8 @@ from config.config import (
     RAW_DATA_DIR
 )
 
+from config.config import API_URL, TIMEZONE, RAW_DATA_DIR, get_locations
+
 logger = logging.getLogger(__name__)
 
 
@@ -139,6 +141,45 @@ def fetch_weather():
     except requests.HTTPError as e:
         logger.error(f"API returned error: {e}")
         raise
+
+
+def fetch_weather() -> list: 
+    """Call API for all cities"""
+
+    locations = get_locations()
+    saved_files = []
+
+    for location in locations:
+        print(f"\n📍 Fetching weather for {location['name']}...")
+
+        params = {
+            "latitude": location["latitude"],
+            "longitude": location["longitude"],
+            "hourly": (
+                "temperature_2m",
+                "relative_humidity_2m",
+                "wind_speed_10m",
+                "precipitation"
+            ),
+            "timezone": TIMEZONE
+        }
+
+        response = requests.get(API_URL, params=params, timeout=30)
+        response.raise_for_status()
+        data = response.json()
+
+        # Save with city name
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"weather_{location['name']}_{timestamp}.json"
+        filepath = Path(RAW_DATA_DIR) / filename
+
+        with open(filepath, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4)
+
+        print(f"✅ Saved: {filepath}")
+        saved_files.append(filepath)
+
+    return saved_files
     
 if __name__ == "__main__":
     fetch_weather()

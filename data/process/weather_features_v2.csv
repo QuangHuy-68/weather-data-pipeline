@@ -1,169 +1,169 @@
 time,temperature,humidity,wind_speed,precipitation,hour,day,month,day_of_week,day_name,is_weekend,is_rainy,temperature_category,temp_humidity_index,wind_category,rain_intensity,is_hot
-2026-08-25 00:00:00,26.6,82,14.4,0.0,0,25,8,1,Tuesday,False,False,Moderate,34.800000000000004,Moderate,No Rain,False
-2026-08-25 01:00:00,26.9,82,16.8,0.0,1,25,8,1,Tuesday,False,False,Moderate,35.1,Moderate,No Rain,False
-2026-08-25 02:00:00,26.4,85,16.3,0.0,2,25,8,1,Tuesday,False,False,Moderate,34.9,Moderate,No Rain,False
-2026-08-25 03:00:00,26.2,86,15.6,0.0,3,25,8,1,Tuesday,False,False,Moderate,34.8,Moderate,No Rain,False
-2026-08-25 04:00:00,26.0,87,14.2,0.0,4,25,8,1,Tuesday,False,False,Moderate,34.7,Moderate,No Rain,False
-2026-08-25 05:00:00,25.9,87,13.4,0.0,5,25,8,1,Tuesday,False,False,Moderate,34.6,Moderate,No Rain,False
-2026-08-25 06:00:00,26.0,88,13.1,0.0,6,25,8,1,Tuesday,False,False,Moderate,34.8,Moderate,No Rain,False
-2026-08-25 07:00:00,27.4,81,14.3,0.0,7,25,8,1,Tuesday,False,False,Moderate,35.5,Moderate,No Rain,False
-2026-08-25 08:00:00,28.7,76,14.8,0.0,8,25,8,1,Tuesday,False,False,Moderate,36.3,Moderate,No Rain,False
-2026-08-25 09:00:00,29.7,70,19.7,0.1,9,25,8,1,Tuesday,False,True,Moderate,36.7,Moderate,Light,False
-2026-08-25 10:00:00,31.1,64,19.5,0.0,10,25,8,1,Tuesday,False,False,Hot,37.5,Moderate,No Rain,False
-2026-08-25 11:00:00,32.0,60,19.4,0.0,11,25,8,1,Tuesday,False,False,Hot,38.0,Moderate,No Rain,True
-2026-08-25 12:00:00,32.7,57,19.5,0.1,12,25,8,1,Tuesday,False,True,Hot,38.400000000000006,Moderate,Light,True
-2026-08-25 13:00:00,33.4,52,20.2,0.0,13,25,8,1,Tuesday,False,False,Hot,38.6,High,No Rain,True
-2026-08-25 14:00:00,33.3,51,20.4,0.1,14,25,8,1,Tuesday,False,True,Hot,38.4,High,Light,True
-2026-08-25 15:00:00,31.1,63,20.3,0.4,15,25,8,1,Tuesday,False,True,Hot,37.400000000000006,High,Light,False
-2026-08-25 16:00:00,30.5,68,18.4,0.3,16,25,8,1,Tuesday,False,True,Hot,37.3,Moderate,Light,False
-2026-08-25 17:00:00,29.6,75,15.8,0.0,17,25,8,1,Tuesday,False,False,Moderate,37.1,Moderate,No Rain,False
-2026-08-25 18:00:00,28.9,77,15.3,0.0,18,25,8,1,Tuesday,False,False,Moderate,36.6,Moderate,No Rain,False
-2026-08-25 19:00:00,28.4,75,16.1,0.0,19,25,8,1,Tuesday,False,False,Moderate,35.9,Moderate,No Rain,False
-2026-08-25 20:00:00,27.9,76,16.2,0.0,20,25,8,1,Tuesday,False,False,Moderate,35.5,Moderate,No Rain,False
-2026-08-25 21:00:00,27.6,77,15.0,0.0,21,25,8,1,Tuesday,False,False,Moderate,35.300000000000004,Moderate,No Rain,False
-2026-08-25 22:00:00,27.3,79,13.7,0.0,22,25,8,1,Tuesday,False,False,Moderate,35.2,Moderate,No Rain,False
-2026-08-25 23:00:00,27.0,80,13.1,0.0,23,25,8,1,Tuesday,False,False,Moderate,35.0,Moderate,No Rain,False
-2026-08-26 00:00:00,26.7,82,13.2,0.0,0,26,8,2,Wednesday,False,False,Moderate,34.9,Moderate,No Rain,False
-2026-08-26 01:00:00,26.6,83,12.0,0.0,1,26,8,2,Wednesday,False,False,Moderate,34.900000000000006,Moderate,No Rain,False
-2026-08-26 02:00:00,26.3,86,11.6,0.0,2,26,8,2,Wednesday,False,False,Moderate,34.9,Moderate,No Rain,False
-2026-08-26 03:00:00,26.1,87,10.7,0.0,3,26,8,2,Wednesday,False,False,Moderate,34.800000000000004,Moderate,No Rain,False
-2026-08-26 04:00:00,26.1,86,10.6,0.0,4,26,8,2,Wednesday,False,False,Moderate,34.7,Moderate,No Rain,False
-2026-08-26 05:00:00,26.1,86,11.4,0.0,5,26,8,2,Wednesday,False,False,Moderate,34.7,Moderate,No Rain,False
-2026-08-26 06:00:00,26.1,87,11.3,0.0,6,26,8,2,Wednesday,False,False,Moderate,34.800000000000004,Moderate,No Rain,False
-2026-08-26 07:00:00,26.8,84,11.8,0.0,7,26,8,2,Wednesday,False,False,Moderate,35.2,Moderate,No Rain,False
-2026-08-26 08:00:00,28.0,78,16.8,0.0,8,26,8,2,Wednesday,False,False,Moderate,35.8,Moderate,No Rain,False
-2026-08-26 09:00:00,29.2,74,16.7,0.1,9,26,8,2,Wednesday,False,True,Moderate,36.6,Moderate,Light,False
-2026-08-26 10:00:00,30.6,69,15.8,0.1,10,26,8,2,Wednesday,False,True,Hot,37.5,Moderate,Light,False
-2026-08-26 11:00:00,31.8,66,15.6,0.1,11,26,8,2,Wednesday,False,True,Hot,38.4,Moderate,Light,False
-2026-08-26 12:00:00,32.6,62,16.7,0.0,12,26,8,2,Wednesday,False,False,Hot,38.800000000000004,Moderate,No Rain,True
-2026-08-26 13:00:00,32.1,63,14.2,0.2,13,26,8,2,Wednesday,False,True,Hot,38.400000000000006,Moderate,Light,True
-2026-08-26 14:00:00,27.5,84,12.6,2.1,14,26,8,2,Wednesday,False,True,Moderate,35.9,Moderate,Light,False
-2026-08-26 15:00:00,29.6,78,12.0,0.4,15,26,8,2,Wednesday,False,True,Moderate,37.400000000000006,Moderate,Light,False
-2026-08-26 16:00:00,28.7,79,14.8,1.0,16,26,8,2,Wednesday,False,True,Moderate,36.6,Moderate,Light,False
-2026-08-26 17:00:00,27.0,92,9.2,2.5,17,26,8,2,Wednesday,False,True,Moderate,36.2,Low,Moderate,False
-2026-08-26 18:00:00,27.0,92,11.0,0.6,18,26,8,2,Wednesday,False,True,Moderate,36.2,Moderate,Light,False
-2026-08-26 19:00:00,26.7,91,9.6,0.2,19,26,8,2,Wednesday,False,True,Moderate,35.8,Low,Light,False
-2026-08-26 20:00:00,26.5,91,10.5,0.1,20,26,8,2,Wednesday,False,True,Moderate,35.6,Moderate,Light,False
-2026-08-26 21:00:00,26.3,90,11.6,0.0,21,26,8,2,Wednesday,False,False,Moderate,35.3,Moderate,No Rain,False
-2026-08-26 22:00:00,26.2,90,11.7,0.0,22,26,8,2,Wednesday,False,False,Moderate,35.2,Moderate,No Rain,False
-2026-08-26 23:00:00,26.1,90,11.4,0.0,23,26,8,2,Wednesday,False,False,Moderate,35.1,Moderate,No Rain,False
-2026-08-27 00:00:00,26.0,89,10.8,0.0,0,27,8,3,Thursday,False,False,Moderate,34.9,Moderate,No Rain,False
-2026-08-27 01:00:00,25.9,90,8.6,0.0,1,27,8,3,Thursday,False,False,Moderate,34.9,Low,No Rain,False
-2026-08-27 02:00:00,25.8,90,8.2,0.2,2,27,8,3,Thursday,False,True,Moderate,34.8,Low,Light,False
-2026-08-27 03:00:00,25.7,91,7.8,0.0,3,27,8,3,Thursday,False,False,Moderate,34.8,Low,No Rain,False
-2026-08-27 04:00:00,25.7,91,10.6,0.0,4,27,8,3,Thursday,False,False,Moderate,34.8,Moderate,No Rain,False
-2026-08-27 05:00:00,25.6,91,11.2,0.0,5,27,8,3,Thursday,False,False,Moderate,34.7,Moderate,No Rain,False
-2026-08-27 06:00:00,25.3,91,12.5,0.0,6,27,8,3,Thursday,False,False,Moderate,34.4,Moderate,No Rain,False
-2026-08-27 07:00:00,25.6,91,10.6,0.9,7,27,8,3,Thursday,False,True,Moderate,34.7,Moderate,Light,False
-2026-08-27 08:00:00,26.3,89,12.0,0.8,8,27,8,3,Thursday,False,True,Moderate,35.2,Moderate,Light,False
-2026-08-27 09:00:00,27.9,80,14.4,0.0,9,27,8,3,Thursday,False,False,Moderate,35.9,Moderate,No Rain,False
-2026-08-27 10:00:00,28.9,77,14.1,0.1,10,27,8,3,Thursday,False,True,Moderate,36.6,Moderate,Light,False
-2026-08-27 11:00:00,29.9,74,12.9,0.1,11,27,8,3,Thursday,False,True,Moderate,37.3,Moderate,Light,False
-2026-08-27 12:00:00,31.1,70,13.8,0.1,12,27,8,3,Thursday,False,True,Hot,38.1,Moderate,Light,False
-2026-08-27 13:00:00,31.1,66,18.9,0.3,13,27,8,3,Thursday,False,True,Hot,37.7,Moderate,Light,False
-2026-08-27 14:00:00,28.2,85,11.0,4.1,14,27,8,3,Thursday,False,True,Moderate,36.7,Moderate,Moderate,False
-2026-08-27 15:00:00,29.3,80,14.8,0.4,15,27,8,3,Thursday,False,True,Moderate,37.3,Moderate,Light,False
-2026-08-27 16:00:00,29.2,78,11.9,0.1,16,27,8,3,Thursday,False,True,Moderate,37.0,Moderate,Light,False
-2026-08-27 17:00:00,29.0,79,11.2,0.1,17,27,8,3,Thursday,False,True,Moderate,36.9,Moderate,Light,False
-2026-08-27 18:00:00,28.4,79,10.7,0.0,18,27,8,3,Thursday,False,False,Moderate,36.3,Moderate,No Rain,False
-2026-08-27 19:00:00,27.9,76,11.0,0.0,19,27,8,3,Thursday,False,False,Moderate,35.5,Moderate,No Rain,False
-2026-08-27 20:00:00,27.5,77,10.5,0.0,20,27,8,3,Thursday,False,False,Moderate,35.2,Moderate,No Rain,False
-2026-08-27 21:00:00,27.4,77,12.0,0.0,21,27,8,3,Thursday,False,False,Moderate,35.1,Moderate,No Rain,False
-2026-08-27 22:00:00,27.1,80,11.2,0.0,22,27,8,3,Thursday,False,False,Moderate,35.1,Moderate,No Rain,False
-2026-08-27 23:00:00,26.8,82,10.5,0.0,23,27,8,3,Thursday,False,False,Moderate,35.0,Moderate,No Rain,False
-2026-08-28 00:00:00,26.6,84,10.1,0.0,0,28,8,4,Friday,False,False,Moderate,35.0,Moderate,No Rain,False
-2026-08-28 01:00:00,26.4,85,10.9,0.0,1,28,8,4,Friday,False,False,Moderate,34.9,Moderate,No Rain,False
-2026-08-28 02:00:00,26.1,86,9.0,0.0,2,28,8,4,Friday,False,False,Moderate,34.7,Low,No Rain,False
-2026-08-28 03:00:00,25.7,88,9.1,0.0,3,28,8,4,Friday,False,False,Moderate,34.5,Low,No Rain,False
-2026-08-28 04:00:00,25.5,89,8.4,0.0,4,28,8,4,Friday,False,False,Moderate,34.4,Low,No Rain,False
-2026-08-28 05:00:00,25.7,88,12.2,0.0,5,28,8,4,Friday,False,False,Moderate,34.5,Moderate,No Rain,False
-2026-08-28 06:00:00,25.4,89,9.4,0.0,6,28,8,4,Friday,False,False,Moderate,34.3,Low,No Rain,False
-2026-08-28 07:00:00,25.8,88,12.2,0.0,7,28,8,4,Friday,False,False,Moderate,34.6,Moderate,No Rain,False
-2026-08-28 08:00:00,27.1,81,13.7,0.0,8,28,8,4,Friday,False,False,Moderate,35.2,Moderate,No Rain,False
-2026-08-28 09:00:00,28.6,76,15.7,0.0,9,28,8,4,Friday,False,False,Moderate,36.2,Moderate,No Rain,False
-2026-08-28 10:00:00,29.0,74,14.9,0.1,10,28,8,4,Friday,False,True,Moderate,36.4,Moderate,Light,False
-2026-08-28 11:00:00,30.2,72,12.8,0.1,11,28,8,4,Friday,False,True,Hot,37.4,Moderate,Light,False
-2026-08-28 12:00:00,31.2,69,13.5,0.1,12,28,8,4,Friday,False,True,Hot,38.1,Moderate,Light,False
-2026-08-28 13:00:00,31.2,67,13.3,0.2,13,28,8,4,Friday,False,True,Hot,37.9,Moderate,Light,False
-2026-08-28 14:00:00,26.6,91,10.2,5.6,14,28,8,4,Friday,False,True,Moderate,35.7,Moderate,Moderate,False
-2026-08-28 15:00:00,26.3,94,15.1,9.5,15,28,8,4,Friday,False,True,Moderate,35.7,Moderate,Moderate,False
-2026-08-28 16:00:00,26.5,95,10.8,2.0,16,28,8,4,Friday,False,True,Moderate,36.0,Moderate,Light,False
-2026-08-28 17:00:00,26.8,90,11.9,0.9,17,28,8,4,Friday,False,True,Moderate,35.8,Moderate,Light,False
-2026-08-28 18:00:00,26.4,94,10.1,0.5,18,28,8,4,Friday,False,True,Moderate,35.8,Moderate,Light,False
-2026-08-28 19:00:00,26.0,95,9.4,0.8,19,28,8,4,Friday,False,True,Moderate,35.5,Low,Light,False
-2026-08-28 20:00:00,26.0,95,9.0,0.1,20,28,8,4,Friday,False,True,Moderate,35.5,Low,Light,False
-2026-08-28 21:00:00,25.9,95,8.2,0.0,21,28,8,4,Friday,False,False,Moderate,35.4,Low,No Rain,False
-2026-08-28 22:00:00,25.8,94,8.9,0.0,22,28,8,4,Friday,False,False,Moderate,35.2,Low,No Rain,False
-2026-08-28 23:00:00,25.6,93,11.9,0.1,23,28,8,4,Friday,False,True,Moderate,34.900000000000006,Moderate,Light,False
-2026-08-29 00:00:00,25.2,94,11.1,0.7,0,29,8,5,Saturday,True,True,Moderate,34.6,Moderate,Light,False
-2026-08-29 01:00:00,25.0,95,10.6,0.4,1,29,8,5,Saturday,True,True,Moderate,34.5,Moderate,Light,False
-2026-08-29 02:00:00,24.8,95,10.2,0.1,2,29,8,5,Saturday,True,True,Moderate,34.3,Moderate,Light,False
-2026-08-29 03:00:00,24.7,96,9.5,0.1,3,29,8,5,Saturday,True,True,Moderate,34.3,Low,Light,False
-2026-08-29 04:00:00,24.7,96,9.1,0.1,4,29,8,5,Saturday,True,True,Moderate,34.3,Low,Light,False
-2026-08-29 05:00:00,24.8,96,9.8,0.0,5,29,8,5,Saturday,True,False,Moderate,34.400000000000006,Low,No Rain,False
-2026-08-29 06:00:00,25.1,96,11.1,0.0,6,29,8,5,Saturday,True,False,Moderate,34.7,Moderate,No Rain,False
-2026-08-29 07:00:00,25.8,93,12.4,0.0,7,29,8,5,Saturday,True,False,Moderate,35.1,Moderate,No Rain,False
-2026-08-29 08:00:00,27.1,85,13.4,0.0,8,29,8,5,Saturday,True,False,Moderate,35.6,Moderate,No Rain,False
-2026-08-29 09:00:00,28.8,77,14.2,0.0,9,29,8,5,Saturday,True,False,Moderate,36.5,Moderate,No Rain,False
-2026-08-29 10:00:00,29.8,72,15.0,0.0,10,29,8,5,Saturday,True,False,Moderate,37.0,Moderate,No Rain,False
-2026-08-29 11:00:00,29.7,73,15.9,0.6,11,29,8,5,Saturday,True,True,Moderate,37.0,Moderate,Light,False
-2026-08-29 12:00:00,28.9,76,16.9,0.6,12,29,8,5,Saturday,True,True,Moderate,36.5,Moderate,Light,False
-2026-08-29 13:00:00,28.0,80,17.5,0.6,13,29,8,5,Saturday,True,True,Moderate,36.0,Moderate,Light,False
-2026-08-29 14:00:00,27.2,83,18.2,1.4,14,29,8,5,Saturday,True,True,Moderate,35.5,Moderate,Light,False
-2026-08-29 15:00:00,26.3,87,19.2,1.4,15,29,8,5,Saturday,True,True,Moderate,35.0,Moderate,Light,False
-2026-08-29 16:00:00,25.7,91,18.9,1.4,16,29,8,5,Saturday,True,True,Moderate,34.8,Moderate,Light,False
-2026-08-29 17:00:00,25.5,93,16.1,1.2,17,29,8,5,Saturday,True,True,Moderate,34.8,Moderate,Light,False
-2026-08-29 18:00:00,25.7,95,12.2,1.2,18,29,8,5,Saturday,True,True,Moderate,35.2,Moderate,Light,False
-2026-08-29 19:00:00,25.7,96,9.8,1.2,19,29,8,5,Saturday,True,True,Moderate,35.3,Low,Light,False
-2026-08-29 20:00:00,25.6,96,9.2,0.3,20,29,8,5,Saturday,True,True,Moderate,35.2,Low,Light,False
-2026-08-29 21:00:00,25.4,96,9.2,0.3,21,29,8,5,Saturday,True,True,Moderate,35.0,Low,Light,False
-2026-08-29 22:00:00,25.2,96,9.6,0.3,22,29,8,5,Saturday,True,True,Moderate,34.8,Low,Light,False
-2026-08-29 23:00:00,25.1,96,10.2,0.6,23,29,8,5,Saturday,True,True,Moderate,34.7,Moderate,Light,False
-2026-08-30 00:00:00,25.0,97,11.0,0.6,0,30,8,6,Sunday,True,True,Moderate,34.7,Moderate,Light,False
-2026-08-30 01:00:00,24.9,97,11.6,0.6,1,30,8,6,Sunday,True,True,Moderate,34.6,Moderate,Light,False
-2026-08-30 02:00:00,24.7,97,11.5,0.4,2,30,8,6,Sunday,True,True,Moderate,34.4,Moderate,Light,False
-2026-08-30 03:00:00,24.5,97,11.0,0.4,3,30,8,6,Sunday,True,True,Moderate,34.2,Moderate,Light,False
-2026-08-30 04:00:00,24.4,96,10.7,0.4,4,30,8,6,Sunday,True,True,Moderate,34.0,Moderate,Light,False
-2026-08-30 05:00:00,24.5,96,10.9,0.0,5,30,8,6,Sunday,True,False,Moderate,34.1,Moderate,No Rain,False
-2026-08-30 06:00:00,24.6,96,11.5,0.0,6,30,8,6,Sunday,True,False,Moderate,34.2,Moderate,No Rain,False
-2026-08-30 07:00:00,25.2,93,12.3,0.0,7,30,8,6,Sunday,True,False,Moderate,34.5,Moderate,No Rain,False
-2026-08-30 08:00:00,26.7,85,14.1,0.2,8,30,8,6,Sunday,True,True,Moderate,35.2,Moderate,Light,False
-2026-08-30 09:00:00,28.5,77,16.2,0.2,9,30,8,6,Sunday,True,True,Moderate,36.2,Moderate,Light,False
-2026-08-30 10:00:00,29.6,73,17.3,0.2,10,30,8,6,Sunday,True,True,Moderate,36.900000000000006,Moderate,Light,False
-2026-08-30 11:00:00,29.4,74,16.2,0.6,11,30,8,6,Sunday,True,True,Moderate,36.8,Moderate,Light,False
-2026-08-30 12:00:00,28.5,80,13.9,0.6,12,30,8,6,Sunday,True,True,Moderate,36.5,Moderate,Light,False
-2026-08-30 13:00:00,27.7,85,12.1,0.6,13,30,8,6,Sunday,True,True,Moderate,36.2,Moderate,Light,False
-2026-08-30 14:00:00,27.1,87,11.4,1.3,14,30,8,6,Sunday,True,True,Moderate,35.800000000000004,Moderate,Light,False
-2026-08-30 15:00:00,26.7,89,11.3,1.3,15,30,8,6,Sunday,True,True,Moderate,35.6,Moderate,Light,False
-2026-08-30 16:00:00,26.4,90,11.3,1.3,16,30,8,6,Sunday,True,True,Moderate,35.4,Moderate,Light,False
-2026-08-30 17:00:00,26.3,91,10.6,0.4,17,30,8,6,Sunday,True,True,Moderate,35.4,Moderate,Light,False
-2026-08-30 18:00:00,26.4,91,10.0,0.4,18,30,8,6,Sunday,True,True,Moderate,35.5,Moderate,Light,False
-2026-08-30 19:00:00,26.4,91,9.6,0.4,19,30,8,6,Sunday,True,True,Moderate,35.5,Low,Light,False
-2026-08-30 20:00:00,26.3,91,9.2,0.0,20,30,8,6,Sunday,True,False,Moderate,35.4,Low,No Rain,False
-2026-08-30 21:00:00,26.1,91,8.9,0.0,21,30,8,6,Sunday,True,False,Moderate,35.2,Low,No Rain,False
-2026-08-30 22:00:00,25.9,91,9.0,0.0,22,30,8,6,Sunday,True,False,Moderate,35.0,Low,No Rain,False
-2026-08-30 23:00:00,25.7,92,9.3,0.0,23,30,8,6,Sunday,True,False,Moderate,34.9,Low,No Rain,False
-2026-08-31 00:00:00,25.4,93,9.9,0.0,0,31,8,0,Monday,False,False,Moderate,34.7,Low,No Rain,False
-2026-08-31 01:00:00,25.2,94,10.4,0.0,1,31,8,0,Monday,False,False,Moderate,34.6,Moderate,No Rain,False
-2026-08-31 02:00:00,25.1,94,10.8,0.1,2,31,8,0,Monday,False,True,Moderate,34.5,Moderate,Light,False
-2026-08-31 03:00:00,24.9,95,11.3,0.1,3,31,8,0,Monday,False,True,Moderate,34.4,Moderate,Light,False
-2026-08-31 04:00:00,24.9,95,11.5,0.1,4,31,8,0,Monday,False,True,Moderate,34.4,Moderate,Light,False
-2026-08-31 05:00:00,24.6,96,10.3,0.1,5,31,8,0,Monday,False,True,Moderate,34.2,Moderate,Light,False
-2026-08-31 06:00:00,24.7,95,10.2,0.1,6,31,8,0,Monday,False,True,Moderate,34.2,Moderate,Light,False
-2026-08-31 07:00:00,25.1,93,10.1,0.1,7,31,8,0,Monday,False,True,Moderate,34.400000000000006,Moderate,Light,False
-2026-08-31 08:00:00,25.8,90,10.2,0.1,8,31,8,0,Monday,False,True,Moderate,34.8,Moderate,Light,False
-2026-08-31 09:00:00,27.0,85,10.2,0.1,9,31,8,0,Monday,False,True,Moderate,35.5,Moderate,Light,False
-2026-08-31 10:00:00,28.3,79,10.4,0.1,10,31,8,0,Monday,False,True,Moderate,36.2,Moderate,Light,False
-2026-08-31 11:00:00,29.6,75,10.6,0.1,11,31,8,0,Monday,False,True,Moderate,37.1,Moderate,Light,False
-2026-08-31 12:00:00,30.6,71,10.7,0.1,12,31,8,0,Monday,False,True,Hot,37.7,Moderate,Light,False
-2026-08-31 13:00:00,31.1,70,10.6,0.1,13,31,8,0,Monday,False,True,Hot,38.1,Moderate,Light,False
-2026-08-31 14:00:00,30.9,71,10.3,0.5,14,31,8,0,Monday,False,True,Hot,38.0,Moderate,Light,False
-2026-08-31 15:00:00,30.3,74,9.8,0.5,15,31,8,0,Monday,False,True,Hot,37.7,Low,Light,False
-2026-08-31 16:00:00,29.3,78,9.1,0.5,16,31,8,0,Monday,False,True,Moderate,37.1,Low,Light,False
-2026-08-31 17:00:00,28.3,83,8.5,0.5,17,31,8,0,Monday,False,True,Moderate,36.6,Low,Light,False
-2026-08-31 18:00:00,27.4,87,8.2,0.5,18,31,8,0,Monday,False,True,Moderate,36.1,Low,Light,False
-2026-08-31 19:00:00,26.7,90,8.2,0.5,19,31,8,0,Monday,False,True,Moderate,35.7,Low,Light,False
-2026-08-31 20:00:00,26.2,92,8.4,0.0,20,31,8,0,Monday,False,False,Moderate,35.4,Low,No Rain,False
-2026-08-31 21:00:00,25.9,93,9.0,0.0,21,31,8,0,Monday,False,False,Moderate,35.2,Low,No Rain,False
-2026-08-31 22:00:00,25.7,94,9.6,0.0,22,31,8,0,Monday,False,False,Moderate,35.1,Low,No Rain,False
-2026-08-31 23:00:00,25.5,94,10.4,0.0,23,31,8,0,Monday,False,False,Moderate,34.9,Moderate,No Rain,False
+2026-08-26 00:00:00,26.5,80,12.1,0.0,0,26,8,2,Wednesday,False,False,Moderate,34.5,Moderate,No Rain,False
+2026-08-26 01:00:00,27.0,83,17.0,0.0,1,26,8,2,Wednesday,False,False,Moderate,35.3,Moderate,No Rain,False
+2026-08-26 02:00:00,26.5,84,15.1,0.0,2,26,8,2,Wednesday,False,False,Moderate,34.9,Moderate,No Rain,False
+2026-08-26 03:00:00,26.2,86,14.6,0.0,3,26,8,2,Wednesday,False,False,Moderate,34.8,Moderate,No Rain,False
+2026-08-26 04:00:00,26.1,87,13.7,0.0,4,26,8,2,Wednesday,False,False,Moderate,34.800000000000004,Moderate,No Rain,False
+2026-08-26 05:00:00,25.9,88,12.6,0.0,5,26,8,2,Wednesday,False,False,Moderate,34.7,Moderate,No Rain,False
+2026-08-26 06:00:00,25.9,87,11.9,0.0,6,26,8,2,Wednesday,False,False,Moderate,34.6,Moderate,No Rain,False
+2026-08-26 07:00:00,27.6,82,12.4,0.0,7,26,8,2,Wednesday,False,False,Moderate,35.800000000000004,Moderate,No Rain,False
+2026-08-26 08:00:00,29.0,76,13.8,0.0,8,26,8,2,Wednesday,False,False,Moderate,36.6,Moderate,No Rain,False
+2026-08-26 09:00:00,30.3,69,17.0,0.0,9,26,8,2,Wednesday,False,False,Hot,37.2,Moderate,No Rain,False
+2026-08-26 10:00:00,31.4,64,17.1,0.0,10,26,8,2,Wednesday,False,False,Hot,37.8,Moderate,No Rain,False
+2026-08-26 11:00:00,32.4,61,16.2,0.0,11,26,8,2,Wednesday,False,False,Hot,38.5,Moderate,No Rain,True
+2026-08-26 12:00:00,33.2,57,15.9,0.2,12,26,8,2,Wednesday,False,True,Hot,38.900000000000006,Moderate,Light,True
+2026-08-26 13:00:00,29.0,78,12.7,3.0,13,26,8,2,Wednesday,False,True,Moderate,36.8,Moderate,Moderate,False
+2026-08-26 14:00:00,27.5,89,11.2,10.2,14,26,8,2,Wednesday,False,True,Moderate,36.4,Moderate,Heavy,False
+2026-08-26 15:00:00,28.0,91,9.0,1.7,15,26,8,2,Wednesday,False,True,Moderate,37.1,Low,Light,False
+2026-08-26 16:00:00,29.3,82,12.2,0.4,16,26,8,2,Wednesday,False,True,Moderate,37.5,Moderate,Light,False
+2026-08-26 17:00:00,28.9,77,14.2,0.6,17,26,8,2,Wednesday,False,True,Moderate,36.6,Moderate,Light,False
+2026-08-26 18:00:00,28.2,77,11.4,0.0,18,26,8,2,Wednesday,False,False,Moderate,35.9,Moderate,No Rain,False
+2026-08-26 19:00:00,27.8,79,9.3,0.0,19,26,8,2,Wednesday,False,False,Moderate,35.7,Low,No Rain,False
+2026-08-26 20:00:00,27.4,79,11.1,0.0,20,26,8,2,Wednesday,False,False,Moderate,35.3,Moderate,No Rain,False
+2026-08-26 21:00:00,27.2,80,10.6,0.0,21,26,8,2,Wednesday,False,False,Moderate,35.2,Moderate,No Rain,False
+2026-08-26 22:00:00,26.9,81,9.8,0.0,22,26,8,2,Wednesday,False,False,Moderate,35.0,Low,No Rain,False
+2026-08-26 23:00:00,26.7,82,9.9,0.0,23,26,8,2,Wednesday,False,False,Moderate,34.9,Low,No Rain,False
+2026-08-27 00:00:00,26.4,84,9.0,0.0,0,27,8,3,Thursday,False,False,Moderate,34.8,Low,No Rain,False
+2026-08-27 01:00:00,26.2,85,8.1,0.0,1,27,8,3,Thursday,False,False,Moderate,34.7,Low,No Rain,False
+2026-08-27 02:00:00,26.1,86,8.9,0.0,2,27,8,3,Thursday,False,False,Moderate,34.7,Low,No Rain,False
+2026-08-27 03:00:00,26.0,86,8.5,0.0,3,27,8,3,Thursday,False,False,Moderate,34.6,Low,No Rain,False
+2026-08-27 04:00:00,25.9,87,9.5,0.0,4,27,8,3,Thursday,False,False,Moderate,34.6,Low,No Rain,False
+2026-08-27 05:00:00,25.8,88,10.8,0.1,5,27,8,3,Thursday,False,True,Moderate,34.6,Moderate,Light,False
+2026-08-27 06:00:00,25.1,91,10.4,0.1,6,27,8,3,Thursday,False,True,Moderate,34.2,Moderate,Light,False
+2026-08-27 07:00:00,26.0,90,7.8,0.1,7,27,8,3,Thursday,False,True,Moderate,35.0,Low,Light,False
+2026-08-27 08:00:00,27.5,84,12.1,0.1,8,27,8,3,Thursday,False,True,Moderate,35.9,Moderate,Light,False
+2026-08-27 09:00:00,28.7,78,15.4,0.2,9,27,8,3,Thursday,False,True,Moderate,36.5,Moderate,Light,False
+2026-08-27 10:00:00,30.1,74,13.3,0.2,10,27,8,3,Thursday,False,True,Hot,37.5,Moderate,Light,False
+2026-08-27 11:00:00,31.4,69,13.7,0.2,11,27,8,3,Thursday,False,True,Hot,38.3,Moderate,Light,False
+2026-08-27 12:00:00,32.1,63,15.6,0.2,12,27,8,3,Thursday,False,True,Hot,38.400000000000006,Moderate,Light,True
+2026-08-27 13:00:00,28.3,80,16.7,1.5,13,27,8,3,Thursday,False,True,Moderate,36.3,Moderate,Light,False
+2026-08-27 14:00:00,28.0,87,4.8,6.5,14,27,8,3,Thursday,False,True,Moderate,36.7,Low,Moderate,False
+2026-08-27 15:00:00,29.0,83,6.3,0.6,15,27,8,3,Thursday,False,True,Moderate,37.3,Low,Light,False
+2026-08-27 16:00:00,27.9,86,13.8,1.9,16,27,8,3,Thursday,False,True,Moderate,36.5,Moderate,Light,False
+2026-08-27 17:00:00,27.6,82,15.4,0.6,17,27,8,3,Thursday,False,True,Moderate,35.800000000000004,Moderate,Light,False
+2026-08-27 18:00:00,26.4,89,6.5,0.4,18,27,8,3,Thursday,False,True,Moderate,35.3,Low,Light,False
+2026-08-27 19:00:00,26.4,91,6.6,0.1,19,27,8,3,Thursday,False,True,Moderate,35.5,Low,Light,False
+2026-08-27 20:00:00,26.5,90,9.2,0.0,20,27,8,3,Thursday,False,False,Moderate,35.5,Low,No Rain,False
+2026-08-27 21:00:00,26.6,87,11.8,0.0,21,27,8,3,Thursday,False,False,Moderate,35.300000000000004,Moderate,No Rain,False
+2026-08-27 22:00:00,26.4,85,9.5,0.0,22,27,8,3,Thursday,False,False,Moderate,34.9,Low,No Rain,False
+2026-08-27 23:00:00,25.9,87,8.0,0.0,23,27,8,3,Thursday,False,False,Moderate,34.6,Low,No Rain,False
+2026-08-28 00:00:00,25.8,87,8.6,0.0,0,28,8,4,Friday,False,False,Moderate,34.5,Low,No Rain,False
+2026-08-28 01:00:00,25.5,88,7.7,0.0,1,28,8,4,Friday,False,False,Moderate,34.3,Low,No Rain,False
+2026-08-28 02:00:00,25.4,90,7.8,0.0,2,28,8,4,Friday,False,False,Moderate,34.4,Low,No Rain,False
+2026-08-28 03:00:00,25.2,91,6.1,0.0,3,28,8,4,Friday,False,False,Moderate,34.3,Low,No Rain,False
+2026-08-28 04:00:00,25.3,92,8.7,0.0,4,28,8,4,Friday,False,False,Moderate,34.5,Low,No Rain,False
+2026-08-28 05:00:00,25.3,91,11.2,0.0,5,28,8,4,Friday,False,False,Moderate,34.4,Moderate,No Rain,False
+2026-08-28 06:00:00,25.1,90,10.9,0.0,6,28,8,4,Friday,False,False,Moderate,34.1,Moderate,No Rain,False
+2026-08-28 07:00:00,25.5,89,11.2,0.0,7,28,8,4,Friday,False,False,Moderate,34.4,Moderate,No Rain,False
+2026-08-28 08:00:00,27.4,80,12.1,0.0,8,28,8,4,Friday,False,False,Moderate,35.4,Moderate,No Rain,False
+2026-08-28 09:00:00,28.8,75,15.4,0.0,9,28,8,4,Friday,False,False,Moderate,36.3,Moderate,No Rain,False
+2026-08-28 10:00:00,29.7,72,15.4,0.2,10,28,8,4,Friday,False,True,Moderate,36.9,Moderate,Light,False
+2026-08-28 11:00:00,31.0,68,15.1,0.1,11,28,8,4,Friday,False,True,Hot,37.8,Moderate,Light,False
+2026-08-28 12:00:00,27.5,90,9.9,2.3,12,28,8,4,Friday,False,True,Moderate,36.5,Low,Light,False
+2026-08-28 13:00:00,29.9,77,8.0,0.5,13,28,8,4,Friday,False,True,Moderate,37.6,Low,Light,False
+2026-08-28 14:00:00,28.3,82,10.9,1.9,14,28,8,4,Friday,False,True,Moderate,36.5,Moderate,Light,False
+2026-08-28 15:00:00,26.5,91,4.1,8.5,15,28,8,4,Friday,False,True,Moderate,35.6,Low,Moderate,False
+2026-08-28 16:00:00,26.7,92,11.0,3.3,16,28,8,4,Friday,False,True,Moderate,35.9,Moderate,Moderate,False
+2026-08-28 17:00:00,26.2,92,8.0,0.8,17,28,8,4,Friday,False,True,Moderate,35.4,Low,Light,False
+2026-08-28 18:00:00,26.2,93,8.9,0.4,18,28,8,4,Friday,False,True,Moderate,35.5,Low,Light,False
+2026-08-28 19:00:00,25.7,95,8.5,0.1,19,28,8,4,Friday,False,True,Moderate,35.2,Low,Light,False
+2026-08-28 20:00:00,25.6,94,8.0,0.0,20,28,8,4,Friday,False,False,Moderate,35.0,Low,No Rain,False
+2026-08-28 21:00:00,25.5,95,7.7,0.0,21,28,8,4,Friday,False,False,Moderate,35.0,Low,No Rain,False
+2026-08-28 22:00:00,25.4,95,5.8,0.0,22,28,8,4,Friday,False,False,Moderate,34.9,Low,No Rain,False
+2026-08-28 23:00:00,25.3,96,4.6,0.8,23,28,8,4,Friday,False,True,Moderate,34.900000000000006,Low,Light,False
+2026-08-29 00:00:00,25.2,97,6.0,2.2,0,29,8,5,Saturday,True,True,Moderate,34.9,Low,Light,False
+2026-08-29 01:00:00,25.3,96,11.2,0.4,1,29,8,5,Saturday,True,True,Moderate,34.900000000000006,Moderate,Light,False
+2026-08-29 02:00:00,25.3,96,10.6,0.1,2,29,8,5,Saturday,True,True,Moderate,34.900000000000006,Moderate,Light,False
+2026-08-29 03:00:00,25.1,96,12.5,0.1,3,29,8,5,Saturday,True,True,Moderate,34.7,Moderate,Light,False
+2026-08-29 04:00:00,24.8,95,10.7,0.0,4,29,8,5,Saturday,True,False,Moderate,34.3,Moderate,No Rain,False
+2026-08-29 05:00:00,24.5,95,9.9,0.0,5,29,8,5,Saturday,True,False,Moderate,34.0,Low,No Rain,False
+2026-08-29 06:00:00,24.4,96,7.5,0.0,6,29,8,5,Saturday,True,False,Moderate,34.0,Low,No Rain,False
+2026-08-29 07:00:00,25.6,91,10.5,0.0,7,29,8,5,Saturday,True,False,Moderate,34.7,Moderate,No Rain,False
+2026-08-29 08:00:00,27.2,83,14.8,0.0,8,29,8,5,Saturday,True,False,Moderate,35.5,Moderate,No Rain,False
+2026-08-29 09:00:00,28.5,77,13.7,0.0,9,29,8,5,Saturday,True,False,Moderate,36.2,Moderate,No Rain,False
+2026-08-29 10:00:00,30.2,71,14.6,0.0,10,29,8,5,Saturday,True,False,Hot,37.3,Moderate,No Rain,False
+2026-08-29 11:00:00,30.9,69,13.8,0.0,11,29,8,5,Saturday,True,False,Hot,37.8,Moderate,No Rain,False
+2026-08-29 12:00:00,32.0,64,15.8,0.1,12,29,8,5,Saturday,True,True,Hot,38.4,Moderate,Light,True
+2026-08-29 13:00:00,31.7,63,18.3,0.3,13,29,8,5,Saturday,True,True,Hot,38.0,Moderate,Light,False
+2026-08-29 14:00:00,28.2,87,11.7,4.4,14,29,8,5,Saturday,True,True,Moderate,36.9,Moderate,Moderate,False
+2026-08-29 15:00:00,29.7,76,6.6,0.3,15,29,8,5,Saturday,True,True,Moderate,37.3,Low,Light,False
+2026-08-29 16:00:00,26.3,87,20.3,5.8,16,29,8,5,Saturday,True,True,Moderate,35.0,High,Moderate,False
+2026-08-29 17:00:00,25.9,94,10.1,6.2,17,29,8,5,Saturday,True,True,Moderate,35.3,Moderate,Moderate,False
+2026-08-29 18:00:00,26.2,94,8.2,1.2,18,29,8,5,Saturday,True,True,Moderate,35.6,Low,Light,False
+2026-08-29 19:00:00,26.1,95,7.8,0.2,19,29,8,5,Saturday,True,True,Moderate,35.6,Low,Light,False
+2026-08-29 20:00:00,25.8,97,6.0,0.0,20,29,8,5,Saturday,True,False,Moderate,35.5,Low,No Rain,False
+2026-08-29 21:00:00,25.7,96,6.7,0.0,21,29,8,5,Saturday,True,False,Moderate,35.3,Low,No Rain,False
+2026-08-29 22:00:00,25.7,96,8.0,0.0,22,29,8,5,Saturday,True,False,Moderate,35.3,Low,No Rain,False
+2026-08-29 23:00:00,25.8,93,9.3,0.0,23,29,8,5,Saturday,True,False,Moderate,35.1,Low,No Rain,False
+2026-08-30 00:00:00,25.7,92,9.8,0.0,0,30,8,6,Sunday,True,False,Moderate,34.9,Low,No Rain,False
+2026-08-30 01:00:00,25.5,91,11.3,0.0,1,30,8,6,Sunday,True,False,Moderate,34.6,Moderate,No Rain,False
+2026-08-30 02:00:00,25.4,91,11.4,0.0,2,30,8,6,Sunday,True,False,Moderate,34.5,Moderate,No Rain,False
+2026-08-30 03:00:00,25.3,91,10.9,0.0,3,30,8,6,Sunday,True,False,Moderate,34.4,Moderate,No Rain,False
+2026-08-30 04:00:00,25.2,92,10.5,0.0,4,30,8,6,Sunday,True,False,Moderate,34.4,Moderate,No Rain,False
+2026-08-30 05:00:00,25.3,92,10.1,0.0,5,30,8,6,Sunday,True,False,Moderate,34.5,Moderate,No Rain,False
+2026-08-30 06:00:00,25.5,91,9.6,0.0,6,30,8,6,Sunday,True,False,Moderate,34.6,Low,No Rain,False
+2026-08-30 07:00:00,26.0,89,9.8,0.0,7,30,8,6,Sunday,True,False,Moderate,34.9,Low,No Rain,False
+2026-08-30 08:00:00,27.0,83,11.2,0.0,8,30,8,6,Sunday,True,False,Moderate,35.3,Moderate,No Rain,False
+2026-08-30 09:00:00,28.3,77,13.1,0.0,9,30,8,6,Sunday,True,False,Moderate,36.0,Moderate,No Rain,False
+2026-08-30 10:00:00,29.4,72,14.9,0.0,10,30,8,6,Sunday,True,False,Moderate,36.6,Moderate,No Rain,False
+2026-08-30 11:00:00,30.3,69,16.8,0.3,11,30,8,6,Sunday,True,True,Hot,37.2,Moderate,Light,False
+2026-08-30 12:00:00,30.9,67,19.3,0.3,12,30,8,6,Sunday,True,True,Hot,37.6,Moderate,Light,False
+2026-08-30 13:00:00,31.0,68,19.9,0.3,13,30,8,6,Sunday,True,True,Hot,37.8,Moderate,Light,False
+2026-08-30 14:00:00,30.4,72,17.0,2.7,14,30,8,6,Sunday,True,True,Hot,37.6,Moderate,Moderate,False
+2026-08-30 15:00:00,29.2,78,12.7,2.7,15,30,8,6,Sunday,True,True,Moderate,37.0,Moderate,Moderate,False
+2026-08-30 16:00:00,28.2,84,9.9,2.7,16,30,8,6,Sunday,True,True,Moderate,36.6,Low,Moderate,False
+2026-08-30 17:00:00,27.6,87,8.2,0.1,17,30,8,6,Sunday,True,True,Moderate,36.300000000000004,Low,Light,False
+2026-08-30 18:00:00,27.1,87,6.7,0.1,18,30,8,6,Sunday,True,True,Moderate,35.800000000000004,Low,Light,False
+2026-08-30 19:00:00,26.7,88,6.2,0.1,19,30,8,6,Sunday,True,True,Moderate,35.5,Low,Light,False
+2026-08-30 20:00:00,26.5,89,6.4,0.1,20,30,8,6,Sunday,True,True,Moderate,35.4,Low,Light,False
+2026-08-30 21:00:00,26.4,90,7.4,0.1,21,30,8,6,Sunday,True,True,Moderate,35.4,Low,Light,False
+2026-08-30 22:00:00,26.2,90,8.7,0.1,22,30,8,6,Sunday,True,True,Moderate,35.2,Low,Light,False
+2026-08-30 23:00:00,25.8,91,9.7,0.0,23,30,8,6,Sunday,True,False,Moderate,34.9,Low,No Rain,False
+2026-08-31 00:00:00,25.3,91,11.0,0.0,0,31,8,0,Monday,False,False,Moderate,34.4,Moderate,No Rain,False
+2026-08-31 01:00:00,24.9,92,11.8,0.0,1,31,8,0,Monday,False,False,Moderate,34.1,Moderate,No Rain,False
+2026-08-31 02:00:00,24.7,92,11.8,0.0,2,31,8,0,Monday,False,False,Moderate,33.9,Moderate,No Rain,False
+2026-08-31 03:00:00,24.6,92,11.7,0.0,3,31,8,0,Monday,False,False,Moderate,33.800000000000004,Moderate,No Rain,False
+2026-08-31 04:00:00,24.7,92,11.2,0.0,4,31,8,0,Monday,False,False,Moderate,33.9,Moderate,No Rain,False
+2026-08-31 05:00:00,24.8,91,10.5,0.0,5,31,8,0,Monday,False,False,Moderate,33.9,Moderate,No Rain,False
+2026-08-31 06:00:00,25.0,91,9.6,0.0,6,31,8,0,Monday,False,False,Moderate,34.1,Low,No Rain,False
+2026-08-31 07:00:00,25.4,89,9.5,0.0,7,31,8,0,Monday,False,False,Moderate,34.3,Low,No Rain,False
+2026-08-31 08:00:00,26.2,86,10.5,0.1,8,31,8,0,Monday,False,True,Moderate,34.8,Moderate,Light,False
+2026-08-31 09:00:00,27.2,83,12.1,0.1,9,31,8,0,Monday,False,True,Moderate,35.5,Moderate,Light,False
+2026-08-31 10:00:00,28.1,80,13.4,0.1,10,31,8,0,Monday,False,True,Moderate,36.1,Moderate,Light,False
+2026-08-31 11:00:00,29.1,75,14.2,0.1,11,31,8,0,Monday,False,True,Moderate,36.6,Moderate,Light,False
+2026-08-31 12:00:00,30.0,71,15.1,0.1,12,31,8,0,Monday,False,True,Moderate,37.1,Moderate,Light,False
+2026-08-31 13:00:00,30.3,70,15.4,0.1,13,31,8,0,Monday,False,True,Hot,37.3,Moderate,Light,False
+2026-08-31 14:00:00,29.4,75,14.3,1.3,14,31,8,0,Monday,False,True,Moderate,36.9,Moderate,Light,False
+2026-08-31 15:00:00,27.8,84,12.3,1.3,15,31,8,0,Monday,False,True,Moderate,36.2,Moderate,Light,False
+2026-08-31 16:00:00,26.6,91,10.3,1.3,16,31,8,0,Monday,False,True,Moderate,35.7,Moderate,Light,False
+2026-08-31 17:00:00,26.2,93,8.2,1.1,17,31,8,0,Monday,False,True,Moderate,35.5,Low,Light,False
+2026-08-31 18:00:00,26.2,93,6.0,1.1,18,31,8,0,Monday,False,True,Moderate,35.5,Low,Light,False
+2026-08-31 19:00:00,26.1,93,5.0,1.1,19,31,8,0,Monday,False,True,Moderate,35.400000000000006,Low,Light,False
+2026-08-31 20:00:00,26.0,94,6.0,0.1,20,31,8,0,Monday,False,True,Moderate,35.4,Low,Light,False
+2026-08-31 21:00:00,25.9,94,8.2,0.1,21,31,8,0,Monday,False,True,Moderate,35.3,Low,Light,False
+2026-08-31 22:00:00,25.7,94,10.1,0.1,22,31,8,0,Monday,False,True,Moderate,35.1,Moderate,Light,False
+2026-08-31 23:00:00,25.5,94,10.8,0.0,23,31,8,0,Monday,False,False,Moderate,34.9,Moderate,No Rain,False
+2026-09-01 00:00:00,25.3,94,11.3,0.0,0,1,9,1,Tuesday,False,False,Moderate,34.7,Moderate,No Rain,False
+2026-09-01 01:00:00,25.1,94,11.2,0.0,1,1,9,1,Tuesday,False,False,Moderate,34.5,Moderate,No Rain,False
+2026-09-01 02:00:00,25.0,95,10.4,0.0,2,1,9,1,Tuesday,False,False,Moderate,34.5,Moderate,No Rain,False
+2026-09-01 03:00:00,24.8,96,9.3,0.0,3,1,9,1,Tuesday,False,False,Moderate,34.400000000000006,Low,No Rain,False
+2026-09-01 04:00:00,24.9,95,8.5,0.0,4,1,9,1,Tuesday,False,False,Moderate,34.4,Low,No Rain,False
+2026-09-01 05:00:00,25.1,95,9.3,0.0,5,1,9,1,Tuesday,False,False,Moderate,34.6,Low,No Rain,False
+2026-09-01 06:00:00,25.4,93,8.7,0.0,6,1,9,1,Tuesday,False,False,Moderate,34.7,Low,No Rain,False
+2026-09-01 07:00:00,25.9,91,8.6,0.0,7,1,9,1,Tuesday,False,False,Moderate,35.0,Low,No Rain,False
+2026-09-01 08:00:00,26.9,86,9.0,0.1,8,1,9,1,Tuesday,False,True,Moderate,35.5,Low,Light,False
+2026-09-01 09:00:00,28.2,79,10.2,0.1,9,1,9,1,Tuesday,False,True,Moderate,36.1,Moderate,Light,False
+2026-09-01 10:00:00,29.7,72,11.6,0.1,10,1,9,1,Tuesday,False,True,Moderate,36.9,Moderate,Light,False
+2026-09-01 11:00:00,31.2,66,12.9,0.1,11,1,9,1,Tuesday,False,True,Hot,37.8,Moderate,Light,False
+2026-09-01 12:00:00,32.3,62,13.8,0.1,12,1,9,1,Tuesday,False,True,Hot,38.5,Moderate,Light,True
+2026-09-01 13:00:00,32.8,61,13.9,0.1,13,1,9,1,Tuesday,False,True,Hot,38.9,Moderate,Light,True
+2026-09-01 14:00:00,32.5,62,12.9,1.2,14,1,9,1,Tuesday,False,True,Hot,38.7,Moderate,Light,True
+2026-09-01 15:00:00,31.8,66,11.0,1.2,15,1,9,1,Tuesday,False,True,Hot,38.4,Moderate,Light,False
+2026-09-01 16:00:00,30.6,71,8.8,1.2,16,1,9,1,Tuesday,False,True,Hot,37.7,Low,Light,False
+2026-09-01 17:00:00,29.4,77,6.9,1.2,17,1,9,1,Tuesday,False,True,Moderate,37.1,Low,Light,False
+2026-09-01 18:00:00,28.3,84,5.9,1.2,18,1,9,1,Tuesday,False,True,Moderate,36.7,Low,Light,False
+2026-09-01 19:00:00,27.5,88,5.5,1.2,19,1,9,1,Tuesday,False,True,Moderate,36.3,Low,Light,False
+2026-09-01 20:00:00,27.0,90,5.6,0.0,20,1,9,1,Tuesday,False,False,Moderate,36.0,Low,No Rain,False
+2026-09-01 21:00:00,26.7,91,6.1,0.0,21,1,9,1,Tuesday,False,False,Moderate,35.8,Low,No Rain,False
+2026-09-01 22:00:00,26.4,91,6.9,0.0,22,1,9,1,Tuesday,False,False,Moderate,35.5,Low,No Rain,False
+2026-09-01 23:00:00,26.3,91,8.1,0.0,23,1,9,1,Tuesday,False,False,Moderate,35.4,Low,No Rain,False
