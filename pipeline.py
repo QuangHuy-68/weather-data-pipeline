@@ -3,6 +3,7 @@ import subprocess
 import logging
 import argparse
 from pathlib import Path
+from src.notifications.telegram_alert import generate_weather_alert
 
 # ==========================================
 # 1. Logging configuration
@@ -88,7 +89,10 @@ STEP_NAMES = {
     "advanced":     ("Advanced Features", "src/transformation/advanced_features.py"),
     "summary":      ("Daily Summary", "src/analysis/daily_summary.py"),
     "dashboard":    ("Daily Dashboard", "src/analysis/daily_dashboard.py"),
-    "database":     ("Database Storage", "src/storage/database.py")
+    "database":     ("Database Storage", "src/storage/database.py"),
+    "alert":        ("Telegram Weather Alert", "src/notifications/telegram_alert.py"),
+    "ml_train":     ("ML Model Training", "src/ml/train_model.py"),
+    "ml_predict":   ("ML Weather Forecasting", "src/ml/predict_weather.py")
 }
 
 DEFAULT_ORDER = [
@@ -100,7 +104,10 @@ DEFAULT_ORDER = [
     "advanced",
     "summary",
     "dashboard",
-    "database"
+    "database",
+    "alert",
+    "ml_train",
+    "ml_predict"
 ]
 
 def parse_args():

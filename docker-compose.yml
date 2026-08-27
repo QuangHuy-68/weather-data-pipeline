@@ -1,0 +1,16 @@
+version: '3.8'
+
+services: 
+  weather-dashboard:
+    build: .
+    container_name: weather_analytics_app
+    ports: 
+      - "8501:8501"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./database:/app/database
+      - ./logs:/app/logs
+      - ./reports:/app/reports
+    restart: unless-stopped

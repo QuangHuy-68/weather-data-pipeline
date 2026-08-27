@@ -189,6 +189,7 @@ def create_daily_dashboard():
         )
 
         raise
+    
 
 if __name__ == "__main__":
     create_daily_dashboard()

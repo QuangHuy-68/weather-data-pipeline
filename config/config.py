@@ -57,3 +57,10 @@ def get_locations() -> list:
         })
 
     return locations
+
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
+
+MODEL_DIR = "models"
+MODEL_FILE = "models/weather_temp_model.pkl"
+PREDICTIONS_FILE = "data/process/weather_predictions.csv"

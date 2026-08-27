@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from pathlib import Path
-from config.config import DB_PATH, DAILY_SUMMARY_FILE
+from config.config import DB_PATH, DAILY_SUMMARY_FILE, PREDICTIONS_FILE
 
 # ==========================================
 # 1. Configure Streamlit
@@ -136,7 +136,7 @@ st.markdown("---")
 # Interactive Charts
 st.subheader("📈 Weather trend analysis")
 
-tab1, tab2, tab3 = st.tabs(["🌡️ Temperature and Humidity", "🌧️ Precipitation", "💨 Wind"])
+tab1, tab2, tab3, tab4 = st.tabs(["🌡️ Temperature and Humidity", "🌧️ Precipitation", "💨 Wind", "🤖 ML Temperature Forecast" ])
 
 with tab1: 
     fig_temp = go.Figure()
@@ -195,6 +195,49 @@ with tab3:
     )
     st.plotly_chart(fig_wind, width="stretch")
 
+with tab4:
+    st.subheader("🤖 Machine Learning Temperature Forecast (Random Forest)")
+
+    if Path(PREDICTIONS_FILE).exists():
+        df_pred = pd.read_csv(PREDICTIONS_FILE)
+        df_pred["time"] = pd.to_datetime(df_pred["time"])
+
+        if len(date_range) == 2:
+            mask_pred = (df_pred["time"].dt.date >= start_date) & (df_pred["time"].dt.date <= end_date)
+            df_pred = df_pred.loc[mask_pred]
+
+        fig_ml = go.Figure()
+        fig_ml.add_trace(go.Scatter(
+            x=df_pred["time"],
+            y=df_pred["actual_temperature"],
+            mode="lines+markers", 
+            name="Actual Temperature",
+            line=dict(color="#3498db", width=2)
+        ))
+
+        fig_ml.add_trace(go.Scatter(
+            x=df_pred["time"],
+            y=df_pred["predicted_temperature"],
+            mode="lines+markers",
+            name="Forecasted Temperature (AI Predicted)",
+            line=dict(color="#e67e22", width=2, dash="dash")
+        ))
+
+        fig_ml.update_layout(
+            title="Comparison of Actual Temperature vs. Machine Learning Model Forecast (°C)",
+            xaxis_title="Time",
+            yaxis_title="Temperature (°C)",
+            hovermode="x unified", 
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+        )
+
+        st.plotly_chart(fig_ml, width="stretch")
+
+        with st.expander("🔍 View hourly error details (Actual vs. AI Prediction)"):
+            st.dataframe(df_pred, width="stretch")
+
+    else: 
+        st.info("No ML prediction data available. Please run `python pipeline.py --steps ml_train,ml_predict`!")        
 
 st.markdown("---")
 st.subheader("📋 Detail Data")
