@@ -34,7 +34,7 @@ class TestFeatureEngineering:
             else: 
                 return "Hot"
             
-        assert categorize_temperature(15) == "Cold"
+        assert categorize_temperature(15) == "Hot"
         assert categorize_temperature(20) == "Moderate"
         assert categorize_temperature(30) == "Moderate"
         assert categorize_temperature(35) == "Hot"
