@@ -64,3 +64,8 @@ TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
 MODEL_DIR = "models"
 MODEL_FILE = "models/weather_temp_model.pkl"
 PREDICTIONS_FILE = "data/process/weather_predictions.csv"
+
+# === Modern Data Stack (DuckDB & Parquet) ===
+PARQUET_DATA_DIR = "data/parquet"
+PARQUET_FILE = "data/parquet/weather_analytics.parquet"
+DUCKDB_PATH = "database/weather_olap.duckdb"

@@ -2,6 +2,7 @@ import os
 import subprocess 
 import logging
 import argparse
+import sys
 from pathlib import Path
 from src.notifications.telegram_alert import generate_weather_alert
 
@@ -92,7 +93,8 @@ STEP_NAMES = {
     "database":     ("Database Storage", "src/storage/database.py"),
     "alert":        ("Telegram Weather Alert", "src/notifications/telegram_alert.py"),
     "ml_train":     ("ML Model Training", "src/ml/train_model.py"),
-    "ml_predict":   ("ML Weather Forecasting", "src/ml/predict_weather.py")
+    "ml_predict":   ("ML Weather Forecasting", "src/ml/predict_weather.py"),
+    "parquet":      ("DuckDB & Parquet Storage", "src/storage/duckdb_storage.py"),
 }
 
 DEFAULT_ORDER = [
@@ -107,7 +109,8 @@ DEFAULT_ORDER = [
     "database",
     "alert",
     "ml_train",
-    "ml_predict"
+    "ml_predict",
+    "parquet"
 ]
 
 def parse_args():
@@ -149,7 +152,7 @@ def run_step(name, script):
         env["PYTHONPATH"] = str(Path.cwd())
 
         subprocess.run(
-            ["Python", script],
+            [sys.executable, script],
             check=True,
             env=env
         )
