@@ -24,3 +24,12 @@ database/
 data/process/
 data/output/
 node_modules
+# Virtual environments
+.venv/
+.venv-airflow/
+.venv_airflow/
+
+# Airflow generated files
+airflow/airflow.db*
+airflow/logs/
+airflow/simple_auth_manager_passwords.json.generated
