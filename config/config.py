@@ -5,16 +5,17 @@ load_dotenv()
 
 API_URL = "https://api.open-meteo.com/v1/forecast"
 
+
 LATITUDE = float(
-    os.getenv("LATITUDE")
+    os.getenv("LATITUDE", "10.8231")
 )
 
 LONGITUDE = float(
-    os.getenv("LONGITUDE")
+    os.getenv("LONGITUDE", "106.6297")
 )
 
 TIMEZONE = os.getenv(
-    "TIMEZONE"
+    "TIMEZONE", "Asia/Ho_Chi_Minh"
 )
 
 RAW_DATA_DIR = "data/raw"
