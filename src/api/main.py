@@ -25,7 +25,11 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://*.vercel.app", 
+        "*"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -116,7 +120,7 @@ def get_daily_summary(limit: Optional[int] = Query(7, ge=1, le=30, description="
 
 
 @app.get("/weather/forecast", response_model=ForecastResponse, tags=["Machine Learning"])
-def get_ml_forecast(limit: Optional[int] = Query(24, ge=1, le=168, desciption="Number of forecast hours to retrieve")):
+def get_ml_forecast(limit: Optional[int] = Query(24, ge=1, le=168, description="Number of forecast hours to retrieve")):
 
     if not Path(PREDICTIONS_FILE).exists():
         raise HTTPException(status_code=404, detail="Predictions file not found")
