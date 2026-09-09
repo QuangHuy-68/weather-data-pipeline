@@ -63,3 +63,7 @@ urllib3==2.7.0
 uvicorn==0.52.4
 watchdog==6.0.0
 websockets==16.1.1
+
+fastapi>=0.100.0
+uvicorn>=0.23.0
+httpx>=0.24.0
