@@ -21,7 +21,7 @@ export default function Forecast() {
     })) || []
 
     return (
-        <div className="min-h-screen bg-slate-900 text-white p-4">
+        <div className="min-h-screen bg-slate-900 text-white p-4 pb-20">
             <h1 className="text-2xl font-bold text-sky-400 mb-2">🤖 AI Forecast</h1>
             <p className="text-slate-400 text-sm mb-6">24-Hour Temperature Forecasting Using Random Forest Machine Learning</p>
             {loading ? (
