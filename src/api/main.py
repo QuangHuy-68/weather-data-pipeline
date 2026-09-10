@@ -13,6 +13,7 @@ from src.api.schemas import (
     ForecastHourlyItem,
     ForecastResponse
 ) 
+from datetime import datetime 
 
 
 app = FastAPI(
@@ -68,6 +69,8 @@ def get_current_weather():
     if not Path(DB_PATH).exists():
         raise HTTPException(status_code=404, detail="Database not found")
 
+    now_str = datetime.now().strftime("%Y-%m-%dT%H:00")
+
     with sqlite3.connect(DB_PATH) as conn:
         query = """
             SELECT 
@@ -77,10 +80,14 @@ def get_current_weather():
                 wind_speed,
                 precipitation
             FROM weather_data
+            WHERE time <= ?
             ORDER BY time DESC
             LIMIT 1
             """
-        df = pd.read_sql_query(query, conn)
+        df = pd.read_sql_query(query, conn, params=[now_str])
+
+        if df.empty: 
+            df = pd.read_sql_query("SELECT time, temperature, humidity, wind_speed, precipitation FROM weather_data ORDER BY time DESC LIMIT 1", conn)
 
     if df.empty: 
         raise HTTPException(status_code=404, detail="No weather data found")
