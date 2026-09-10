@@ -14,7 +14,7 @@ from src.api.schemas import (
     ForecastResponse
 ) 
 from datetime import datetime 
-
+from zoneinfo import ZoneInfo
 
 app = FastAPI(
     title="🌦️ Weather Data Pipeline & ML Forecast API",
@@ -69,7 +69,7 @@ def get_current_weather():
     if not Path(DB_PATH).exists():
         raise HTTPException(status_code=404, detail="Database not found")
 
-    now_str = datetime.now().strftime("%Y-%m-%dT%H:00")
+    now_str = datetime.now(ZoneInfo("Asia/Ho_Chi_Minh")).strftime("%Y-%m-%dT%H:00")
 
     with sqlite3.connect(DB_PATH) as conn:
         query = """
