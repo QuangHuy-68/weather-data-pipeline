@@ -1,267 +1,152 @@
-# 🌦️ Weather Data Pipeline
 
-An end-to-end weather data pipeline built with Python.
+# 🌦️ End-to-End Weather Data Pipeline & AI Forecasting Platform
 
-This project collects weather data from the Open-Meteo API,
-cleans and validates the data, performs feature engineering,
-creates daily weather summaries, and generates visualizations.
+[![Python CI Pipeline](https://github.com/QuangHuy-68/weather-data-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/QuangHuy-68/weather-data-pipeline/actions)
+[![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688.svg?logo=fastapi&logoColor=white)](https://weather-data-pipeline-er66.onrender.com/docs)
+[![React PWA](https://img.shields.io/badge/React-19_PWA-61DAFB.svg?logo=react&logoColor=black)](https://weather-data-pipeline-one.vercel.app)
+[![Streamlit](https://img.shields.io/badge/Streamlit-Cloud-FF4B4B.svg?logo=streamlit&logoColor=white)](https://weather-data-pipeline-2tnainwikjfawai76ekqqn.streamlit.app)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## 📌 Project Overview
-
-The goal of this project is to build a complete data pipeline
-for collecting and analyzing weather data.
-
-The pipeline automatically:
-
-1. Collects weather data from an API
-2. Stores raw JSON data
-3. Cleans the data
-4. Validates data quality
-5. Performs feature engineering
-6. Creates daily weather summaries
-7. Generates weather visualizations
-8. Logs pipeline execution
-
-## 🏗️ Pipeline Architecture
-
-```text
-Open-Meteo API
-      │
-      ▼
-Raw JSON Data
-      │
-      ▼
-Data Transformation
-      │
-      ▼
-Data Validation
-      │
-      ▼
-Feature Engineering
-      │
-      ▼
-Daily Aggregation
-      │
-      ▼
-Visualization
-      │
-      ▼
-Reports
-```
-
-
-
-GitHub sẽ hiển thị diagram dạng text.
+An enterprise-grade, end-to-end Data Engineering & Machine Learning pipeline that ingests real-time hourly meteorological data, validates data quality, persists across OLTP (SQLite) and OLAP (DuckDB + Parquet) storage, predicts future temperatures using Random Forest regression, orchestrates workflows via Apache Airflow, and serves insights through a FastAPI REST API, a Streamlit analytics dashboard, and an installable React PWA.
 
 ---
 
-# 6. Tech Stack
+## 🌐 Live Demonstrations
 
-Thêm:
-
-```markdown
-## 🛠️ Tech Stack
-
-- Python
-- Requests
-- Pandas
-- Matplotlib
-- JSON
-- pathlib
-- Logging
-- Git & GitHub
-```
-
-
-
-## 📊 Data Source
-
-Weather data is collected from the Open-Meteo API.
-
-The pipeline collects hourly weather data including:
-
-- Temperature
-- Relative humidity
-- Wind speed
-- Precipitation
-
-
-
-## 🔄 Data Pipeline
-
-### 1. Data Ingestion
-
-The pipeline sends a request to the Open-Meteo API
-and saves the response as a raw JSON file.
-
-Raw data is stored in:
-
-data/raw/
-
-
-
-### 2. Data Transformation
-
-Raw JSON data is converted into a Pandas DataFrame.
-
-The pipeline performs:
-
-- Datetime conversion
-- Numeric conversion
-- Duplicate removal
-- Missing value checking
-
-Processed data is saved as:
-
-data/process/weather_cleaned.csv
-
-
-### 3. Data Validation
-
-The pipeline checks data quality including:
-
-- Missing values
-- Invalid temperature values
-- Invalid humidity values
-- Invalid wind speed
-- Invalid precipitation
-- Duplicate timestamps
-- Invalid time intervals
-- Missing timestamps
-
-
-
-### 4. Feature Engineering
-
-The pipeline creates additional features such as:
-
-- hour
-- day
-- month
-- day_of_week
-- day_name
-- is_weekend
-- is_rainy
-- temperature_category
-- temp_humidity_index
-- wind_category
-- rain_intensity
-- is_hot
-
-
-
-### 5. Daily Aggregation
-
-Hourly weather data is aggregated into daily summaries.
-
-Daily metrics include:
-
-- Average temperature
-- Maximum temperature
-- Minimum temperature
-- Average humidity
-- Maximum wind speed
-- Total precipitation
-
-
-
-### 6. Visualization
-
-The pipeline generates daily weather charts:
-
-- Daily temperature
-- Daily humidity
-- Daily precipitation
-
-Charts are saved in:
-
-reports/charts/
-
-
-### 7. Logging
-
-Pipeline execution is recorded using Python's logging module.
-
-Logs are stored in:
-
-logs/pipeline.log
-
-The logs record:
-
-- Pipeline start
-- Pipeline steps
-- Successful steps
-- Failed steps
-- Pipeline completion
-
-
-
-## 📁 Project Structure
-
-```text
-weather-data-pipeline/
-│
-├── data/
-│   ├── raw/
-│   └── process/
-│
-├── logs/
-│   └── pipeline.log
-│
-├── reports/
-│   └── charts/
-│
-├── src/
-│   ├── ingestion/
-│   ├── transformation/
-│   ├── validation/
-│   └── analysis/
-│
-├── pipeline.py
-├── README.md
-├── requirements.txt
-└── .gitignore
-```
-
-
+| Platform                         | Type                                        | URL                                                                                                      |
+| :------------------------------- | :------------------------------------------ | :------------------------------------------------------------------------------------------------------- |
+| **📱 Mobile PWA App**      | Progressive Web App (React 19, TailwindCSS) | [weather-data-pipeline-one.vercel.app](https://weather-data-pipeline-one.vercel.app)                      |
+| **⚡ Production API**      | FastAPI REST API + Interactive Swagger UI   | [weather-data-pipeline-er66.onrender.com/docs](https://weather-data-pipeline-er66.onrender.com/docs)      |
+| **📊 Analytics Dashboard** | Streamlit Interactive Cloud Dashboard       | [weather-data-pipeline.streamlit.app](https://weather-data-pipeline-2tnainwikjfawai76ekqqn.streamlit.app) |
 
 ---
 
-# 14. Installation
+## 🏗️ System Architecture
 
-Bây giờ người khác clone project về thì phải biết cài dependency.
+```mermaid
+flowchart TD
+    subgraph Ingestion ["1. Data Ingestion & Validation"]
+        API["Open-Meteo REST API"] --> Ingest["weather_api.py"]
+        Ingest --> Raw["data/raw/*.json"]
+        Raw --> Transform["transform_weather.py"]
+        Transform --> Validate["validate_weather.py"]
+    end
 
-README:
+    subgraph FeatureEng ["2. Feature Engineering & ML"]
+        Validate --> Features["feature_engineering.py<br/>advanced_features.py"]
+        Features --> CleanCSV["data/process/*.csv"]
+        CleanCSV --> MLTrain["train_model.py<br/>(Random Forest Regressor)"]
+        MLTrain --> ModelPKL["models/*.pkl"]
+        ModelPKL --> MLPredict["predict_weather.py"]
+        MLPredict --> PredCSV["weather_predictions.csv"]
+    end
 
-```markdown
-## ⚙️ Installation
+    subgraph Storage ["3. Modern Data Stack Storage"]
+        Validate --> SQLite[("SQLite OLTP<br/>(weather.db)")]
+        CleanCSV --> DuckDB[("DuckDB OLAP<br/>(weather_olap.duckdb)")]
+        CleanCSV --> Parquet[("Columnar Parquet<br/>(data/parquet)")]
+    end
 
-### 1. Clone the repository
+    subgraph Orchestration ["4. Orchestration & Monitoring"]
+        Airflow["Apache Airflow DAG<br/>(Daily 06:00 AM)"] -.-> Ingestion
+        Airflow -.-> FeatureEng
+        Airflow -.-> Storage
+        CleanCSV --> Telegram["Telegram Bot Alerts<br/>(Daily Morning Summary)"]
+        Cron["GitHub Actions Cron<br/>(Daily 07:00 AM Cloud)"] -.-> Telegram
+    end
 
-```bash
-git clone https://github.com/QuangHuy-68/weather-data-pipeline.git
+    subgraph Delivery ["5. Data Serving & User Applications"]
+        SQLite & PredCSV --> FastAPI["FastAPI REST API<br/>(Deployed on Render)"]
+        CleanCSV & PredCSV --> Streamlit["Streamlit Analytics Dashboard<br/>(Deployed on Streamlit Cloud)"]
+        FastAPI --> ReactPWA["React 19 PWA Web App<br/>(Deployed on Vercel)"]
+    end
 
-cd weather-data-pipeline
+    classDef ing fill:#e1f5fe,stroke:#0288d1,stroke-width:1.5px;
+    classDef fe fill:#f3e5f5,stroke:#7b1fa2,stroke-width:1.5px;
+    classDef stor fill:#e8f5e9,stroke:#388e3c,stroke-width:1.5px;
+    classDef orch fill:#fff3e0,stroke:#f57c00,stroke-width:1.5px;
+    classDef deliv fill:#fce4ec,stroke:#c2185b,stroke-width:1.5px;
+
+    class API,Ingest,Raw,Transform,Validate ing;
+    class Features,CleanCSV,MLTrain,ModelPKL,MLPredict,PredCSV fe;
+    class SQLite,DuckDB,Parquet stor;
+    class Airflow,Telegram,Cron orch;
+    class FastAPI,Streamlit,ReactPWA deliv;
 ```
 
+# 🌦️ End-to-End Weather Data Pipeline & AI Forecasting Platform
 
+[![Python CI Pipeline](https://github.com/QuangHuy-68/weather-data-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/QuangHuy-68/weather-data-pipeline/actions)
+[![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688.svg?logo=fastapi&logoColor=white)](https://weather-data-pipeline-er66.onrender.com/docs)
+[![React PWA](https://img.shields.io/badge/React-19_PWA-61DAFB.svg?logo=react&logoColor=black)](https://weather-data-pipeline-one.vercel.app)
+[![Streamlit](https://img.shields.io/badge/Streamlit-Cloud-FF4B4B.svg?logo=streamlit&logoColor=white)](https://weather-data-pipeline-2tnainwikjfawai76ekqqn.streamlit.app)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+An enterprise-grade, end-to-end Data Engineering & Machine Learning pipeline that ingests real-time hourly meteorological data, validates data quality, persists across OLTP (SQLite) and OLAP (DuckDB + Parquet) storage, predicts future temperatures using Random Forest regression, orchestrates workflows via Apache Airflow, and serves insights through a FastAPI REST API, a Streamlit analytics dashboard, and an installable React PWA.
 
 ---
 
-# 15. Nhưng chúng ta đang thiếu `requirements.txt`
+## 🌐 Live Demonstrations
 
-Bạn kiểm tra:
+| Platform                         | Type                                        | URL                                                                                                      |
+| :------------------------------- | :------------------------------------------ | :------------------------------------------------------------------------------------------------------- |
+| **📱 Mobile PWA App**      | Progressive Web App (React 19, TailwindCSS) | [weather-data-pipeline-one.vercel.app](https://weather-data-pipeline-one.vercel.app)                      |
+| **⚡ Production API**      | FastAPI REST API + Interactive Swagger UI   | [weather-data-pipeline-er66.onrender.com/docs](https://weather-data-pipeline-er66.onrender.com/docs)      |
+| **📊 Analytics Dashboard** | Streamlit Interactive Cloud Dashboard       | [weather-data-pipeline.streamlit.app](https://weather-data-pipeline-2tnainwikjfawai76ekqqn.streamlit.app) |
 
-```powershell
-dir requirements.txt
-```
+---
 
+## 🏗️ System Architecture
 
+```mermaid
+flowchart TD
+    subgraph Ingestion ["1. Data Ingestion & Validation"]
+        API["Open-Meteo REST API"] --> Ingest["weather_api.py"]
+        Ingest --> Raw["data/raw/*.json"]
+        Raw --> Transform["transform_weather.py"]
+        Transform --> Validate["validate_weather.py"]
+    end
 
-## ▶️ Run the Pipeline
+    subgraph FeatureEng ["2. Feature Engineering & ML"]
+        Validate --> Features["feature_engineering.py<br/>advanced_features.py"]
+        Features --> CleanCSV["data/process/*.csv"]
+        CleanCSV --> MLTrain["train_model.py<br/>(Random Forest Regressor)"]
+        MLTrain --> ModelPKL["models/*.pkl"]
+        ModelPKL --> MLPredict["predict_weather.py"]
+        MLPredict --> PredCSV["weather_predictions.csv"]
+    end
 
-From the project root directory:
+    subgraph Storage ["3. Modern Data Stack Storage"]
+        Validate --> SQLite[("SQLite OLTP<br/>(weather.db)")]
+        CleanCSV --> DuckDB[("DuckDB OLAP<br/>(weather_olap.duckdb)")]
+        CleanCSV --> Parquet[("Columnar Parquet<br/>(data/parquet)")]
+    end
 
-```powershell
-python pipeline.py
+    subgraph Orchestration ["4. Orchestration & Monitoring"]
+        Airflow["Apache Airflow DAG<br/>(Daily 06:00 AM)"] -.-> Ingestion
+        Airflow -.-> FeatureEng
+        Airflow -.-> Storage
+        CleanCSV --> Telegram["Telegram Bot Alerts<br/>(Daily Morning Summary)"]
+        Cron["GitHub Actions Cron<br/>(Daily 07:00 AM Cloud)"] -.-> Telegram
+    end
+
+    subgraph Delivery ["5. Data Serving & User Applications"]
+        SQLite & PredCSV --> FastAPI["FastAPI REST API<br/>(Deployed on Render)"]
+        CleanCSV & PredCSV --> Streamlit["Streamlit Analytics Dashboard<br/>(Deployed on Streamlit Cloud)"]
+        FastAPI --> ReactPWA["React 19 PWA Web App<br/>(Deployed on Vercel)"]
+    end
+
+    classDef ing fill:#e1f5fe,stroke:#0288d1,stroke-width:1.5px;
+    classDef fe fill:#f3e5f5,stroke:#7b1fa2,stroke-width:1.5px;
+    classDef stor fill:#e8f5e9,stroke:#388e3c,stroke-width:1.5px;
+    classDef orch fill:#fff3e0,stroke:#f57c00,stroke-width:1.5px;
+    classDef deliv fill:#fce4ec,stroke:#c2185b,stroke-width:1.5px;
+
+    class API,Ingest,Raw,Transform,Validate ing;
+    class Features,CleanCSV,MLTrain,ModelPKL,MLPredict,PredCSV fe;
+    class SQLite,DuckDB,Parquet stor;
+    class Airflow,Telegram,Cron orch;
+    class FastAPI,Streamlit,ReactPWA deliv;
 ```
