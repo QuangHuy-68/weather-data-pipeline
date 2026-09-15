@@ -62,8 +62,9 @@ export default function Home() {
     })) || []
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to slate-950 text-white p-4 pb-24 max-w-md mx-auto">
-            <div className="flex justify-between items-center mb-6 pt-2">
+        <div className="min-h-screen bg-slate-950 text-white">
+            <div className="max-w-3xl mx-auto p-4 md:p-8 pb-28">
+                <div className="flex justify-between items-center mb-6 pt-2">
                 <div>
                     <span className="text-xs font-semibold uppercase tracking-wider text-sky-400 bg-sky-400/10 px-2.5 py-1 rounded-full border border-sky-400/20">📍 Ho Chi Minh City</span>
                     <h1 className="text-2xl font-bold text-white mt-2">Current Weather</h1>
@@ -74,6 +75,8 @@ export default function Home() {
                     <span className="text-xs text-slate-400">Live API</span>
                 </div>
             </div>
+        </div>
+            
 
             {loadingCurrent ? (
                 <div className="animate-pulse bg-slate-800/60 rounded-3xl h-48 border border-slate-700/50 mb-6 flex items-center justify-center">
