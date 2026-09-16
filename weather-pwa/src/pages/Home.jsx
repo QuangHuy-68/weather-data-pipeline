@@ -116,21 +116,21 @@ export default function Home() {
     })) : []
 
     return (
-        <div className="min-h-screen bg-slate-950 text-white">
+        <div className="min-h-screen bg-slate-950 text-white w-full overflow-x-hidden">
             <div className="max-w-3xl mx-auto p-4 md:p-8 pb-28">
                 
                 {/* Header Title & Live API Indicator */}
                 <div className="flex justify-between items-center mb-4 pt-2">
-                    <div>
-                        <span className="text-xs font-semibold uppercase tracking-wider text-sky-400 bg-sky-400/10 px-2.5 py-1 rounded-full border border-sky-400/20">
+                    <div className="min-w-0 pr-2">
+                        <span className="inline-block text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-sky-400/10 px-2.5 py-1 rounded-full border border-sky-400/20 truncate max-w-full">
                             {isGPSActive ? "📍 Your GPS Location" : `📍 ${current?.location || "Vietnam"}`}
                         </span>
-                        <h1 className="text-2xl font-bold text-white mt-2">Current Weather</h1>
+                        <h1 className="text-xl sm:text-2xl font-bold text-white mt-1.5">Current Weather</h1>
                     </div>
 
-                    <div className="text-right">
-                        <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse mr-1.5"></span>
-                        <span className="text-xs text-slate-400">Live API</span>
+                    <div className="flex-shrink-0 text-right flex items-center bg-slate-900/60 px-2.5 py-1 rounded-full border border-slate-800/80">
+                        <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-1.5"></span>
+                        <span className="text-[11px] text-slate-400 font-medium">Live API</span>
                     </div>
                 </div>
 
