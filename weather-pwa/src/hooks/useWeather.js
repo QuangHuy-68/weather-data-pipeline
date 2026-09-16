@@ -76,6 +76,8 @@ export function useWeatherCurrent({ city = 'HCM', lat = null, lon = null } = {})
                 })
         }
     }, [city, lat, lon])
+
+    return { data, loading }
 }
 
 
@@ -157,6 +159,8 @@ export function useWeatherDaily({limit = 7, city = 'HCM', lat = null, lon = null
                 })
         }
     }, [limit, city, lat, lon])
+
+    return { data, loading }
 }
 
 
