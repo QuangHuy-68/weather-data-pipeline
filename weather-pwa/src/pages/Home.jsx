@@ -107,12 +107,12 @@ export default function Home() {
     const alert = getWeatherAlert()
 
     // Format daily data for 7-day charts
-    const formattedDaily = daily?.map(d => ({
+    const formattedDaily = Array.isArray(daily) ? daily.map(d => ({
         ...d,
         shortDate: d.date ? d.date.slice(5) : "", 
         rain: d.total_precipitation ?? 0,
         temp: d.avg_temperature ? Math.round(d.avg_temperature * 10) / 10 : 0 
-    })) || []
+    })) : []
 
     return (
         <div className="min-h-screen bg-slate-950 text-white">
