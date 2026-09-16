@@ -30,15 +30,17 @@ export default function Home() {
         clearCoords 
     } = useGeolocation()
 
+    const isUsingGPS = isGPSActive && coords?.lat != null && coords?.lon != null
+
     // 3. Fetch weather data by selected city or GPS coordinates
     const { 
         data: current,
         loading: loadingCurrent,
         error: currentError 
     } = useWeatherCurrent({
-        city: isGPSActive ? null : selectedCity,
-        lat: isGPSActive ? coords?.lat : null,
-        lon: isGPSActive ? coords?.lon : null
+        city: isUsingGPS ? null : selectedCity,
+        lat: isUsingGPS ? coords?.lat : null,
+        lon: isUsingGPS ? coords?.lon : null
     })
 
     const { 
@@ -46,9 +48,9 @@ export default function Home() {
         loading: loadingDaily 
     } = useWeatherDaily({
         limit: 7,
-        city: isGPSActive ? null : selectedCity,
-        lat: isGPSActive ? coords?.lat : null,
-        lon: isGPSActive ? coords?.lon : null
+        city: isUsingGPS ? null : selectedCity,
+        lat: isUsingGPS ? coords?.lat : null,
+        lon: isUsingGPS ? coords?.lon : null
     })
 
     // Handle city selection
@@ -61,7 +63,6 @@ export default function Home() {
 
     // Handle GPS button click
     const handleSelectGPS = () => {
-        setIsGPSActive(true)
         getLocation()
     }
 
