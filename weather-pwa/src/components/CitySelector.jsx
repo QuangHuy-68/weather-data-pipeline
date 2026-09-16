@@ -20,7 +20,7 @@ export default function CitySelector({
                     type="button"
                     onClick={onSelectGPS}
                     disabled={loadingGPS}
-                    className={`flex-shrink-0 flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border ${isGPSActive
+                    className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium transition-all duration-200 border ${isGPSActive
                         ? "bg-emerald-500 text-white border-emerald-400 shadow-lg shadow-emerald-500/30 scale-105"
                         : "bg-slate-800/80 text-slate-300 border-slate-700/60 hover:bg-slate-700 hover:text-white"
                     }`}
