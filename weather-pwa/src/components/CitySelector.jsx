@@ -15,7 +15,7 @@ export default function CitySelector({
 
     return (
         <div className="mb-6">
-            <div className="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-none" style={{ scrollbarWidth: 'none' }}>
+            <div className="flex flex-wrap items-center gap-2">
                 <button
                     type="button"
                     onClick={onSelectGPS}
