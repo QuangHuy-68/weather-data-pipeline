@@ -44,29 +44,37 @@ export function useNotification() {
     }
 
     // Trigger push notification (prioritizes PWA Service Worker for lock screen delivery)
-        const sendNotification = (title, options = {}) => {
-            if (!supported || Notification.permission !== 'granted') return
+    const sendNotification = (title, options = {}) => {
+        if (!supported || Notification.permission !== 'granted') return
             
-            const defaultOptions = {
-                icon: '/pwa-192x192.png',
-                badge: '/favicon.svg',
-                vibrate: [200, 100, 200],
-                ...options
-            }
+        const defaultOptions = {
+            icon: '/pwa-192x192.png',
+            badge: '/favicon.svg',
+            vibrate: [200, 100, 200],
+            ...options
+        }
 
-            // 1. Standard PWA approach: Use Service Worker for lock screen & background delivery
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.ready
-                    .then(registration => {
-                        registration.showNotification(title,defaultOptions)
-                    })
-                    .catch(() => {
-                        // 2. Fallback to standard desktop Notification API
-                        new Notification(title,defaultOptions)
-                    })
-            } else {
-                new Notification(title, defaultOptions)
+        let shownOnDesktop = false
+        try {
+            const notif = new Notification(title, defaultOptions)
+            notif.onclick = () => {
+                window.focus()
+                notif.close()
             }
+            shownOnDesktop = true
+        } catch (e) {
+            // Mobile Android blocks `new Notification` and requires Service Worker
+            shownOnDesktop = false
+        }
+
+        // 1. Standard PWA approach: Use Service Worker for lock screen & background delivery
+        if ('serviceWorker' in navigator && !shownOnDesktop) {
+            navigator.serviceWorker.getRegistration().then(reg=> {
+                if (reg) {
+                    reg.showNotification(title, defaultOptions)
+                }
+            }).catch(() => {})                    
+        }
     }
 
     return { permission, supported, requestPermission, sendNotification }
