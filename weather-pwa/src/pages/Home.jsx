@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react"
-import { useWeatherCurrent, useWeatherDaily } from "../hooks/useWeather"
+import { useWeatherCurrent, useWeatherDaily, useWeatherHourly } from "../hooks/useWeather"
 import { useGeolocation } from "../hooks/useGeolocation"
 import { useNotification } from "../hooks/useNotification"
 import CitySelector from "../components/CitySelector"
+import HourlyForecast from "../components/HourlyForecast"
 import {
     AreaChart, 
     Area,
@@ -53,6 +54,16 @@ export default function Home() {
         loading: loadingDaily 
     } = useWeatherDaily({
         limit: 7,
+        city: isUsingGPS ? null : selectedCity,
+        lat: isUsingGPS ? coords.lat : null,
+        lon: isUsingGPS ? coords.lon : null
+    })
+
+    // 5. Fetch 24-hour hourly forecast timeline
+    const { 
+        data: hourly,
+        loading: loadingHourly 
+    } = useWeatherHourly({
         city: isUsingGPS ? null : selectedCity,
         lat: isUsingGPS ? coords.lat : null,
         lon: isUsingGPS ? coords.lon : null
@@ -194,7 +205,7 @@ export default function Home() {
                     </div>
                 </div>
 
-                {/* Header Row 2: Full-width Title (Never squeezed or clipped) */}
+                {/* Header Row 2: Full-width Title */}
                 <h1 className="text-2xl sm:text-3xl font-bold text-white mb-4 tracking-tight">
                     Current Weather
                 </h1>
@@ -258,6 +269,9 @@ export default function Home() {
                                 </div>
                             </div>
                         )}
+
+                        {/* ⭐ 24-Hour Hourly Forecast Timeline (Apple Weather Style) ⭐ */}
+                        <HourlyForecast data={hourly} loading={loadingHourly} />
 
                         {/* 4 Detail Metric Cards */}
                         <div className="grid grid-cols-2 gap-3 mb-6">

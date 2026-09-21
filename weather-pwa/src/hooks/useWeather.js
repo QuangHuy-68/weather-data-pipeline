@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { API_BASE_URL } from '../config'
+import { isDataAttribute } from 'recharts/types/util/svgPropertiesNoEvents'
 
 const CITY_COORDS = {
     HCM: { name: "Ho Chi Minh City", lat: 10.8231, lon: 106.6297 },
@@ -176,4 +177,82 @@ export function useForecast(limit = 24) {
     }, [limit])
 
     return { data, loading } 
+}
+
+
+// Helper: Map WMO Weather Code to weather icons (day/night aware)
+export function getWeatherIcon(code, isDay = 1) {
+    if (code === 0) return isDay ? '☀️' : '🌙'
+    if (code >= 1 && code <= 3) return isDay ? '⛅' : '☁️'
+    if (code === 45 || code === 48) return '🌫️'
+    if (code >= 51 && code <= 55) return '🌦️'
+    if (code >= 61 && code <= 65) return '🌧️'
+    if (code >= 80 && code <= 82) return '🌧️'
+    if (code >= 95) return '⛈️'
+    return isDay ? '⛅' : '☁️'
+}
+
+// Hook: Fetch next 24-hour weather forecast timeline
+export function useWeatherHourly ({ city = 'HCM', lat = null, lon = null } = {}) {
+    const [data, setData] = useState([])
+    const[loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        setLoading(true)
+
+        let targetLat = lat
+        let targetLon = lon
+
+        if (targetLat === null || targetLon === null) { 
+            const cityInfo = CITY_COORDS[city] || CITY_COORDS.HCM
+            targetLat = cityInfo.lat
+            targetLon = cityInfo.lon
+        }
+
+        const url = 'https://api.open-meteo.com/v1/forecast?latitude=${targetLat}&longitude=${targetLon}&hourly=temperature_2m,precipitation_probability,precipitation,weather_code&timezone=Asia%2FHo_Chi_Minh&forecast_days=2'
+
+        fetch(url)
+            .then(res => res.json())    
+            .then(json => {
+                const h = json.hourly || {}
+                const times = h.time || []
+                const temps = h.temperature_2m || []
+                const probs = h.precipitation_probability || []
+                const codes = h.weather_code || []
+
+                // Match current hour in local time
+                const now = new Date()
+                const currentHourStr = now.toISOString().slice(0, 13)
+                
+                let startIndex = times.findIndex(t => t.startsWith(currentHourStr))
+                if (startIndex === -1) startIndex = 0 
+
+                // Slice next 24 hours starting from current hour\
+                const next24Hours = []
+                for (let i = startIndex; i < Math.min(startIndex + 24, times.length); i++) {
+                    const timeStr = times[i]
+                    const hourNumber = parseInt(timeStr.slice(11, 13), 10)
+                    const isNow = i === startIndex
+                    const isDay = hourNumber >= 6 && hourNumber < 18 ? 1 : 0
+
+                    next24Hours.push({
+                        time: timeStr,
+                        displayTime: isNow ? 'Now' : `${timeStr.slice(11, 16)}`,
+                        temp: Math.round(temps[i] ?? 0),
+                        rainProb: probs[i] ?? 0,
+                        code: codes[i] ?? 0,
+                        isDay
+                    })
+                }
+
+                setData(next24Hours)
+                setLoading(false)
+            })
+            .catch(() => {
+                setData([])
+                setLoading(false)
+            })
+    }, [city, lat, lon])
+
+    return { data, loading }
 }
