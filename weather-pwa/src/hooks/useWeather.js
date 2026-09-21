@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { API_BASE_URL } from '../config'
-import { isDataAttribute } from 'recharts/types/util/svgPropertiesNoEvents'
 
 const CITY_COORDS = {
     HCM: { name: "Ho Chi Minh City", lat: 10.8231, lon: 106.6297 },
@@ -209,7 +208,7 @@ export function useWeatherHourly ({ city = 'HCM', lat = null, lon = null } = {})
             targetLon = cityInfo.lon
         }
 
-        const url = 'https://api.open-meteo.com/v1/forecast?latitude=${targetLat}&longitude=${targetLon}&hourly=temperature_2m,precipitation_probability,precipitation,weather_code&timezone=Asia%2FHo_Chi_Minh&forecast_days=2'
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${targetLat}&longitude=${targetLon}&hourly=temperature_2m,precipitation_probability,precipitation,weather_code&timezone=Asia%2FHo_Chi_Minh&forecast_days=2`
 
         fetch(url)
             .then(res => res.json())    
