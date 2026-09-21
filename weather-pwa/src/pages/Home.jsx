@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useWeatherCurrent, useWeatherDaily } from "../hooks/useWeather"
 import { useGeolocation } from "../hooks/useGeolocation"
+import { useNotification } from "../hooks/useNotification"
 import CitySelector from "../components/CitySelector"
 import {
     AreaChart, 
@@ -30,17 +31,21 @@ export default function Home() {
         clearCoords 
     } = useGeolocation()
 
+    // 3. Web Push Notification Hook
+    const { permission, requestPermission, sendNotification } = useNotification()
+    const lastAlertKey = useRef("")
+
     const isUsingGPS = isGPSActive && coords?.lat != null && coords?.lon != null
 
-    // 3. Fetch weather data by selected city or GPS coordinates
+    // 4. Fetch weather data by selected city or GPS coordinates
     const { 
         data: current,
         loading: loadingCurrent,
         error: currentError 
     } = useWeatherCurrent({
         city: isUsingGPS ? null : selectedCity,
-        lat: isUsingGPS ? coords?.lat : null,
-        lon: isUsingGPS ? coords?.lon : null
+        lat: isUsingGPS ? coords.lat : null,
+        lon: isUsingGPS ? coords.lon : null
     })
 
     const { 
@@ -49,8 +54,8 @@ export default function Home() {
     } = useWeatherDaily({
         limit: 7,
         city: isUsingGPS ? null : selectedCity,
-        lat: isUsingGPS ? coords?.lat : null,
-        lon: isUsingGPS ? coords?.lon : null
+        lat: isUsingGPS ? coords.lat : null,
+        lon: isUsingGPS ? coords.lon : null
     })
 
     // Handle city selection
@@ -73,7 +78,47 @@ export default function Home() {
         }
     }, [coords])
 
-    // Smart weather alert generator
+    // Handle Alert Bell click: Request permission or send a test notification
+    const handleAlertClick = async () => {
+        if (permission === 'granted') {
+            sendNotification('🔔 Weather Alerts Active', {
+                body: `Notifications are active for ${current?.location || 'your selected location'}.`,
+                icon: '/pwa-192x192.png',
+                badge: '/favicon.svg'
+            })
+        } else {
+            await requestPermission()
+        }
+    }
+
+    // Smart automatic notification trigger when severe weather is detected
+    useEffect(() => {
+        if (!current || permission !== 'granted') return
+
+        const condition = current.precipitation > 0 ? 'rain' : current.temperature >= 33 ? 'heat' : 'normal'
+        const alertKey = `${current.location}_${condition}`
+
+        // Trigger notification only once per weather state change (anti-spam)
+        if (alertKey !== lastAlertKey.current) {
+            lastAlertKey.current = alertKey
+
+            if (current.precipitation > 0) {
+                sendNotification(`🌧️ Rain Alert: ${current.location}`, {
+                    body: `Scattered rain detected (${current.precipitation} mm). Remember your umbrella or raincoat!`,
+                    icon: '/pwa-192x192.png',
+                    badge: '/favicon.svg'
+                })
+            } else if (current.temperature >= 33) {
+                sendNotification(`☀️ Heatwave Warning: ${current.location}`, {
+                    body: `High outdoor temperature of ${current.temperature}°C. Stay hydrated and avoid prolonged sun exposure!`,
+                    icon: '/pwa-192x192.png',
+                    badge: '/favicon.svg'
+                })
+            }
+        }
+    }, [current, permission, sendNotification])
+
+    // Smart weather alert generator for UI banner
     const getWeatherAlert = () => { 
         if (!current) return null
         if (current.precipitation > 0) {
@@ -107,7 +152,7 @@ export default function Home() {
 
     const alert = getWeatherAlert()
 
-    // Format daily data for 7-day charts
+    // Format daily data for 7-day charts (defensive against non-array payloads)
     const formattedDaily = Array.isArray(daily) ? daily.map(d => ({
         ...d,
         shortDate: d.date ? d.date.slice(5) : "", 
@@ -119,20 +164,40 @@ export default function Home() {
         <div className="min-h-screen bg-slate-950 text-white w-full overflow-x-hidden">
             <div className="max-w-3xl mx-auto p-4 md:p-8 pb-28">
                 
-                {/* Header Title & Live API Indicator */}
-                <div className="flex items-center justify-between gap-3 mb-4 pt-2">
-                    <div className="flex-1 min-w-0">
-                        <span className="inline-block text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-sky-400 bg-sky-400/10 px-2.5 py-1 rounded-full border border-sky-400/20">
-                            {isGPSActive ? "📍 Your GPS Location" : `📍 ${current?.location || "Vietnam"}`}
-                        </span>
-                        <h1 className="text-lg sm:text-2xl font-bold text-white mt-1 tracking-tight">Current Weather</h1>
-                    </div>
+                {/* Header Row 1: Location Badge on left, Alert Bell + Live API on right */}
+                <div className="flex items-center justify-between mb-2 pt-2">
+                    <span className="inline-flex items-center text-xs font-semibold uppercase tracking-wider text-sky-400 bg-sky-400/10 px-2.5 py-1 rounded-full border border-sky-400/20">
+                        {isGPSActive ? "📍 Your GPS Location" : `📍 ${current?.location || "Vietnam"}`}
+                    </span>
 
-                    <div className="flex-shrink-0 text-right flex items-center bg-slate-900/80 px-2.5 py-1 rounded-full border border-slate-800/80">
-                        <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-1.5"></span>
-                        <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap">Live API</span>
+                    <div className="flex items-center space-x-2">
+                        {/* Weather Alert Bell Button */}
+                        <button
+                            type="button"
+                            onClick={handleAlertClick}
+                            className={`flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-200 border ${
+                                permission === 'granted'
+                                    ? 'bg-amber-400/15 text-amber-300 border-amber-400/40 hover:bg-amber-400/25 shadow-sm shadow-amber-400/20'
+                                    : 'bg-slate-800/80 text-slate-400 border-slate-700/60 hover:text-white hover:bg-slate-700'
+                            }`}
+                            title={permission === 'granted' ? 'Alerts enabled (Click to test)' : 'Enable push notifications'}
+                        >
+                            <span>{permission === 'granted' ? '🔔' : '🔕'}</span>
+                            <span className="text-[11px]">{permission === 'granted' ? 'Alerts On' : 'Alerts'}</span>
+                        </button>
+
+                        {/* Live API Tag */}
+                        <div className="flex items-center bg-slate-900/80 px-2.5 py-1 rounded-full border border-slate-800/80">
+                            <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-1.5"></span>
+                            <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap">Live API</span>
+                        </div>
                     </div>
                 </div>
+
+                {/* Header Row 2: Full-width Title (Never squeezed or clipped) */}
+                <h1 className="text-2xl sm:text-3xl font-bold text-white mb-4 tracking-tight">
+                    Current Weather
+                </h1>
 
                 {/* City Selector / GPS Navigation Bar */}
                 <CitySelector 
