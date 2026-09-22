@@ -326,8 +326,6 @@ export default function Home() {
                                 <p className="text-[10px] text-slate-500 mt-1">Measured over the past hour</p>
                             </div>
                         </div>
-                        {/* ⭐ Air Quality Index Card (AQI & PM2.5) ⭐ */}
-                        <AirQualityCard data={aqiData} loading={loadingAQI} />
                     </>
                 ) : (
                     <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-4 mb-6 text-red-400 text-sm">
@@ -394,6 +392,9 @@ export default function Home() {
                         </ResponsiveContainer>
                     )}
                 </div>
+
+                {/* ⭐ Air Quality Index Card (AQI & PM2.5) ⭐ */}
+                <AirQualityCard data={aqiData} loading={loadingAQI} />
 
             </div>
         </div>
