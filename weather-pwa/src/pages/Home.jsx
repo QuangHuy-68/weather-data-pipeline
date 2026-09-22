@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react"
-import { useWeatherCurrent, useWeatherDaily, useWeatherHourly } from "../hooks/useWeather"
+import { useWeatherCurrent, useWeatherDaily, useWeatherHourly, useAirQuality } from "../hooks/useWeather"
 import { useGeolocation } from "../hooks/useGeolocation"
 import { useNotification } from "../hooks/useNotification"
 import CitySelector from "../components/CitySelector"
 import HourlyForecast from "../components/HourlyForecast"
+import AirQualityCard from "../components/AirQualityCard"
 import {
     AreaChart, 
     Area,
@@ -64,6 +65,16 @@ export default function Home() {
         data: hourly,
         loading: loadingHourly 
     } = useWeatherHourly({
+        city: isUsingGPS ? null : selectedCity,
+        lat: isUsingGPS ? coords.lat : null,
+        lon: isUsingGPS ? coords.lon : null
+    })
+
+    // 6. Fetch Air Quality Index (AQI & PM2.5)
+    const {
+        data: aqiData,
+        loading: loadingAQI
+    } = useAirQuality({
         city: isUsingGPS ? null : selectedCity,
         lat: isUsingGPS ? coords.lat : null,
         lon: isUsingGPS ? coords.lon : null
@@ -315,6 +326,8 @@ export default function Home() {
                                 <p className="text-[10px] text-slate-500 mt-1">Measured over the past hour</p>
                             </div>
                         </div>
+                        {/* ⭐ Air Quality Index Card (AQI & PM2.5) ⭐ */}
+                        <AirQualityCard data={aqiData} loading={loadingAQI} />
                     </>
                 ) : (
                     <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-4 mb-6 text-red-400 text-sm">

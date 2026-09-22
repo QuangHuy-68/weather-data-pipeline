@@ -255,3 +255,109 @@ export function useWeatherHourly ({ city = 'HCM', lat = null, lon = null } = {})
 
     return { data, loading }
 }
+
+
+// Helper: Determine US AQI health level, colors, and recommendation
+export function getAQILevel(aqi) {
+    if (aqi <=50) { 
+        return {
+            level: 'Good',
+            label: 'Good',
+            color: 'text-emerald-400',
+            bgcolor: 'bg-emerald-500/10',
+            boderColor: 'border-emerald-500/30',
+            advice: 'Air quality is satisfactory, and air polution poses little or no risk.'
+        }
+    }
+
+    if (aqi <=100) {
+        return {
+            level: 'Moderate',
+            label: 'Moderate',
+            color: 'text-amber-400',
+            bgColor: 'bg-amber-500/10',
+            borderColor: 'border-amber-500/30', 
+            advice: 'Air quality is acceptable. Unusually sensitive individuals should monitor symptoms.'
+        }
+    }
+
+    if (aqi <= 150) {
+        return {
+            level: 'Sensitive Groups',
+            label: 'Unhealthy for Sensitive', 
+            color: 'text-orange-400',
+            bgColor: 'bg-orange-500/10',
+            borderColor: 'border-orange-500/30',
+            advice: 'Members of sensitive groups should reduce prolonged or heavy outdoor exertion.'
+        }
+    }
+
+    if (aqi <=200) {
+        return {
+            level: 'Unhealthy',
+            label: 'Unhealthy',
+            color: 'text-rose-500',
+            bgColor: 'bg-rose-500/10',
+            borderColor: 'border-rose-500/30',
+            advice: 'Wear a protective mask (e.g. N95) outdoors and avoid heavy physical exertion.'
+        }
+    }
+
+    return {
+        level: 'Hazardous',
+        label: 'Hazardous',
+        color: 'text-purple-400',
+        bgColor: 'text-purple-500/10',
+        borderColor: 'bg-purple-500/30',
+        advice: 'Avoid all outdoor activities; keep windows closed and run indoor air purifiers.'
+    }
+}
+
+// Hook: Fetch Air Quality Index (AQI, PM2.5, PM10, Ozone)
+export function useAirQuality({ city = 'HCM', lat = null, lon = null } = {}) {
+    const [data, setData] = useState(null)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
+
+    useEffect(() => {
+        setLoading(true)
+        setError(null)
+
+        let targetLat = lat
+        let targetLon = lon
+
+        if (targetLat === null || targetLon === null) { 
+            const cityInfo = CITY_COORDS[city] || CITY_COORDS.HCM
+            targetLat = cityInfo.lat
+            targetLon = cityInfo.lon
+        }
+
+        const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${targetLat}&longitude=${targetLon}&current=us_aqi,pm2_5,pm10,ozone&timezone=Asia%2FHo_Chi_Minh`
+
+        fetch(url) 
+            .then(res => {
+                if (!res.ok) throw new Error(`AQI API Error: ${res.status}`)
+                return res.json()
+            })
+
+            .then(json => {
+                const current = json.current || {}
+                setData({
+                    aqi: Math.round(current.us_aqi ?? 0),
+                    pm2_5: Math.round((current.pm2_5 ?? 0) * 10) / 10,
+                    pm10: Math.round((current.pm10 ?? 0) * 10) / 10,
+                    ozone: Math.round((current.ozone ?? 0) * 10) / 10
+                })
+
+                setLoading(false)
+            })
+
+            .catch(err => {
+                console.error('Failed to fetch AQI:', err)
+                setError(err.message)
+                setLoading(false)
+            })   
+    }, [city, lat, lon])
+
+    return { data, loading, error }
+}
