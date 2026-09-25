@@ -396,6 +396,14 @@ export default function Home() {
                 {/* ⭐ Air Quality Index Card (AQI & PM2.5) ⭐ */}
                 <AirQualityCard data={aqiData} loading={loadingAQI} />
 
+                {/* ⭐ AI Weather Assistant Chatbot (SkyBot) ⭐ */}
+                <ChatAssistant 
+                    current={current}
+                    hourly={hourly}
+                    daily={daily}
+                    aqi={aqiData}
+                    location={current?.location || selectedCity}
+                />
             </div>
         </div>
     )
