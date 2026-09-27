@@ -221,10 +221,18 @@ export function useWeatherHourly ({ city = 'HCM', lat = null, lon = null } = {})
 
                 // Match current hour in local time
                 const now = new Date()
-                const currentHourStr = now.toISOString().slice(0, 13)
+                const year = now.getFullYear()
+                const month = String(now.getMonth() + 1).padStart(2, '0')
+                const day = String(now.getDate()).padStart(2, '0')
+                const hour = String(now.getHours()).padStart(2, '0')
+                const currentHourStr = `${year}-${month}-${day}T${hour}`
                 
                 let startIndex = times.findIndex(t => t.startsWith(currentHourStr))
-                if (startIndex === -1) startIndex = 0 
+                if (startIndex === -1) {
+                    const nowMs = now.getTime()
+                    startIndex = times.findIndex(t => new Date(t).getTime() >= nowMs)
+                    if (startIndex === -1) startIndex = 0
+                }
 
                 // Slice next 24 hours starting from current hour\
                 const next24Hours = []
