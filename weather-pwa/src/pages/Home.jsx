@@ -5,6 +5,7 @@ import { useNotification } from "../hooks/useNotification"
 import CitySelector from "../components/CitySelector"
 import HourlyForecast from "../components/HourlyForecast"
 import AirQualityCard from "../components/AirQualityCard"
+import ChatAssistant from "../components/ChatAssistant"
 import {
     AreaChart, 
     Area,
