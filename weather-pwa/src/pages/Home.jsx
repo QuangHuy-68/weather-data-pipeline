@@ -6,6 +6,7 @@ import CitySelector from "../components/CitySelector"
 import HourlyForecast from "../components/HourlyForecast"
 import AirQualityCard from "../components/AirQualityCard"
 import ChatAssistant from "../components/ChatAssistant"
+import WeatherRadar from "../components/WeatherRadar"
 import {
     AreaChart, 
     Area,
@@ -185,7 +186,7 @@ export default function Home() {
 
     return (
         <div className="min-h-screen bg-slate-950 text-white w-full overflow-x-hidden">
-            <div className="max-w-3xl mx-auto p-4 md:p-8 pb-36">
+            <div className="max-w-3xl mx-auto p-4 md:p-8 pb-28">
                 
                 {/* Header Row 1: Location Badge on left, Alert Bell + Live API on right */}
                 <div className="flex items-center justify-between mb-2 pt-2">
@@ -393,6 +394,13 @@ export default function Home() {
                         </ResponsiveContainer>
                     )}
                 </div>
+
+                {/* ⭐ Live Weather Radar Map (RainViewer) ⭐ */}
+                <WeatherRadar 
+                    lat={isUsingGPS ? coords.lat : current?.lat} 
+                    lon={isUsingGPS ? coords.lon : current?.lon}
+                    locationName={current?.location || selectedCity}
+                />
 
                 {/* ⭐ Air Quality Index Card (AQI & PM2.5) ⭐ */}
                 <AirQualityCard data={aqiData} loading={loadingAQI} />
