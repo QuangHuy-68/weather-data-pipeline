@@ -184,7 +184,7 @@ export default function Home() {
 
     return (
         <div className="min-h-screen bg-slate-950 text-white w-full overflow-x-hidden">
-            <div className="max-w-3xl mx-auto p-4 md:p-8 pb-28">
+            <div className="max-w-3xl mx-auto p-4 md:p-8 pb-36">
                 
                 {/* Header Row 1: Location Badge on left, Alert Bell + Live API on right */}
                 <div className="flex items-center justify-between mb-2 pt-2">
@@ -367,7 +367,7 @@ export default function Home() {
                 </div>
 
                 {/* Chart 2: Daily Rainfall */}
-                <div className="bg-slate-800/40 backdrop-blur-md rounded-3xl p-4 border border-slate-700/50">
+                <div className="bg-slate-800/40 backdrop-blur-md rounded-3xl p-4 border border-slate-700/50 mb-6">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-sm font-semibold text-slate-200 flex items-center">
                             <span className="mr-2">🌧️</span>
