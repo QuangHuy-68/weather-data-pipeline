@@ -27,9 +27,8 @@ export default function WeatherRadar({ lat = 10.8231, lon = 106.6297, locationNa
         })
 
         // Dark Matter Base Map (CartoDB) - matches dark UI theme
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            maxZoom: 19,
-            subdomains: 'abcd'
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 16,
         }).addTo(map)
 
         // Pulsing location marker pin
