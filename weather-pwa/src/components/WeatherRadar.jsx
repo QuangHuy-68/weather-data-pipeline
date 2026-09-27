@@ -5,7 +5,7 @@ import 'leaflet/dist/leaflet.css'
 export default function WeatherRadar({ lat = 10.8231, lon = 106.6297, locationName = 'Location' }) {
     const mapRef = useRef(null)
     const mapInstance = useRef(null)
-    const raderLayerRef = useRef(null)
+    const radarLayerRef = useRef(null)
     const markerRef = useRef(null)
 
     const [frames, setFrames] = useState([])
@@ -19,7 +19,7 @@ export default function WeatherRadar({ lat = 10.8231, lon = 106.6297, locationNa
         if (!mapRef.current || mapInstance.current) return
 
         // Create Leaflet map centered at selected coordinates
-        const map =L.map(mapRef,current, { 
+        const map =L.map(mapRef.current, { 
             center: [lat, lon],
             zoom: 7,
             zoomControl: false,
@@ -69,7 +69,7 @@ export default function WeatherRadar({ lat = 10.8231, lon = 106.6297, locationNa
             .then(data => {
                 if (data && data.radar && data.radar.past) {
                     setHost(data.host || 'https://tilecache.rainviewer.com')
-                    const allFrames = [...data.radar.past, ...L(data.radar.nowcast || [])]
+                    const allFrames = [...data.radar.past, ...(data.radar.nowcast || [])]
 
                     setFrames(allFrames)
                     setCurrentFrameIndex(allFrames.length - 1)
