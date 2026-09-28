@@ -150,16 +150,14 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
             {!isOpen && (
                 <button 
                     onClick={() => setIsOpen(true)}
-                    className="fixed bottom-20 right-4 z-40 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white rounded-full p-3.5 shadow-2xl shadow-sky-500/30 border border-sky-400/40 flex items-center space-x-2 transition-all transform hover:scale-105 active:scale-95"
+                    className="fixed bottom-20 right-4 z-40 bg-slate-900/90 hover:bg-slate-800 text-slate-200 hover:text-white rounded-full px-3.5 py-1.5 shadow-xl shadow-black/60 border border-slate-700/70 backdrop-blur-md flex items-center space-x-2 transition-all transform hover:scale-105 active:scale-95"
                     aria-label="Open AI Assistant"
                 >
-                    <span className="text-xl">🤖</span>
-                    <span className="text-xs font-semibold pr-1 hidden sm:inline">Ask SkyBot</span>
-
+                    <span className="text-xs font-medium tracking-wide">Ask SkyBot</span>
                     {/* Pulsing online indicator badge */}
-                    <span className="relative flex h-2.5 w-2.5">
+                    <span className="relative flex h-2 w-2">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
                     </span>
                 </button>
             )}
