@@ -1,25 +1,25 @@
 import { useState, useRef, useEffect } from 'react'
 
-export default function chatAssistant({ current, hourly = [], daily = [], aqi, location }) {
+export default function ChatAssistant({ current, hourly = [], daily = [], aqi, location }) {
     const [isOpen, setIsOpen] = useState(false)
     const [showSettings, setShowSettings] = useState(false)
-
+    
     // API Key persisted in LocalStorage with fallback to Vite env
     const [apiKey, setApiKey] = useState(() => {
-        return localStorage.getItem('skybot_gemini_key') || import.meta.env.VITE_GEMINI_API_KEY || ''
+        return localStorage.getItem('skybot_gemini_api_key') || import.meta.env.VITE_GEMINI_API_KEY || ''
     })
-
     const [keyInput, setKeyInput] = useState('')
     const [keyStatusMessage, setKeyStatusMessage] = useState('')
+    const [isValidatingKey, setIsValidatingKey] = useState(false)
 
-    const [messages, setMessage] = useState([
+    const [messages, setMessages] = useState([
         {
             sender: 'bot', 
-            text: `Hi! I am SkyBot, your AI weather assistant. Ask me anything about rain chances, clothing advive, outdoor workouts, or the weekly forecast for ${location || 'your city'}!`
+            text: `Hi! I am SkyBot, your AI weather assistant. Ask me anything about rain probability, outfit suggestions, outdoor activities, or air quality for ${location || 'your city'}!`
         }
     ])
     const [input, setInput] = useState('')
-    const[isTyping, setIsTyping] = useState(false)
+    const [isTyping, setIsTyping] = useState(false)
     const messagesEndRef = useRef(null)
 
     // Auto-scroll to latest message
@@ -29,27 +29,61 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
         }
     }, [messages, isOpen, isTyping])
 
-    // Save or clear API Key
-    const handleSaveKey = (e) => {
+    // Test and save API Key
+    const handleSaveKey = async (e) => {
         e.preventDefault()
-        const trimmed = keyInput.trim()
-        if (trimmed) {
-            localStorage.setItem('skybot_gemini_api_key', trimmed)
-            setApiKey(trimmed)
-            setKeyStatusMessage('API Key saved successfully! Gemini 1.5 Flash is now active.')
-        } else {
+        // Clean key: remove whitespace and accidental surrounding quotes
+        const trimmed = keyInput.trim().replace(/^["']|["']$/g, '')
+        
+        if (!trimmed) {
             localStorage.removeItem('skybot_gemini_api_key')
             setApiKey('')
-            setKeyStatusMessage('API Key removed. Skybot switched to Local engine.')
+            setKeyStatusMessage('API Key removed. SkyBot switched to Local Engine.')
+            setTimeout(() => {
+                setKeyStatusMessage('')
+                setShowSettings(false)
+            }, 1200)
+            return
         }
 
-        setTimeout(() => {
-            setKeyStatusMessage('')
-            setShowSettings(false)
-        }, 1200)
+        setIsValidatingKey(true)
+        setKeyStatusMessage('Testing connection to Google Gemini...')
+
+        try {
+            // Test ping to verify key validity
+            const testRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${trimmed}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: 'Hello' }] }]
+                })
+            })
+
+            const testData = await testRes.json()
+
+            if (!testRes.ok) {
+                const errMsg = testData?.error?.message || `HTTP ${testRes.status}`
+                setKeyStatusMessage(`❌ Error: ${errMsg}`)
+                setIsValidatingKey(false)
+                return
+            }
+
+            // Successfully validated
+            localStorage.setItem('skybot_gemini_api_key', trimmed)
+            setApiKey(trimmed)
+            setKeyStatusMessage('✅ Verified! Gemini 1.5 Flash is ready.')
+            setTimeout(() => {
+                setKeyStatusMessage('')
+                setShowSettings(false)
+            }, 1200)
+        } catch (err) {
+            setKeyStatusMessage(`❌ Network error: ${err.message}`)
+        } finally {
+            setIsValidatingKey(false)
+        }
     }
 
-    const handleClearChat = () => { 
+    const handleClearChat = () => {
         setMessages([
             {
                 sender: 'bot',
@@ -62,7 +96,7 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
     const suggestions = [
         { label: '☔ Need umbrella?', query: 'Do I need an umbrella today?' },
         { label: '👕 What to wear?', query: 'What should I wear today?' },
-        { label: '🏃 Workout?', query: 'Is the weather good for outdoor running or exercise?' },
+        { label: '🏃 Workout?', query: 'Is the weather good for outdoor exercise?' },
         { label: '🍃 Air quality?', query: 'How is the air quality right now?' },
         { label: '📅 Weekend outlook', query: 'What is the upcoming forecast outlook?' }
     ]
@@ -71,41 +105,43 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
     const generateBotResponse = async (userQuery) => {
         const q = userQuery.toLowerCase()
 
-        // 1. Check if user configured an external Gemini API key
+        // 1. Try Google Gemini 1.5 Flash if API Key is configured
         const activeKey = apiKey || import.meta.env.VITE_GEMINI_API_KEY
         if (activeKey) {
-            try { 
+            try {
                 const next12Hours = hourly.slice(0, 12)
                 const maxRainChance = Math.max(...next12Hours.map(h => h.rainProb || 0), 0)
-                const upcomingOutlook = daily && daily.length > 0
+                const upcomingOutlook = daily && daily.length > 0 
                     ? daily.slice(0, 3).map(d => `${d.day_name || 'Day'}: ${Math.round(d.avg_temp || 28)}°C, ${d.precipitation || 0}mm rain`).join('; ')
                     : 'Stable conditions'
+
                 const weatherContext = `
-                    Location:  ${location || 'Selected Station'}
-                    Current Temperature: ${current?.temperature ?? '--'}°C
-                    Relative Humidity: ${current?.humidity ?? '--'}%
-                    Wind Speed: ${current?.wind_speed ?? 0} km/h
-                    Precipitation right now: ${current?.precipitation ?? 0} mm
-                    Peak Rain Probability in next 12 hours: ${maxRainChance}%
-                    Air Quality Index: US-EPA AQI ${aqi?.aqi ?? 'N/A'} (PM2.5: ${aqi?.pm2_5 ?? 'N/A'} µg/m³)
-                    Next days outlook: ${upcomingOutlook}
+Active Station Location: ${location || 'Selected Station'}
+Current Temperature: ${current?.temperature ?? '--'}°C
+Relative Humidity: ${current?.humidity ?? '--'}%
+Wind Speed: ${current?.wind_speed ?? 0} km/h
+Precipitation right now: ${current?.precipitation ?? 0} mm
+Peak Rain Probability in next 12 hours: ${maxRainChance}%
+Air Quality Index: US-EPA AQI ${aqi?.aqi ?? 'N/A'} (PM2.5: ${aqi?.pm2_5 ?? 'N/A'} µg/m³)
+Next days outlook: ${upcomingOutlook}
                 `.trim()
 
-                const systemPrompt =  `You are SkyBot, an ultra-smart, friendly meteorological AI assistant built for the SkyPulse weather app.
-                    You analyze real-time meteorological conditions and provide accurate, direct, and actionable advice (clothing, commute, outdoor activities, health, rain timing).
-                    Rules:
-                        1. If the user asks in Vietnamese, reply in natural, fluent Vietnamese. If asked in English, reply in English.
-                        2. Keep answers concise (2-4 sentences max), conversational, and actionable.
-                        3. Use appropriate weather emojis (☀️, 🌧️, 🧥, 🏃, 💨, 🍃).
-                        4. Rely strictly on the provided real-time data.`
-                
+                const systemPrompt = `You are SkyBot, an ultra-smart, friendly meteorological AI assistant built for the SkyPulse weather app.
+Guidelines:
+1. The currently active app station data is for "${location || 'Current City'}".
+2. If the user asks about the weather in ANOTHER city (e.g. Thai Binh, Hanoi, Da Nang, Tokyo, Paris):
+   - Answer their question using your general meteorological knowledge about that location.
+   - Gently remind them they can search and select that city in the app's top search bar to view its live Doppler radar, AQI, and hourly forecast.
+3. If the user asks in Vietnamese, reply in fluent, friendly Vietnamese. If asked in English, reply in English.
+4. Keep answers concise (2-4 sentences max), engaging, and helpful with appropriate weather emojis (☀️, 🌧️, 🧥, 🏃, 💨, 🍃).`
+
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${activeKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: [{
                             parts: [{
-                                text: `${systemPrompt}\n\n[REAL-TIME WEATHER DATA]:\n${weatherContext}\n\n[USER QUESTION]:\n"${userQuery}"`
+                                text: `${systemPrompt}\n\n[REAL-TIME APP CONTEXT]:\n${weatherContext}\n\n[USER QUESTION]:\n"${userQuery}"`
                             }]
                         }],
                         generationConfig: {
@@ -115,18 +151,20 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
                     })
                 })
 
+                const result = await res.json()
+
                 if (!res.ok) {
-                    throw new Error(`Gemini API error status: ${res.status}`)
+                    const errorDetail = result?.error?.message || `HTTP ${res.status}`
+                    return `⚠️ Gemini API Error: ${errorDetail}. Click ⚙️ to update your API key, or remove it to use the offline engine.`
                 }
 
-                const result = await res.json()
                 const reply = result?.candidates?.[0]?.content?.parts?.[0]?.text
-
                 if (reply && reply.trim()) {
                     return reply.trim()
                 }
             } catch (err) {
                 console.warn('Gemini 1.5 Flash unavailable, falling back to Local Engine:', err)
+                return `⚠️ Connection Error: Unable to reach Gemini API (${err.message}). Falling back to local offline engine.`
             }
         }
 
@@ -137,15 +175,14 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
             const maxProb = Math.max(...next12Hours.map(h => h.rainProb || 0), 0)
 
             if (current?.precipitation > 0) {
-                return `🌧️ It is currently raining (${current.precipitation} mm) in ${location || `your area`}. You will definitely need an umbrella or raincoat!`
+                return `🌧️ It is currently raining (${current.precipitation} mm) in ${location || 'your area'}. You will definitely need an umbrella or raincoat!`
             } else if (rainySlot) {
-                return `☔ Rain is probable today! The rain chance peaks at around ${maxProb}% at ${rainySlot.displayTime}. It is strongly recommended to carry an umbrella.`
+                return `☔ Rain is probable today! Rain chance peaks at around ${maxProb}% at ${rainySlot.displayTime}. It is strongly recommended to carry an umbrella.`
             } else {
                 return `☀️ Low chance of rain today (peak probability is only ${maxProb}%). You likely won't need an umbrella, but stay alert for quick sky changes!`
             }
         }
 
-        // Outfit / Clothing queries
         if (q.includes('wear') || q.includes('outfit') || q.includes('cloth') || q.includes('mặc')) {
             const temp = current?.temperature ?? 28
             if (temp >= 33) { 
@@ -159,7 +196,6 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
             }
         }
 
-        // Workout / Exercise queries
         if (q.includes('workout') || q.includes('run') || q.includes('exercise') || q.includes('chạy') || q.includes('thể dục')) {
             const temp = current?.temperature ?? 28
             const aqiVal = aqi?.aqi ?? 50
@@ -168,7 +204,7 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
             if (isRaining) {
                 return `🌧️ Outdoor workouts are not recommended right now due to ongoing rain. Consider doing an indoor session instead.`
             } else if (aqiVal > 100) {
-                return `⚠️ Air quality is currently degraded (US AQI: ${aqiVal}). Sensitive groups should avoid intense outdoor cardio; an indoor gym workout is preferred.`
+                return `⚠️ Air quality is degraded (US AQI: ${aqiVal}). Sensitive groups should avoid intense outdoor cardio; an indoor workout is preferred.`
             } else if (temp > 34) { 
                 return `🔥 High heat warning (${temp}°C). Postpone vigorous outdoor running until early morning or late evening to prevent heat exhaustion.`
             } else {
@@ -176,24 +212,20 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
             }
         }
 
-        // Air Quality queries
         if (q.includes('air') || q.includes('aqi') || q.includes('pm2.5') || q.includes('không khí') || q.includes('pollution')) {
             if (!aqi) return `🍃 Air quality sensor data is currently synchronizing for ${location || 'your location'}.`
             return `🍃 Current US AQI is ${aqi.aqi}. Fine dust PM2.5 is ${aqi.pm2_5} µg/m³ and PM10 is ${aqi.pm10} µg/m³. Maintain normal ventilation if AQI is below 100.`
         }
 
-        // Weekend / Weekly outlook
         if (q.includes('weekend') || q.includes('week') || q.includes('outlook') || q.includes('forecast') || q.includes('mai') || q.includes('tuần')) {
             if (daily && daily.length > 0) {
                 const nextDay = daily[0]
                 return `📅 Outlook: Tomorrow's expected average temperature is around ${Math.round(nextDay.avg_temp || nextDay.temperature || 28)}°C with ${nextDay.precipitation || 0}mm rainfall. The general trend for the week remains steady.`
             }
-
             return `📅 Over the next few days, expect steady seasonal temperatures around ${current?.temperature || 30}°C.`
         }
 
-        // Default greeting / Summary
-        return `🤖 At ${location || 'your station'}, current temperature is ${current?.temperature || '--'}°C with ${current?.humidity || '--'}% humidity and wind at ${current?.wind_speed || 0} km/h. Feel free to ask about rain risks, clothing, or exercise recommendations!`
+        return `🤖 In ${location || 'your station'}, current temperature is ${current?.temperature || '--'}°C with ${current?.humidity || '--'}% humidity and wind at ${current?.wind_speed || 0} km/h. To check another city, type its name in the top search bar!`
     }
 
     // Handle user message submission
@@ -202,16 +234,16 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
         if (!textToSend || isTyping) return 
 
         const userMSG = { sender: 'user', text: textToSend }
-        setMessage(prev => [...prev, userMSG])
+        setMessages(prev => [...prev, userMSG])
         setInput('')
         setIsTyping(true)
 
-        try { 
+        try {
             const botReplyText = await generateBotResponse(textToSend)
-            setMessage(prev => [...prev, { sender: 'bot', text: botReplyText }])
+            setMessages(prev => [...prev, { sender: 'bot', text: botReplyText }])
         } catch (err) {
-            setMessage(prev => [...prev, { sender: 'bot', text: '⚠️ Unable to process query. Please check connection or try again.' }])
-        } finally { 
+            setMessages(prev => [...prev, { sender: 'bot', text: '⚠️ Unable to process query. Please check connection or try again.' }])
+        } finally {
             setIsTyping(false)
         }
     }
@@ -220,7 +252,7 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
         <>
             {/* Floating Action Button (FAB) */}
             {!isOpen && (
-                 <button 
+                <button 
                     onClick={() => setIsOpen(true)}
                     className="fixed bottom-20 right-4 z-40 bg-slate-800/95 hover:bg-slate-700 text-white rounded-full px-3.5 py-1.5 shadow-lg shadow-black/80 border border-slate-600/80 hover:border-slate-500 backdrop-blur-xl flex items-center space-x-2 transition-all transform hover:scale-105 active:scale-95"
                     aria-label="Open AI Assistant"
@@ -243,6 +275,7 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
                             <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-base shadow-inner">
                                 🤖
                             </div>
+
                             <div>
                                 <h3 className="text-sm font-bold text-white leading-tight">SkyBot AI</h3>
                                 <p className="text-[10px] flex items-center">
@@ -260,6 +293,7 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
                                 </p>
                             </div>
                         </div>
+
                         {/* Top Action Buttons */}
                         <div className="flex items-center space-x-1">
                             {/* Settings button */}
@@ -273,6 +307,7 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
                             >
                                 ⚙️
                             </button>
+
                             {/* Clear conversation button */}
                             <button
                                 onClick={handleClearChat}
@@ -281,6 +316,7 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
                             >
                                 🗑️
                             </button>
+
                             {/* Close drawer button */}
                             <button 
                                 onClick={() => setIsOpen(false)}
@@ -291,6 +327,7 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
                             </button>
                         </div>
                     </div>
+
                     {/* Settings Panel Overlay */}
                     {showSettings && (
                         <div className="bg-slate-800/95 border-b border-slate-700/80 p-3.5 text-xs text-slate-300 animate-in fade-in duration-200">
@@ -307,25 +344,28 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
                                 </button>
                             </div>
                             <p className="text-[11px] text-slate-400 mb-2 leading-relaxed">
-                                Enter your free Gemini key to enable generative reasoning. It is stored securely in your browser's LocalStorage.
+                                Get your free key at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-sky-400 underline">aistudio.google.com</a>. Saved securely in your browser's LocalStorage.
                             </p>
                             <form onSubmit={handleSaveKey} className="space-y-2">
                                 <input
-                                    type="password"
+                                    type="text"
                                     value={keyInput}
                                     onChange={(e) => setKeyInput(e.target.value)}
-                                    placeholder="Paste Gemini API Key (AIzaSy...)"
-                                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-sky-400"
+                                    placeholder="Paste Gemini Key (AIzaSy...)"
+                                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-sky-400 font-mono"
                                 />
                                 {keyStatusMessage && (
-                                    <p className="text-[11px] text-sky-400 font-medium">{keyStatusMessage}</p>
+                                    <p className={`text-[11px] font-medium ${keyStatusMessage.startsWith('✅') ? 'text-emerald-400' : keyStatusMessage.startsWith('❌') ? 'text-red-400' : 'text-sky-400'}`}>
+                                        {keyStatusMessage}
+                                    </p>
                                 )}
                                 <div className="flex space-x-2 pt-1">
                                     <button
                                         type="submit"
-                                        className="flex-1 bg-sky-600 hover:bg-sky-500 text-white py-1 rounded-lg font-medium transition-colors"
+                                        disabled={isValidatingKey}
+                                        className="flex-1 bg-sky-600 hover:bg-sky-500 disabled:opacity-50 text-white py-1 rounded-lg font-medium transition-colors"
                                     >
-                                        Save Key
+                                        {isValidatingKey ? 'Testing Key...' : 'Test & Save Key'}
                                     </button>
                                     {apiKey && (
                                         <button
@@ -346,12 +386,14 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
                             </form>
                         </div>
                     )}
+
                     {/* Live Context Banner */}
                     <div className="bg-slate-950/50 px-4 py-1.5 border-b border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
                         <span>📍 {location || 'Current City'}</span>
                         <span>{current?.temperature ?? '--'}°C · {current?.precipitation > 0 ? '🌧️ Rain' : '🌤️ Dry'}</span>
                         {aqi && <span className="text-emerald-400">AQI: {aqi.aqi}</span>}
                     </div>
+
                     {/* Messages Container */}
                     <div className="flex-1 p-3.5 overflow-y-auto space-y-3 scrollbar-none text-xs">
                         {messages.map((m, idx) => (
@@ -370,6 +412,7 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
                                 </div>
                             </div>
                         ))}
+
                         {/* Typing indicator bubble */}
                         {isTyping && (
                             <div className="flex justify-start">
@@ -380,8 +423,10 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
                                 </div>
                             </div>
                         )}
+
                         <div ref={messagesEndRef} />
                     </div>
+
                     {/* Quick Suggestion Chips */}
                     <div className="px-3 py-1.5 border-t border-slate-800/60 flex items-center space-x-1.5 overflow-x-auto scrollbar-none bg-slate-950/40">
                         {suggestions.map((s, idx) => (
@@ -394,6 +439,7 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
                             </button>
                         ))}
                     </div>
+
                     {/* Input Bar */}
                     <form 
                         onSubmit={(e) => {
@@ -406,9 +452,10 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            placeholder="Ask about rain, outfit, workout..."
+                            placeholder="Ask about rain, outfit, other cities..."
                             className="flex-1 bg-slate-800/90 text-white placeholder-slate-500 text-xs rounded-xl px-3 py-2 border border-slate-700/60 focus:outline-none focus:border-sky-400"
                         />
+
                         <button 
                             type="submit"
                             disabled={!input.trim() || isTyping}
