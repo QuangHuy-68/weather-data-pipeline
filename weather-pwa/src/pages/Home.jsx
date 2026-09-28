@@ -142,12 +142,14 @@ export default function Home() {
         }
     }, [current, permission, sendNotification])
 
-    // Smart weather alert generator for UI banner
+    // Smart weather alert generator for UI banner (synced with hourly rain probability)
     const getWeatherAlert = () => { 
         if (!current) return null
+
         // Check current rain precipitation or high rain probability in current hour
         const currentRainProb = hourly?.[0]?.rainProb || 0
         const isRainingOrLikely = current.precipitation > 0 || currentRainProb >= 40
+
         if (isRainingOrLikely) {
             return {
                 type: "rain",
@@ -159,6 +161,7 @@ export default function Home() {
                     : `Rain probability is high (${currentRainProb}%). It is strongly recommended to carry rain gear!`
             }
         }
+
         if (current.temperature >= 33) {
             return {
                 type: "hot",
@@ -168,6 +171,7 @@ export default function Home() {
                 desc: "Outdoor temperature is quite high. Remember to apply sunscreen and stay hydrated!"
             }
         }
+
         return {
             type: "good",
             bg: "bg-emerald-500/20 border-emerald-500/40 text-emerald-300", 
