@@ -24,7 +24,7 @@ export default function HourlyForecast({ data = [], loading = false }) {
                  style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
             >
                 {data.map((item, index) => {
-                    const icon = getWeatherIcon(item.code, item.isDay)
+                    const icon = getWeatherIcon(item.code, item.isDay, item.rainProb)
                     const isNow = item.displayTime === 'Now'
 
                     return (

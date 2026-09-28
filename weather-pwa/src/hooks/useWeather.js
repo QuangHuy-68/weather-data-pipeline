@@ -179,15 +179,32 @@ export function useForecast(limit = 24) {
 }
 
 
-// Helper: Map WMO Weather Code to weather icons (day/night aware)
-export function getWeatherIcon(code, isDay = 1) {
+// Helper: Map WMO Weather Code and Rain Probability to weather icons (day/night & probability aware)
+export function getWeatherIcon(code, isDay = 1, rainProb = 0) { 
+    // 1. Severe weather / Thunderstorm
+    if (code >= 95) return '⛈️'
+
+    // 2. Low rain probability (< 30%): Show sun or partly cloudy instead of rain
+    if (rainProb < 30) {
+        if (code === 0) return isDay ? '☀️' : '🌙'
+        if (code === 45 || code === 48) return '🌫️'
+        return isDay ? '⛅' : (code === 0 ? '🌙' : '☁️')
+    }
+
+    // 3. High rain probability (>= 70%) or heavy rain codes
+    if (rainProb >= 70 || (code >= 61 && code <= 65) || (code >=80 && code <= 82)) {
+        return '🌧️'
+    }
+
+    // 4. Moderate rain probability (30% - 69%) or light showers
+    if (rainProb >= 30 || (code >= 51 && code <= 55)) {
+        return isDay ? '🌦️' : '🌧️'
+    }
+
+    // 5. Default by WMO Code
     if (code === 0) return isDay ? '☀️' : '🌙'
     if (code >= 1 && code <= 3) return isDay ? '⛅' : '☁️'
     if (code === 45 || code === 48) return '🌫️'
-    if (code >= 51 && code <= 55) return '🌦️'
-    if (code >= 61 && code <= 65) return '🌧️'
-    if (code >= 80 && code <= 82) return '🌧️'
-    if (code >= 95) return '⛈️'
     return isDay ? '⛅' : '☁️'
 }
 
