@@ -64,7 +64,7 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
         if (q.includes('umbrella') || q.includes('rain') || q.includes('mưa') || q.includes('dù') || q.includes('ô')) {
             const next12Hours = hourly.slice(0, 12)
             const rainySlot = next12Hours.find(h => h.rainProb >= 30)
-            const maxProb = Math.maxx(...next12Hours.map(h => h.rainProb || 0), 0)
+            const maxProb = Math.max(...next12Hours.map(h => h.rainProb || 0), 0)
 
             if (current?.precipitation > 0) {
                 return `🌧️ It is currently raining (${current.precipitation} mm) in ${location || `your area`}. You will definitely need an umbrella or raincoat!`
@@ -107,7 +107,7 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
         }
 
         // Air Quality queries
-        if (q.includes('air') || q.includes('aqi') || q,includes('pm2.5') || q.includes('không khí') || q.includes('pollution')) {
+        if (q.includes('air') || q.includes('aqi') || q.includes('pm2.5') || q.includes('không khí') || q.includes('pollution')) {
             if (!aqi) return `🍃 Air quality sensor data is currently synchronizing for ${location || 'your location'}.`
             return `🍃 Current US AQI is ${aqi.aqi}. Fine dust PM2.5 is ${aqi.pm2_5} µg/m³ and PM10 is ${aqi.pm10} µg/m³. Maintain normal ventilation if AQI is below 100.`
         }
