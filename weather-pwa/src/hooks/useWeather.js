@@ -9,7 +9,7 @@ const CITY_COORDS = {
     HP:  { name: "Hai Phong",        lat: 20.8449, lon: 106.6881 },
 }
 
-export function useWeatherCurrent({ city = 'HCM', lat = null, lon = null } = {}) {
+export function useWeatherCurrent({ city = 'HCM', lat = null, lon = null, name = null } = {}) {
     const [data, setData] = useState(null)
     const [loading, setLoading] = useState(true) 
     const [error, setError] = useState(null)
@@ -38,7 +38,7 @@ export function useWeatherCurrent({ city = 'HCM', lat = null, lon = null } = {})
 
         let targetLat = lat
         let targetLon = lon
-        let locationName = "Your GPS Location"
+        let locationName = name || "Your GPS Location"
 
         if (targetLat === null || targetLon === null) {
             const cityInfo = CITY_COORDS[city] || CITY_COORDS.HCM

@@ -20,11 +20,20 @@ import {
 } from "recharts"
 
 export default function Home() {
-    // 1. City state management (automatically read from localStorage if available)
+    // 1. Location state management (with localStorage persistence)
     const [selectedCity, setSelectedCity] = useState(() => {
         return localStorage.getItem("weather_selected_city") || "HCM"
     })
-    const [isGPSActive, setIsGPSActive] = useState(false)
+    const [customLocation, setCustomLocation] = useState(() => {
+        try {
+            const saved = localStorage.getItem("weather_custom_location")
+            return saved ? JSON.parse(saved) : null
+        } catch {
+            return null
+        }
+    })
+
+    const [isGPSActive , setIsGPSActive] = useState(false)
 
     // 2. GPS Geolocation Hook
     const { 
@@ -41,15 +50,23 @@ export default function Home() {
 
     const isUsingGPS = isGPSActive && coords?.lat != null && coords?.lon != null
 
+    // Determine active target coordinates and location name
+    const activeLat = isUsingGPS ? coords.lat : customLocation ? customLocation.lat : null
+    const activeLon = isUsingGPS ? coords.lon : customLocation ? customLocation.lon : null
+    const activeCityId = (isUsingGPS || customLocation) ? null : selectedCity
+    const activeName = isUsingGPS ? "Your GPS Location" : customLocation ? 
+    `${customLocation.name}${customLocation.country ? `, ${customLocation.country}` : ''}` : null
+
     // 4. Fetch weather data by selected city or GPS coordinates
     const { 
         data: current,
         loading: loadingCurrent,
         error: currentError 
     } = useWeatherCurrent({
-        city: isUsingGPS ? null : selectedCity,
-        lat: isUsingGPS ? coords.lat : null,
-        lon: isUsingGPS ? coords.lon : null
+        city: activeCityId,
+        lat: activeLat,
+        lon: activeLon,
+        name: activeName
     })
 
     const { 
@@ -57,9 +74,9 @@ export default function Home() {
         loading: loadingDaily 
     } = useWeatherDaily({
         limit: 7,
-        city: isUsingGPS ? null : selectedCity,
-        lat: isUsingGPS ? coords.lat : null,
-        lon: isUsingGPS ? coords.lon : null
+        city: activeCityId,
+        lat: activeLat,
+        lon: activeLon
     })
 
     // 5. Fetch 24-hour hourly forecast timeline
@@ -67,9 +84,9 @@ export default function Home() {
         data: hourly,
         loading: loadingHourly 
     } = useWeatherHourly({
-        city: isUsingGPS ? null : selectedCity,
-        lat: isUsingGPS ? coords.lat : null,
-        lon: isUsingGPS ? coords.lon : null
+        city: activeCityId,
+        lat: activeLat,
+        lon: activeLon
     })
 
     // 6. Fetch Air Quality Index (AQI & PM2.5)
@@ -77,21 +94,33 @@ export default function Home() {
         data: aqiData,
         loading: loadingAQI
     } = useAirQuality({
-        city: isUsingGPS ? null : selectedCity,
-        lat: isUsingGPS ? coords.lat : null,
-        lon: isUsingGPS ? coords.lon : null
+        city: activeCityId,
+        lat: activeLat,
+        lon: activeLon
     })
 
-    // Handle city selection
+    // Handle preset city selection
     const handleSelectCity = (cityId) => {
         setIsGPSActive(false)
         clearCoords()
+        setCustomLocation(null)
+        localStorage.removeItem("weather_custom_location")
         setSelectedCity(cityId)
         localStorage.setItem("weather_selected_city", cityId)
     }
 
+    // Handle custom searched location selection
+    const handleSelectCustomLocation = (loc) => {
+        setIsGPSActive(false)
+        clearCoords()
+        setCustomLocation(loc)
+        localStorage.setItem("weather_custom_location", JSON.stringify(loc))
+    }
+
     // Handle GPS button click
     const handleSelectGPS = () => {
+        setCustomLocation(null)
+        localStorage.removeItem("weather_custom_location")
         getLocation()
     }
 
@@ -233,7 +262,9 @@ export default function Home() {
                 {/* City Selector / GPS Navigation Bar */}
                 <CitySelector 
                     selectedCity={selectedCity}
+                    customLocation={customLocation}
                     onSelectCity={handleSelectCity}
+                    onSelectCustomLocation={handleSelectCustomLocation}
                     isGPSActive={isGPSActive}
                     onSelectGPS={handleSelectGPS}
                     loadingGPS={loadingGPS}
