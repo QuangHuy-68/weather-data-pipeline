@@ -2,6 +2,16 @@ import { useState, useRef, useEffect } from 'react'
 
 export default function chatAssistant({ current, hourly = [], daily = [], aqi, location }) {
     const [isOpen, setIsOpen] = useState(false)
+    const [showSettings, setShowSettings] = useState(false)
+
+    // API Key persisted in LocalStorage with fallback to Vite env
+    const [apiKey, setApiKey] = useState(() => {
+        return localStorage.getItem('skybot_gemini_key') || import.meta.env.VITE_GEMINI_API_KEY || ''
+    })
+
+    const [keyInput, setKeyInput] = useState('')
+    const [keyStatusMessage, setKeyStatusMessage] = useState('')
+
     const [messages, setMessage] = useState([
         {
             sender: 'bot', 
@@ -19,6 +29,35 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
         }
     }, [messages, isOpen, isTyping])
 
+    // Save or clear API Key
+    const handleSaveKey = (e) => {
+        e.preventDefault()
+        const trimmed = keyInput.trim()
+        if (trimmed) {
+            localStorage.setItem('skybot_gemini_api_key', trimmed)
+            setApiKey(trimmed)
+            setKeyStatusMessage('API Key saved successfully! Gemini 1.5 Flash is now active.')
+        } else {
+            localStorage.removeItem('skybot_gemini_api_key')
+            setApiKey('')
+            setKeyStatusMessage('API Key removed. Skybot switched to Local engine.')
+        }
+
+        setTimeout(() => {
+            setKeyStatusMessage('')
+            setShowSettings(false)
+        }, 1200)
+    }
+
+    const handleClearChat = () => { 
+        setMessages([
+            {
+                sender: 'bot',
+                text: `Chat cleared! How can I assist your day in ${location || 'your city'}?`
+            }
+        ])
+    }
+
     // Quick suggestion prompts
     const suggestions = [
         { label: '☔ Need umbrella?', query: 'Do I need an umbrella today?' },
@@ -33,34 +72,65 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
         const q = userQuery.toLowerCase()
 
         // 1. Check if user configured an external Gemini API key
-        const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY
-        if (geminiApiKey) {
-            try {
-                const weatherContext = `LocationL ${location || 'Selected city'}. Current Temp: ${current?.temperature}°C, Rain: ${current?.precipitation}mm, Humidity: ${current?.humidity}%, Wind: ${current?.wind_speed}km/h. AQI: ${aqi?.aqi}(PM2.5: ${aqi?.pm2_5}). Next 12h max rain chance: ${Math.max(...hourly.slice(0, 12).map(h => h.rainProb || 0), 0)}%.`
+        const activeKey = apiKey || import.meta.env.VITE_GEMINI_API_KEY
+        if (activeKey) {
+            try { 
+                const next12Hours = hourly.slice(0, 12)
+                const maxRainChance = Math.max(...next12Hours.map(h => h.rainProb || 0), 0)
+                const upcomingOutlook = daily && daily.length > 0
+                    ? daily.slice(0, 3).map(d => `${d.day_name || 'Day'}: ${Math.round(d.avg_temp || 28)}°C, ${d.precipitation || 0}mm rain`).join('; ')
+                    : 'Stable conditions'
+                const weatherContext = `
+                    Location:  ${location || 'Selected Station'}
+                    Current Temperature: ${current?.temperature ?? '--'}°C
+                    Relative Humidity: ${current?.humidity ?? '--'}%
+                    Wind Speed: ${current?.wind_speed ?? 0} km/h
+                    Precipitation right now: ${current?.precipitation ?? 0} mm
+                    Peak Rain Probability in next 12 hours: ${maxRainChance}%
+                    Air Quality Index: US-EPA AQI ${aqi?.aqi ?? 'N/A'} (PM2.5: ${aqi?.pm2_5 ?? 'N/A'} µg/m³)
+                    Next days outlook: ${upcomingOutlook}
+                `.trim()
 
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
-                    method: 'POST', 
+                const systemPrompt =  `You are SkyBot, an ultra-smart, friendly meteorological AI assistant built for the SkyPulse weather app.
+                    You analyze real-time meteorological conditions and provide accurate, direct, and actionable advice (clothing, commute, outdoor activities, health, rain timing).
+                    Rules:
+                        1. If the user asks in Vietnamese, reply in natural, fluent Vietnamese. If asked in English, reply in English.
+                        2. Keep answers concise (2-4 sentences max), conversational, and actionable.
+                        3. Use appropriate weather emojis (☀️, 🌧️, 🧥, 🏃, 💨, 🍃).
+                        4. Rely strictly on the provided real-time data.`
+                
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${activeKey}`, {
+                    method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: [{
                             parts: [{
-                                text: `You are SkyBot, a helpful AI Weather Assistant. Weather data: \n${weatherContext}\n\nUser Question: "${userQuery}". Answer concisely in 2-3 friendly, helpful sentences.`
+                                text: `${systemPrompt}\n\n[REAL-TIME WEATHER DATA]:\n${weatherContext}\n\n[USER QUESTION]:\n"${userQuery}"`
                             }]
-                        }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.7,
+                            maxOutputTokens: 300
+                        }
                     })
                 })
+
+                if (!res.ok) {
+                    throw new Error(`Gemini API error status: ${res.status}`)
+                }
 
                 const result = await res.json()
                 const reply = result?.candidates?.[0]?.content?.parts?.[0]?.text
 
-                if (reply) return reply
+                if (reply && reply.trim()) {
+                    return reply.trim()
+                }
             } catch (err) {
-                console.warn('Gemini API fallback to local reasoning engine:', err)
+                console.warn('Gemini 1.5 Flash unavailable, falling back to Local Engine:', err)
             }
         }
 
-        // 2. Built-in Local Intelligence Engine
-        // Rain / Umbrella queries
+        // 2. Built-in Local Fallback Engine (Zero latency, works offline)
         if (q.includes('umbrella') || q.includes('rain') || q.includes('mưa') || q.includes('dù') || q.includes('ô')) {
             const next12Hours = hourly.slice(0, 12)
             const rainySlot = next12Hours.find(h => h.rainProb >= 30)
@@ -136,28 +206,30 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
         setInput('')
         setIsTyping(true)
 
-        // Simulate natural response latency (400ms)
-        setTimeout(async () => {
+        try { 
             const botReplyText = await generateBotResponse(textToSend)
             setMessage(prev => [...prev, { sender: 'bot', text: botReplyText }])
+        } catch (err) {
+            setMessage(prev => [...prev, { sender: 'bot', text: '⚠️ Unable to process query. Please check connection or try again.' }])
+        } finally { 
             setIsTyping(false)
-        }, 400)
+        }
     }
 
     return (
         <>
             {/* Floating Action Button (FAB) */}
             {!isOpen && (
-                <button 
+                 <button 
                     onClick={() => setIsOpen(true)}
                     className="fixed bottom-20 right-4 z-40 bg-slate-800/95 hover:bg-slate-700 text-white rounded-full px-3.5 py-1.5 shadow-lg shadow-black/80 border border-slate-600/80 hover:border-slate-500 backdrop-blur-xl flex items-center space-x-2 transition-all transform hover:scale-105 active:scale-95"
                     aria-label="Open AI Assistant"
                 >
                     <span className="text-xs font-medium tracking-wide">Ask SkyBot</span>
-                    {/* Pulsing online indicator badge */}
+                    {/* Online status indicator */}
                     <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${apiKey ? 'bg-sky-400' : 'bg-emerald-400'}`}></span>
+                        <span className={`relative inline-flex rounded-full h-2 w-2 ${apiKey ? 'bg-sky-400' : 'bg-emerald-400'}`}></span>
                     </span>
                 </button>
             )}
@@ -171,31 +243,115 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
                             <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-base shadow-inner">
                                 🤖
                             </div>
-
                             <div>
                                 <h3 className="text-sm font-bold text-white leading-tight">SkyBot AI</h3>
-                                <p className="text-[10px] text-emerald-400 flex items-center">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1 animate-pulse"></span>
-                                    Live Weather Connected
+                                <p className="text-[10px] flex items-center">
+                                    {apiKey ? (
+                                        <span className="text-sky-400 flex items-center font-medium">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-sky-400 mr-1 animate-pulse"></span>
+                                            Gemini 1.5 Flash Active
+                                        </span>
+                                    ) : (
+                                        <span className="text-emerald-400 flex items-center">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1"></span>
+                                            Local Engine Active
+                                        </span>
+                                    )}
                                 </p>
                             </div>
                         </div>
-
-                        <button 
-                            onClick={() => setIsOpen(false)}
-                            className="text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-700/50 transition-colors"
-                        >
-                            ✕
-                        </button>
+                        {/* Top Action Buttons */}
+                        <div className="flex items-center space-x-1">
+                            {/* Settings button */}
+                            <button
+                                onClick={() => {
+                                    setKeyInput(apiKey)
+                                    setShowSettings(!showSettings)
+                                }}
+                                title="AI Engine Settings"
+                                className="text-slate-400 hover:text-white p-1.5 rounded-full hover:bg-slate-700/50 transition-colors text-xs"
+                            >
+                                ⚙️
+                            </button>
+                            {/* Clear conversation button */}
+                            <button
+                                onClick={handleClearChat}
+                                title="Clear conversation"
+                                className="text-slate-400 hover:text-white p-1.5 rounded-full hover:bg-slate-700/50 transition-colors text-xs"
+                            >
+                                🗑️
+                            </button>
+                            {/* Close drawer button */}
+                            <button 
+                                onClick={() => setIsOpen(false)}
+                                title="Close"
+                                className="text-slate-400 hover:text-white p-1.5 rounded-full hover:bg-slate-700/50 transition-colors text-xs"
+                            >
+                                ✕
+                            </button>
+                        </div>
                     </div>
-
+                    {/* Settings Panel Overlay */}
+                    {showSettings && (
+                        <div className="bg-slate-800/95 border-b border-slate-700/80 p-3.5 text-xs text-slate-300 animate-in fade-in duration-200">
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="font-semibold text-white flex items-center space-x-1.5">
+                                    <span>🔑</span>
+                                    <span>Google Gemini API Key</span>
+                                </span>
+                                <button 
+                                    onClick={() => setShowSettings(false)}
+                                    className="text-slate-400 hover:text-white text-xs"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                            <p className="text-[11px] text-slate-400 mb-2 leading-relaxed">
+                                Enter your free Gemini key to enable generative reasoning. It is stored securely in your browser's LocalStorage.
+                            </p>
+                            <form onSubmit={handleSaveKey} className="space-y-2">
+                                <input
+                                    type="password"
+                                    value={keyInput}
+                                    onChange={(e) => setKeyInput(e.target.value)}
+                                    placeholder="Paste Gemini API Key (AIzaSy...)"
+                                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-sky-400"
+                                />
+                                {keyStatusMessage && (
+                                    <p className="text-[11px] text-sky-400 font-medium">{keyStatusMessage}</p>
+                                )}
+                                <div className="flex space-x-2 pt-1">
+                                    <button
+                                        type="submit"
+                                        className="flex-1 bg-sky-600 hover:bg-sky-500 text-white py-1 rounded-lg font-medium transition-colors"
+                                    >
+                                        Save Key
+                                    </button>
+                                    {apiKey && (
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setKeyInput('')
+                                                localStorage.removeItem('skybot_gemini_api_key')
+                                                setApiKey('')
+                                                setKeyStatusMessage('API Key removed!')
+                                                setTimeout(() => setShowSettings(false), 1000)
+                                            }}
+                                            className="px-2.5 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 rounded-lg transition-colors"
+                                        >
+                                            Remove
+                                        </button>
+                                    )}
+                                </div>
+                            </form>
+                        </div>
+                    )}
                     {/* Live Context Banner */}
                     <div className="bg-slate-950/50 px-4 py-1.5 border-b border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
                         <span>📍 {location || 'Current City'}</span>
                         <span>{current?.temperature ?? '--'}°C · {current?.precipitation > 0 ? '🌧️ Rain' : '🌤️ Dry'}</span>
                         {aqi && <span className="text-emerald-400">AQI: {aqi.aqi}</span>}
                     </div>
-
                     {/* Messages Container */}
                     <div className="flex-1 p-3.5 overflow-y-auto space-y-3 scrollbar-none text-xs">
                         {messages.map((m, idx) => (
@@ -204,7 +360,7 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
                                 className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                             >
                                 <div 
-                                    className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 leading-relaxed shadow-md ${
+                                    className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 leading-relaxed shadow-md whitespace-pre-line ${
                                         m.sender === 'user'
                                             ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-br-xs'
                                             : 'bg-slate-800/90 text-slate-200 border border-slate-700/60 rounded-bl-xs'
@@ -214,21 +370,18 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
                                 </div>
                             </div>
                         ))}
-
                         {/* Typing indicator bubble */}
                         {isTyping && (
                             <div className="flex justify-start">
                                 <div className="bg-slate-800/90 border border-slate-700/60 rounded-2xl rounded-bl-xs px-3.5 py-2 text-slate-400 flex items-center space-x-1">
                                     <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce"></span>
                                     <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0.2s]"></span>
-                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delat:0.4s]"></span>
+                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0.4s]"></span>
                                 </div>
                             </div>
                         )}
-
                         <div ref={messagesEndRef} />
                     </div>
-
                     {/* Quick Suggestion Chips */}
                     <div className="px-3 py-1.5 border-t border-slate-800/60 flex items-center space-x-1.5 overflow-x-auto scrollbar-none bg-slate-950/40">
                         {suggestions.map((s, idx) => (
@@ -241,7 +394,6 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
                             </button>
                         ))}
                     </div>
-
                     {/* Input Bar */}
                     <form 
                         onSubmit={(e) => {
@@ -257,7 +409,6 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
                             placeholder="Ask about rain, outfit, workout..."
                             className="flex-1 bg-slate-800/90 text-white placeholder-slate-500 text-xs rounded-xl px-3 py-2 border border-slate-700/60 focus:outline-none focus:border-sky-400"
                         />
-
                         <button 
                             type="submit"
                             disabled={!input.trim() || isTyping}
