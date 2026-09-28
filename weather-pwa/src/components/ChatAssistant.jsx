@@ -4,9 +4,12 @@ export default function ChatAssistant({ current, hourly = [], daily = [], aqi, l
     const [isOpen, setIsOpen] = useState(false)
     const [showSettings, setShowSettings] = useState(false)
     
-    // API Key persisted in LocalStorage with fallback to Vite env
+    // API Key & Model persisted in LocalStorage
     const [apiKey, setApiKey] = useState(() => {
         return localStorage.getItem('skybot_gemini_api_key') || import.meta.env.VITE_GEMINI_API_KEY || ''
+    })
+    const [modelName, setModelName] = useState(() => {
+        return localStorage.getItem('skybot_gemini_model') || 'models/gemini-2.0-flash'
     })
     const [keyInput, setKeyInput] = useState('')
     const [keyStatusMessage, setKeyStatusMessage] = useState('')
@@ -29,15 +32,16 @@ export default function ChatAssistant({ current, hourly = [], daily = [], aqi, l
         }
     }, [messages, isOpen, isTyping])
 
-    // Test and save API Key
+    // Test and save API Key with Auto-Model Discovery
     const handleSaveKey = async (e) => {
         e.preventDefault()
-        // Clean key: remove whitespace and accidental surrounding quotes
         const trimmed = keyInput.trim().replace(/^["']|["']$/g, '')
         
         if (!trimmed) {
             localStorage.removeItem('skybot_gemini_api_key')
+            localStorage.removeItem('skybot_gemini_model')
             setApiKey('')
+            setModelName('')
             setKeyStatusMessage('API Key removed. SkyBot switched to Local Engine.')
             setTimeout(() => {
                 setKeyStatusMessage('')
@@ -47,11 +51,42 @@ export default function ChatAssistant({ current, hourly = [], daily = [], aqi, l
         }
 
         setIsValidatingKey(true)
-        setKeyStatusMessage('Testing connection to Google Gemini...')
+        setKeyStatusMessage('Connecting & detecting available Gemini models...')
 
         try {
-            // Test ping to verify key validity
-            const testRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${trimmed}`, {
+            // 1. Discover all active models supported by user's key
+            const modelsRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${trimmed}`)
+            const modelsData = await modelsRes.json()
+
+            if (!modelsRes.ok) {
+                const errMsg = modelsData?.error?.message || `HTTP ${modelsRes.status}`
+                setKeyStatusMessage(`❌ Error: ${errMsg}`)
+                setIsValidatingKey(false)
+                return
+            }
+
+            const availableModels = (modelsData.models || []).filter(m => 
+                m.supportedGenerationMethods?.includes('generateContent')
+            )
+
+            if (availableModels.length === 0) {
+                setKeyStatusMessage('❌ Error: No models with generateContent capability found for this key.')
+                setIsValidatingKey(false)
+                return
+            }
+
+            // Pick the best available modern Flash model
+            const chosen = 
+                availableModels.find(m => m.name.includes('2.5-flash')) ||
+                availableModels.find(m => m.name.includes('2.0-flash')) ||
+                availableModels.find(m => m.name.includes('flash')) ||
+                availableModels.find(m => m.name.includes('gemini')) ||
+                availableModels[0]
+
+            const selectedModel = chosen.name
+
+            // 2. Perform test ping with discovered model
+            const testRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/${selectedModel}:generateContent?key=${trimmed}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -68,14 +103,18 @@ export default function ChatAssistant({ current, hourly = [], daily = [], aqi, l
                 return
             }
 
-            // Successfully validated
+            // Save key and discovered model
             localStorage.setItem('skybot_gemini_api_key', trimmed)
+            localStorage.setItem('skybot_gemini_model', selectedModel)
             setApiKey(trimmed)
-            setKeyStatusMessage('✅ Verified! Gemini 1.5 Flash is ready.')
+            setModelName(selectedModel)
+
+            const cleanDisplayName = selectedModel.replace('models/', '').replace(/^gemini-/, 'Gemini ')
+            setKeyStatusMessage(`✅ Verified! Connected to ${cleanDisplayName}`)
             setTimeout(() => {
                 setKeyStatusMessage('')
                 setShowSettings(false)
-            }, 1200)
+            }, 1400)
         } catch (err) {
             setKeyStatusMessage(`❌ Network error: ${err.message}`)
         } finally {
@@ -105,7 +144,7 @@ export default function ChatAssistant({ current, hourly = [], daily = [], aqi, l
     const generateBotResponse = async (userQuery) => {
         const q = userQuery.toLowerCase()
 
-        // 1. Try Google Gemini 1.5 Flash if API Key is configured
+        // 1. Try Google Gemini with the discovered model
         const activeKey = apiKey || import.meta.env.VITE_GEMINI_API_KEY
         if (activeKey) {
             try {
@@ -135,7 +174,10 @@ Guidelines:
 3. If the user asks in Vietnamese, reply in fluent, friendly Vietnamese. If asked in English, reply in English.
 4. Keep answers concise (2-4 sentences max), engaging, and helpful with appropriate weather emojis (☀️, 🌧️, 🧥, 🏃, 💨, 🍃).`
 
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${activeKey}`, {
+                const targetModel = modelName || 'models/gemini-2.0-flash'
+                const endpoint = targetModel.startsWith('models/') ? targetModel : `models/${targetModel}`
+
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/${endpoint}:generateContent?key=${activeKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -163,7 +205,7 @@ Guidelines:
                     return reply.trim()
                 }
             } catch (err) {
-                console.warn('Gemini 1.5 Flash unavailable, falling back to Local Engine:', err)
+                console.warn('Gemini API call failed, falling back to Local Engine:', err)
                 return `⚠️ Connection Error: Unable to reach Gemini API (${err.message}). Falling back to local offline engine.`
             }
         }
@@ -248,6 +290,10 @@ Guidelines:
         }
     }
 
+    const displayModelName = modelName 
+        ? modelName.replace('models/', '').replace(/^gemini-/, 'Gemini ')
+        : 'Gemini 2.0 Flash'
+
     return (
         <>
             {/* Floating Action Button (FAB) */}
@@ -282,7 +328,7 @@ Guidelines:
                                     {apiKey ? (
                                         <span className="text-sky-400 flex items-center font-medium">
                                             <span className="w-1.5 h-1.5 rounded-full bg-sky-400 mr-1 animate-pulse"></span>
-                                            Gemini 1.5 Flash Active
+                                            {displayModelName} Active
                                         </span>
                                     ) : (
                                         <span className="text-emerald-400 flex items-center">
@@ -351,7 +397,7 @@ Guidelines:
                                     type="text"
                                     value={keyInput}
                                     onChange={(e) => setKeyInput(e.target.value)}
-                                    placeholder="Paste Gemini Key (AIzaSy...)"
+                                    placeholder="Paste Gemini Key (AIzaSy... or AQ...)"
                                     className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-sky-400 font-mono"
                                 />
                                 {keyStatusMessage && (
@@ -365,7 +411,7 @@ Guidelines:
                                         disabled={isValidatingKey}
                                         className="flex-1 bg-sky-600 hover:bg-sky-500 disabled:opacity-50 text-white py-1 rounded-lg font-medium transition-colors"
                                     >
-                                        {isValidatingKey ? 'Testing Key...' : 'Test & Save Key'}
+                                        {isValidatingKey ? 'Detecting Model...' : 'Test & Save Key'}
                                     </button>
                                     {apiKey && (
                                         <button
@@ -373,7 +419,9 @@ Guidelines:
                                             onClick={() => {
                                                 setKeyInput('')
                                                 localStorage.removeItem('skybot_gemini_api_key')
+                                                localStorage.removeItem('skybot_gemini_model')
                                                 setApiKey('')
+                                                setModelName('')
                                                 setKeyStatusMessage('API Key removed!')
                                                 setTimeout(() => setShowSettings(false), 1000)
                                             }}
