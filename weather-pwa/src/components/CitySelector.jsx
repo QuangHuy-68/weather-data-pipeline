@@ -9,7 +9,7 @@ export default function CitySelector({
     onSelectGPS,
     loadingGPS
 }) {
-    const citites = [
+    const presetCities = [
         { id: "HCM", name: "TP.Hồ Chí Minh" },
         { id: "HN", name: "Hà Nội" }, 
         { id: "DN", name: "Đà Nẵng" },
