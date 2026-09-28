@@ -150,7 +150,7 @@ export default function chatAssistant({ current, hourly = [], daily = [], aqi, l
             {!isOpen && (
                 <button 
                     onClick={() => setIsOpen(true)}
-                    className="fixed bottom-20 right-4 z-40 bg-slate-900/90 hover:bg-slate-800 text-slate-200 hover:text-white rounded-full px-3.5 py-1.5 shadow-xl shadow-black/60 border border-slate-700/70 backdrop-blur-md flex items-center space-x-2 transition-all transform hover:scale-105 active:scale-95"
+                    className="fixed bottom-20 right-4 z-40 bg-slate-800/95 hover:bg-slate-700 text-white rounded-full px-3.5 py-1.5 shadow-lg shadow-black/80 border border-slate-600/80 hover:border-slate-500 backdrop-blur-xl flex items-center space-x-2 transition-all transform hover:scale-105 active:scale-95"
                     aria-label="Open AI Assistant"
                 >
                     <span className="text-xs font-medium tracking-wide">Ask SkyBot</span>
