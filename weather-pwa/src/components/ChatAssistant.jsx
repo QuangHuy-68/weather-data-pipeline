@@ -140,11 +140,11 @@ export default function ChatAssistant({ current, hourly = [], daily = [], aqi, l
         { label: '📅 Weekend outlook', query: 'What is the upcoming forecast outlook?' }
     ]
 
-    // Context-Aware Weather Reasoning Engine
+    // Context-Aware Weather Reasoning Engine with Multi-turn Memory
     const generateBotResponse = async (userQuery) => {
         const q = userQuery.toLowerCase()
 
-        // 1. Try Google Gemini with the discovered model
+        // 1. Try Google Gemini with Conversation History
         const activeKey = apiKey || import.meta.env.VITE_GEMINI_API_KEY
         if (activeKey) {
             try {
@@ -167,12 +167,37 @@ Next days outlook: ${upcomingOutlook}
 
                 const systemPrompt = `You are SkyBot, an ultra-smart, friendly meteorological AI assistant built for the SkyPulse weather app.
 Guidelines:
-1. The currently active app station data is for "${location || 'Current City'}".
-2. If the user asks about the weather in ANOTHER city (e.g. Thai Binh, Hanoi, Da Nang, Tokyo, Paris):
+1. Maintain conversational continuity by remembering previous questions and answers in this chat.
+2. The currently active app station data is for "${location || 'Current City'}".
+3. If the user asks about the weather in ANOTHER city (e.g. Thai Binh, Hanoi, Da Nang, Tokyo, Paris):
    - Answer their question using your general meteorological knowledge about that location.
    - Gently remind them they can search and select that city in the app's top search bar to view its live Doppler radar, AQI, and hourly forecast.
-3. If the user asks in Vietnamese, reply in fluent, friendly Vietnamese. If asked in English, reply in English.
-4. Keep answers concise (2-4 sentences max), engaging, and helpful with appropriate weather emojis (☀️, 🌧️, 🧥, 🏃, 💨, 🍃).`
+4. If the user asks in Vietnamese, reply in fluent, friendly Vietnamese. If asked in English, reply in English.
+5. Keep answers concise (2-4 sentences max), engaging, and helpful with appropriate weather emojis (☀️, 🌧️, 🧥, 🏃, 💨, 🍃).`
+
+                // Build clean multi-turn conversation history for Gemini API
+                // Filter out error alerts and take the last 6 turns to keep context fast and relevant
+                const validHistory = messages.filter(m => m.text && !m.text.startsWith('⚠️'))
+                const firstUserIndex = validHistory.findIndex(m => m.sender === 'user')
+                const historySlice = firstUserIndex !== -1 ? validHistory.slice(firstUserIndex).slice(-6) : []
+
+                const contentsPayload = []
+                historySlice.forEach(m => {
+                    const role = m.sender === 'user' ? 'user' : 'model'
+                    // Gemini requires strictly alternating roles (user -> model -> user -> model)
+                    if (contentsPayload.length > 0 && contentsPayload[contentsPayload.length - 1].role === role) {
+                        contentsPayload[contentsPayload.length - 1].parts[0].text += `\n${m.text}`
+                    } else {
+                        contentsPayload.push({ role, parts: [{ text: m.text }] })
+                    }
+                })
+
+                // Append the current turn with fresh real-time weather context
+                const currentPrompt = `[REAL-TIME APP CONTEXT]:\n${weatherContext}\n\n[USER QUESTION]:\n"${userQuery}"`
+                if (contentsPayload.length > 0 && contentsPayload[contentsPayload.length - 1].role === 'user') {
+                    contentsPayload.push({ role: 'model', parts: [{ text: 'Continuing weather discussion.' }] })
+                }
+                contentsPayload.push({ role: 'user', parts: [{ text: currentPrompt }] })
 
                 const targetModel = modelName || 'models/gemini-2.0-flash'
                 const endpoint = targetModel.startsWith('models/') ? targetModel : `models/${targetModel}`
@@ -181,14 +206,13 @@ Guidelines:
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{
-                            parts: [{
-                                text: `${systemPrompt}\n\n[REAL-TIME APP CONTEXT]:\n${weatherContext}\n\n[USER QUESTION]:\n"${userQuery}"`
-                            }]
-                        }],
+                        systemInstruction: {
+                            parts: [{ text: systemPrompt }]
+                        },
+                        contents: contentsPayload,
                         generationConfig: {
                             temperature: 0.7,
-                            maxOutputTokens: 300
+                            maxOutputTokens: 350
                         }
                     })
                 })
@@ -500,7 +524,7 @@ Guidelines:
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            placeholder="Ask about rain, outfit, other cities..."
+                            placeholder="Ask follow-up questions naturally..."
                             className="flex-1 bg-slate-800/90 text-white placeholder-slate-500 text-xs rounded-xl px-3 py-2 border border-slate-700/60 focus:outline-none focus:border-sky-400"
                         />
 
