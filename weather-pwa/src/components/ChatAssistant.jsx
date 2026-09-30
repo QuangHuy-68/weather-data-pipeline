@@ -140,6 +140,55 @@ export default function ChatAssistant({ current, hourly = [], daily = [], aqi, l
         { label: '📅 Weekend outlook', query: 'What is the upcoming forecast outlook?' }
     ]
 
+    // Helper: Extract target city from natural language query
+    const extracttargetCity = (query) => {
+        const text = query.trim()
+        const patterns = [
+            /(?:thời tiết|thoi tiet|mưa|mua|nhiệt độ|nhiet do)\s+(?:ở|o|tại|tai)\s+([A-Za-zÀ-ỹ\s]+?)(?:\?|\.|,|thế nào|the nao|sao|không|khong|$)/i,
+            /(?:weather in|forecast for|how about|and)\s+([A-Za-zÀ-ỹ\s]+?)(?:\?|\.|,|weather|forecast|$)/i,
+            /(?:ở|o|tại|tai)\s+([A-Za-zÀ-ỹ\s]+?)\s+(?:thời tiết|thoi tiet|thế nào|the nao|có mưa|co mua)/i
+        ]
+
+        for (const pattern of patterns) {
+            const match = text.match(pattern)
+            if (match && match[1]) {
+                const cleaned = match[1].trim().replace(/\s+(weather|thời tiết)$/i, '')
+
+                if (cleaned.length >= 2 && cleaned.toLowerCase() !== location?.toLowerCase()) {
+                    return cleaned
+                }
+            }
+        }
+        return null
+    }
+
+    // Helper: Fetch live weather data for any requested city on-the-fly
+    const fetchCityWeather = async (cityName) => {
+        try {
+            const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&count=1&language=en&format=json`)
+            const geoData = await geoRes.json()
+            if (!geoData.results || geoData.results.length === 0) return null
+            const place = geoData.results[0]
+            const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m&hourly=precipitation_probability&timezone=auto`)
+            const weatherData = await weatherRes.json()
+            const currentHour = new Date().getHours()
+            const next12HoursProb = (weatherData.hourly?.precipitation_probability || [])
+                .slice(currentHour, currentHour + 12)
+            const maxRainProb = next12HoursProb.length > 0 ? Math.max(...next12HoursProb) : 0
+
+            return {
+                cityName: `${place.name}${place.country ? ', ' + place.country : ''}`,
+                temp: weatherData.current?.temperature_2m,
+                humidity: weatherData.current?.relative_humidity_2m,
+                windSpeed: weatherData.current?.wind_speed_10m,
+                precipitation: weatherData.current?.precipitation || 0, maxRainProb
+            }
+        } catch (err) {
+            console.warn('On-the-fly city fetch failed:', err)
+            return null
+        }
+    }
+
     // Context-Aware Weather Reasoning Engine with Multi-turn Memory
     const generateBotResponse = async (userQuery) => {
         const q = userQuery.toLowerCase()
