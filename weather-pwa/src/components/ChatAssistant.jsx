@@ -131,13 +131,15 @@ export default function ChatAssistant({ current, hourly = [], daily = [], aqi, l
         ])
     }
 
-    // Quick suggestion prompts
+    // Quick suggestion prompts with lifestyle & meteorological insights
     const suggestions = [
         { label: '☔ Need umbrella?', query: 'Do I need an umbrella today?' },
         { label: '👕 What to wear?', query: 'What should I wear today?' },
-        { label: '🏃 Workout?', query: 'Is the weather good for outdoor exercise?' },
-        { label: '🍃 Air quality?', query: 'How is the air quality right now?' },
-        { label: '📅 Weekend outlook', query: 'What is the upcoming forecast outlook?' }
+        { label: '🧺 Dry laundry?', query: 'Is it good weather to dry laundry outdoors today?' },
+        { label: '🚗 Wash car?', query: 'Should I wash my car today or will it rain soon?' },
+        { label: '☀️ UV & Sun risk?', query: 'How intense is the UV and sun exposure today?' },
+        { label: '🏃 Workout?', query: 'Is the weather good for outdoor running or exercise?' },
+        { label: '🍃 Air quality?', query: 'How is the air quality right now?' }
     ]
 
     // Helper: Extract target city from natural language query
@@ -189,11 +191,24 @@ export default function ChatAssistant({ current, hourly = [], daily = [], aqi, l
         }
     }
 
-    // Context-Aware Weather Reasoning Engine with Multi-turn Memory
+        // Context-Aware Weather Reasoning Engine with Deep Meteorological Insights
     const generateBotResponse = async (userQuery) => {
         const q = userQuery.toLowerCase()
 
-        // 1. Try Google Gemini with Conversation History
+        // 1. Detect if user is asking about a different city & fetch live data on-the-fly
+        const targetCityName = extracttargetCity(userQuery)
+        let otherCityData = null
+        if (targetCityName) {
+            otherCityData = await fetchCityWeather(targetCityName)
+        }
+
+        // 2. Compute Heat Index / Apparent Thermal Comfort
+        const currentTemp = current?.temperature ?? 28
+        const currentHumid = current?.humidity ?? 70
+        // Australian/Rothfusz apparent temperature estimation
+        const feelsLike = Math.round(currentTemp + (0.33 * (currentHumid / 100 * 6.105 * Math.exp(17.27 * currentTemp / (237.7 + currentTemp)))) - 4)
+
+        // 3. Try Google Gemini with Deep Meteorological Context
         const activeKey = apiKey || import.meta.env.VITE_GEMINI_API_KEY
         if (activeKey) {
             try {
@@ -203,10 +218,10 @@ export default function ChatAssistant({ current, hourly = [], daily = [], aqi, l
                     ? daily.slice(0, 3).map(d => `${d.day_name || 'Day'}: ${Math.round(d.avg_temp || 28)}°C, ${d.precipitation || 0}mm rain`).join('; ')
                     : 'Stable conditions'
 
-                const weatherContext = `
+                let weatherContext = `
 Active Station Location: ${location || 'Selected Station'}
-Current Temperature: ${current?.temperature ?? '--'}°C
-Relative Humidity: ${current?.humidity ?? '--'}%
+Current Temperature: ${currentTemp}°C (Feels like: ${feelsLike}°C due to ${currentHumid}% humidity)
+Relative Humidity: ${currentHumid}%
 Wind Speed: ${current?.wind_speed ?? 0} km/h
 Precipitation right now: ${current?.precipitation ?? 0} mm
 Peak Rain Probability in next 12 hours: ${maxRainChance}%
@@ -214,15 +229,26 @@ Air Quality Index: US-EPA AQI ${aqi?.aqi ?? 'N/A'} (PM2.5: ${aqi?.pm2_5 ?? 'N/A'
 Next days outlook: ${upcomingOutlook}
                 `.trim()
 
-                const systemPrompt = `You are SkyBot, an ultra-smart, friendly meteorological AI assistant built for the SkyPulse weather app.
-Guidelines:
-1. Maintain conversational continuity by remembering previous questions and answers in this chat.
-2. The currently active app station data is for "${location || 'Current City'}".
-3. If the user asks about the weather in ANOTHER city (e.g. Thai Binh, Hanoi, Da Nang, Tokyo, Paris):
-   - Answer their question using your general meteorological knowledge about that location.
-   - Gently remind them they can search and select that city in the app's top search bar to view its live Doppler radar, AQI, and hourly forecast.
-4. If the user asks in Vietnamese, reply in fluent, friendly Vietnamese. If asked in English, reply in English.
-5. Keep answers concise (2-4 sentences max), engaging, and helpful with appropriate weather emojis (☀️, 🌧️, 🧥, 🏃, 💨, 🍃).`
+                // Inject live data of requested target city if available
+                if (otherCityData) {
+                    weatherContext += `\n\n[LIVE ON-THE-FLY DATA FOR REQUESTED CITY: ${otherCityData.cityName}]:
+Temperature: ${otherCityData.temp}°C
+Humidity: ${otherCityData.humidity}%
+Wind Speed: ${otherCityData.windSpeed} km/h
+Precipitation right now: ${otherCityData.precipitation} mm
+Peak rain chance in next 12 hours: ${otherCityData.maxRainProb}%`
+                }
+
+                const systemPrompt = `You are SkyBot, an expert meteorological AI assistant built for the SkyPulse weather app.
+Expert Guidance:
+1. Maintain conversational continuity across multi-turn questions.
+2. Analyze meteorological metrics deeply:
+   - Thermal Comfort: Compare real temperature with "Feels like" (${feelsLike}°C). Explain humidity effects.
+   - Outdoor Drying (Phơi đồ): Favorable if rain chance < 25% and humidity < 75%; warn against outdoor drying if rain is imminent.
+   - Car Wash (Rửa xe): Recommend washing if next 48h are dry; recommend postponing if rain probability is above 40%.
+   - UV / Sun Exposure: Warn about peak solar intensity between 11:00 - 14:00.
+3. If requested for another city, rely on [LIVE ON-THE-FLY DATA FOR REQUESTED CITY] to state exact numbers and recommend the top search bar for radar inspection.
+4. If asked in Vietnamese, reply in natural, fluent Vietnamese. If in English, reply in English. Keep answers concise (2-4 sentences max) with lively weather emojis.`
 
                 // Build clean multi-turn conversation history for Gemini API
                 // Filter out error alerts and take the last 6 turns to keep context fast and relevant
@@ -284,6 +310,10 @@ Guidelines:
         }
 
         // 2. Built-in Local Fallback Engine (Zero latency, works offline)
+        if (otherCityData) {
+            return `📍 Weather in ${otherCityData.cityName}: Current temperature is ${otherCityData.temp}°C with ${otherCityData.humidity}% humidity and wind at ${otherCityData.windSpeed} km/h. Next 12h peak rain chance is ${otherCityData.maxRainProb}%. Search "${otherCityData.cityName}" in the top bar to inspect its full radar map!`
+        }
+
         if (q.includes('umbrella') || q.includes('rain') || q.includes('mưa') || q.includes('dù') || q.includes('ô')) {
             const next12Hours = hourly.slice(0, 12)
             const rainySlot = next12Hours.find(h => h.rainProb >= 30)
@@ -338,6 +368,38 @@ Guidelines:
                 return `📅 Outlook: Tomorrow's expected average temperature is around ${Math.round(nextDay.avg_temp || nextDay.temperature || 28)}°C with ${nextDay.precipitation || 0}mm rainfall. The general trend for the week remains steady.`
             }
             return `📅 Over the next few days, expect steady seasonal temperatures around ${current?.temperature || 30}°C.`
+        }
+
+        // Laundry drying queries
+        if (q.includes('laundry') || q.includes('phơi') || q.includes('quần áo') || q.includes('dry')) {
+            const next12Hours = hourly.slice(0, 12)
+            const maxProb = Math.max(...next12Hours.map(h => h.rainProb || 0), 0)
+            if (maxProb >= 40 || (current?.precipitation ?? 0) > 0) {
+                return `🌧️ Not recommended to dry laundry outdoors today! Rain chance peaks at ${maxProb}%. It's safer to dry clothes indoors or use a dryer.`
+            } else if ((current?.humidity ?? 70) > 82) {
+                return `⛅ High humidity (${current?.humidity ?? 70}%). Clothes will take longer to dry outside. Hang them in a breezy, open space.`
+            } else {
+                return `🧺 Great day for laundry! Low rain chance (${maxProb}%) and good air circulation will dry your clothes quickly.`
+            }
+        }
+        // Car wash queries
+        if (q.includes('wash') || q.includes('car') || q.includes('rửa xe') || q.includes('xe')) {
+            const next12Hours = hourly.slice(0, 12)
+            const maxProb = Math.max(...next12Hours.map(h => h.rainProb || 0), 0)
+            if (maxProb >= 35 || (current?.precipitation ?? 0) > 0) {
+                return `🚗 Postpone car washing! Rain is probable within 12-24 hours (${maxProb}% chance). Save your time and wash it after the weather stabilizes.`
+            } else {
+                return `✨ Excellent weather to wash your car! Dry conditions and low precipitation chance (${maxProb}%) will keep your vehicle clean.`
+            }
+        }
+        // UV and Sun exposure queries
+        if (q.includes('uv') || q.includes('sun') || q.includes('nắng') || q.includes('cực tím')) {
+            const temp = current?.temperature ?? 28
+            if (temp >= 32) {
+                return `☀️ High solar intensity today! UV levels are dangerous between 11:00 AM and 2:00 PM. Apply SPF 50+ sunscreen, wear UV-blocking sunglasses, and stay in shade.`
+            } else {
+                return `🌤️ Moderate sun exposure today. Standard sun protection is sufficient, but keep sunglasses handy if going outdoors at midday.`
+            }
         }
 
         return `🤖 In ${location || 'your station'}, current temperature is ${current?.temperature || '--'}°C with ${current?.humidity || '--'}% humidity and wind at ${current?.wind_speed || 0} km/h. To check another city, type its name in the top search bar!`
