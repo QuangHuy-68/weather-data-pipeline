@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 
-export default function ChatAssistant({ current, hourly = [], daily = [], aqi, location }) {
+export default function ChatAssistant({ current, hourly = [], daily = [], aqi, location, onSelection }) {
     const [isOpen, setIsOpen] = useState(false)
     const [showSettings, setShowSettings] = useState(false)
     
@@ -180,6 +180,10 @@ export default function ChatAssistant({ current, hourly = [], daily = [], aqi, l
 
             return {
                 cityName: `${place.name}${place.country ? ', ' + place.country : ''}`,
+                name: place.name, 
+                lat: place.latitude,
+                lon: place.longitude,
+                country: place.country,
                 temp: weatherData.current?.temperature_2m,
                 humidity: weatherData.current?.relative_humidity_2m,
                 windSpeed: weatherData.current?.wind_speed_10m,
@@ -417,7 +421,10 @@ Expert Guidance:
 
         try {
             const botReplyText = await generateBotResponse(textToSend)
-            setMessages(prev => [...prev, { sender: 'bot', text: botReplyText }])
+            const targetCityName = extracttargetCity(textToSend)
+            const cityData = targetCityName ? await fetchCityWeather(targetCityName) : null
+
+            setMessages(prev => [...prev, { sender: 'bot', text: botReplyText, actionLocation: cityData }])
         } catch (err) {
             setMessages(prev => [...prev, { sender: 'bot', text: '⚠️ Unable to process query. Please check connection or try again.' }])
         } finally {
@@ -592,6 +599,31 @@ Expert Guidance:
                                     }`}
                                 >
                                     {m.text}
+
+                                    {/* Action Card: Switch App Location */}
+                                    {m.actionLocation && onSelection && (
+                                        <div className="mt-2.5 pt-2 border-t border-slate-700/60 flex items-center justify-between">
+                                            <span className="text-[10px] text-slate-400">View radar & charts:</span>
+
+                                            <button 
+                                                type="button"
+                                                onClick={() => {
+                                                    onSelection({
+                                                        name: m.actionLocation.name,
+                                                        lat: m.actionLocation.lat,
+                                                        lon: m.actionLocation.lon,
+                                                        country: m.actionLocation.country
+                                                    })
+
+                                                setIsOpen(false)
+                                            }}
+                                            className="inline-flex items-center space-x-1 bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 hover:text-white border border-sky-400/40 px-2 py-1 rounded-lg text-[10px] font-semibold transition-all transform hover:scale-105 active:scale-95"
+                                            >
+                                                <span>📍 Switch to {m.actionLocation.name}</span>
+                                                <span>➔</span>
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         ))}

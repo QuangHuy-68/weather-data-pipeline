@@ -450,6 +450,7 @@ export default function Home() {
                     daily={daily}
                     aqi={aqiData}
                     location={current?.location || selectedCity}
+                    onSelection = {handleSelectCustomLocation}
                 />
             </div>
         </div>
