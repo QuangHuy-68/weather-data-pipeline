@@ -1,0 +1,5 @@
+{
+  "appId": "com.skypulse.weather",
+  "appName": "SkyPulse Weather",
+  "webDir": "dist"
+}
