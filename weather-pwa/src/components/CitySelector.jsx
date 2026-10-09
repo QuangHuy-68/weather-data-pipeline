@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useTheme } from '../context/ThemeContext'
 
 export default function CitySelector({
     selectedCity,
@@ -9,6 +10,9 @@ export default function CitySelector({
     onSelectGPS,
     loadingGPS
 }) {
+    const { theme } = useTheme()
+    const isDark = theme === 'dark'
+
     const presetCities = [
         { id: "HCM", name: "TP.Hồ Chí Minh" },
         { id: "HN", name: "Hà Nội" }, 
@@ -53,22 +57,19 @@ export default function CitySelector({
                     setLoadingSearch(false)
                     setIsOpen(true)
                 })
-
                 .catch(() => {
                     setResults([])
                     setLoadingSearch(false)
                 })
-        }, 300)
+        }, 350)
 
         return () => clearTimeout(timer)
     }, [query])
 
-    // Handle user selecting a search result
     const handleSelectResult = (item) => {
         onSelectCustomLocation({
-            name: item.name, 
-            country: item.country || '',
-            admin1: item.admin1 || '',
+            name: item.name,
+            country: item.country,
             lat: item.latitude,
             lon: item.longitude
         })
@@ -92,13 +93,15 @@ export default function CitySelector({
                             setQuery(e.target.value)
                             setIsOpen(true)
                         }}
-
                         onFocus={() => {
                             if (results.length > 0) setIsOpen(true)
                         }}
-                        
                         placeholder="Search any location (e.g. Da Lat, Tokyo, Paris)..."
-                        className="w-full bg-slate-900/90 text-white placeholder-slate-400 text-xs rounded-2xl pl-10 pr-9 py-2.5 border border-slate-700/60 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/30 shadow-inner transition-all"
+                        className={`w-full text-xs rounded-2xl pl-10 pr-9 py-2.5 border focus:outline-none focus:ring-1 transition-all ${
+                            isDark
+                                ? 'bg-slate-900/90 text-white placeholder-slate-400 border-slate-700/60 focus:border-sky-400 focus:ring-sky-400/30 shadow-inner'
+                                : 'bg-white text-slate-800 placeholder-slate-400 border-slate-200/90 focus:border-sky-500 focus:ring-sky-500/20 shadow-sm'
+                        }`}
                     />
 
                     {query && (
@@ -109,7 +112,9 @@ export default function CitySelector({
                                 setResults([])
                                 setIsOpen(false)
                             }}
-                            className="absolute right-3 text-slate-400 hover:text-white text-xs p-1"  
+                            className={`absolute right-3 text-xs p-1 transition-colors ${
+                                isDark ? 'text-slate-400 hover:text-white' : 'text-slate-400 hover:text-slate-700'
+                            }`}  
                         >
                              ✕
                         </button>
@@ -118,35 +123,46 @@ export default function CitySelector({
 
                 {/* Dropdown Results List */}
                 {isOpen && query.trim().length >= 2 && (
-                    <div className="absolute top-full left-0 right-0 mt-1.5 z-50 bg-slate-900/95 backdrop-blur-2xl border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden p-1.5 animate-in fade-in slide-in-from-top-2">
+                    <div className={`absolute top-full left-0 right-0 mt-1.5 z-50 backdrop-blur-2xl border rounded-2xl overflow-hidden p-1.5 animate-in fade-in slide-in-from-top-2 shadow-2xl ${
+                        isDark 
+                            ? 'bg-slate-900/95 border-slate-700/80 shadow-black/80' 
+                            : 'bg-white/95 border-slate-200 shadow-slate-300/60'
+                    }`}>
                         {loadingSearch ? (
-                            <p className="text-slate-400 text-xs py-3 px-3 text-center">Searching locations worldwide...</p>
-                        ): results.length > 0 ? (
+                            <p className={`text-xs py-3 px-3 text-center ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                                Searching locations worldwide...
+                            </p>
+                        ) : results.length > 0 ? (
                             <div className="max-h-60 overflow-y-auto space-y-1 scrollbar-none">
                                 {results.map((item) => (
                                     <button
                                         key={item.id}
                                         type="button"
                                         onClick={() => handleSelectResult(item)}
-                                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-800/80 transition-colors flex items-center justify-between text-xs group">
+                                        className={`w-full text-left px-3 py-2 rounded-xl transition-colors flex items-center justify-between text-xs group ${
+                                            isDark ? 'hover:bg-slate-800/80' : 'hover:bg-slate-100'
+                                        }`}
+                                    >
                                         <div> 
-                                            <p className="font-semibold text-white group-hover:text-sky-400 transition-colors">
+                                            <p className={`font-semibold transition-colors ${
+                                                isDark ? 'text-white group-hover:text-sky-400' : 'text-slate-800 group-hover:text-sky-600'
+                                            }`}>
                                                 {item.name}
                                             </p>
 
-                                            <p className="text-[10px] text-slate-400">
+                                            <p className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                                                 {[item.admin1, item.country].filter(Boolean).join(', ')}
                                             </p>
                                         </div>
 
-                                        <span className="text-[10px] text-slate-500 font-mono">
+                                        <span className={`text-[10px] font-mono ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                                             {item.latitude.toFixed(2)}°, {item.longitude.toFixed(2)}°
                                         </span>    
                                     </button>
                                 ))}
                             </div>
                         ) : (
-                            <p className="text-slate-400 text-xs py-3 px-3 text-center">
+                            <p className={`text-xs py-3 px-3 text-center ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                                 No locations found for "{query}".
                             </p>
                         )}
@@ -164,7 +180,9 @@ export default function CitySelector({
                     className={`flex items-center space-x-1 px-2.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border ${
                         isGPSActive
                             ? "bg-emerald-500 text-white border-emerald-400 shadow-md shadow-emerald-500/30 scale-105"
-                            : "bg-slate-800/80 text-slate-300 border-slate-700/60 hover:bg-slate-700 hover:text-white"
+                            : isDark
+                                ? "bg-slate-800/80 text-slate-300 border-slate-700/60 hover:bg-slate-700 hover:text-white"
+                                : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-900 shadow-sm"
                     }`}
                 >
                     <span className={loadingGPS ? "animate-spin" : ""}>
@@ -185,7 +203,9 @@ export default function CitySelector({
                             className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border ${
                                 isActive
                                     ? "bg-sky-500 text-white border-sky-400 shadow-md shadow-sky-500/30 scale-105"
-                                    : "bg-slate-800/80 text-slate-300 border-slate-700/60 hover:bg-slate-700 hover:text-white"
+                                    : isDark
+                                        ? "bg-slate-800/80 text-slate-300 border-slate-700/60 hover:bg-slate-700 hover:text-white"
+                                        : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-900 shadow-sm"
                             }`}
                         >
                             {city.name}   
