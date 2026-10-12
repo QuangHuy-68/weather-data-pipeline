@@ -577,7 +577,7 @@ Expert Guidance:
                             <form onSubmit={handleSaveKey} className="space-y-2">
                                 <input
                                     type="text"
-                                    value={keyIn}
+                                    value={keyInput}
                                     onChange={(e) => setKeyInput(e.target.value)}
                                     placeholder="Paste Gemini Key (AIzaSy... or AQ...)"
                                     className={`w-full rounded-lg px-2.5 py-1.5 text-xs focus:outline-none font-mono transition-all border ${
