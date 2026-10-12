@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
+import { useTheme } from '../context/ThemeContext'
 
 export default function ChatAssistant({ current, hourly = [], daily = [], aqi, location, onSelection }) {
+    const { theme } = useTheme()
+    const isDark = theme === 'dark'
     const [isOpen, setIsOpen] = useState(false)
     const [showSettings, setShowSettings] = useState(false)
     
@@ -440,15 +443,21 @@ Expert Guidance:
         <>
             {/* Floating Action Button (FAB) */}
             {!isOpen && (
-                <button 
+                <button
                     onClick={() => setIsOpen(true)}
-                    className="fixed bottom-20 right-4 z-40 bg-slate-800/95 hover:bg-slate-700 text-white rounded-full px-3.5 py-1.5 shadow-lg shadow-black/80 border border-slate-600/80 hover:border-slate-500 backdrop-blur-xl flex items-center space-x-2 transition-all transform hover:scale-105 active:scale-95"
+                    className={`fixed bottom-20 right-4 z-40 rounded-full px-3.5 py-1.5 backdrop-blur-xl flex items-center space-x-2 transition-all transform hover:scale-105 active:scale-95 border ${
+                        isDark
+                            ? 'bg-slate-800/95 hover:bg-slate-700 text-white border-slate-600/80 shadow-lg shadow-black/80'
+                            : 'bg-white/95 hover:bg-slate-50 text-slate-800 border-slate-200/90 shadow-lg shadow-slate-300/60'
+                    }`}
                     aria-label="Open AI Assistant"
                 >
-                    <span className="text-xs font-medium tracking-wide">Ask SkyBot</span>
+                    <span className="text-xs font-semibold tracking-wide">Ask SkyBot</span>
+
                     {/* Online status indicator */}
+
                     <span className="relative flex h-2 w-2">
-                        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${apiKey ? 'bg-sky-400' : 'bg-emerald-400'}`}></span>
+                        <span className={`animate-ping absolute inline-flex h-full w-ful rounded-full opacity-75 ${apiKey ? 'bg-sky-400' : 'bg-emerald-400'}`}></span>
                         <span className={`relative inline-flex rounded-full h-2 w-2 ${apiKey ? 'bg-sky-400' : 'bg-emerald-400'}`}></span>
                     </span>
                 </button>
@@ -456,25 +465,37 @@ Expert Guidance:
 
             {/* Chat Drawer / Modal */}
             {isOpen && (
-                <div className="fixed bottom-16 right-2 sm:right-6 sm:bottom-20 z-50 w-[calc(100vw-16px)] sm:w-96 max-h-[580px] h-[75vh] flex flex-col bg-slate-900/95 backdrop-blur-2xl border border-slate-700/70 rounded-3xl shadow-2xl shadow-black/80 overflow-hidden transition-all animate-in fade-in slide-in-from-bottom-6">
+                <div className={`fixed bottom-16 right-2 sm:right-6 sm:bottom-20 z-50 w-[calc(100vw-16px)] sm:w-96 max-h-[580px] h-[75vh] flex flex-col backdrop-blur-2xl rounded-3xl overflow-hidden transition-all animate-in fade-in slide-in-from-bottom-6 border ${
+                    isDark
+                        ? 'bg-slate-900/95 border-slate-700/70 shadow-2xl shadow-black/80 text-white'
+                        : 'bg-white/95 border-slate-200/90 shadow-2xl shadow-slate-300/70 text-slate-900'
+                }`}>
+
                     {/* Header */}
-                    <div className="bg-slate-800/80 px-4 py-3 border-b border-slate-700/60 flex justify-between items-center">
+                    <div className={`px-4 py-3 border-b flex justify-between items-center transition-colors ${
+                        isDark ? 'bg-slate-800/80 border-slate-700/60' : 'bg-slate-100/80 border-slate-200/80'
+                    }`}>
+
                         <div className="flex items-center space-x-2.5">
                             <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-base shadow-inner">
                                 🤖
                             </div>
 
                             <div>
-                                <h3 className="text-sm font-bold text-white leading-tight">SkyBot AI</h3>
+                                <h3 className={`text-sm font-bold leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                                    SkyBot AI
+                                </h3>
+
                                 <p className="text-[10px] flex items-center">
                                     {apiKey ? (
-                                        <span className="text-sky-400 flex items-center font-medium">
-                                            <span className="w-1.5 h-1.5 rounded-full bg-sky-400 mr-1 animate-pulse"></span>
+                                        <span className="text-sky-500 flex items-center font-medium">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-sky-500 mr-1 animate-pulse"></span>
                                             {displayModelName} Active
                                         </span>
                                     ) : (
-                                        <span className="text-emerald-400 flex items-center">
-                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1"></span>
+
+                                        <span className="text-emerald-500 flex items-center">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 me-1"></span>
                                             Local Engine Active
                                         </span>
                                     )}
@@ -491,7 +512,11 @@ Expert Guidance:
                                     setShowSettings(!showSettings)
                                 }}
                                 title="AI Engine Settings"
-                                className="text-slate-400 hover:text-white p-1.5 rounded-full hover:bg-slate-700/50 transition-colors text-xs"
+                                className={`p-1.5 rounded-full transition-colors text-xs ${
+                                    isDark
+                                        ? 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200/70'
+                                }`}
                             >
                                 ⚙️
                             </button>
@@ -500,7 +525,11 @@ Expert Guidance:
                             <button
                                 onClick={handleClearChat}
                                 title="Clear conversation"
-                                className="text-slate-400 hover:text-white p-1.5 rounded-full hover:bg-slate-700/50 transition-colors text-xs"
+                                className={`p-1.5 rounded-full transition-colors text-xs ${
+                                    isDark 
+                                        ? 'text-slate-400 hover:text-white hover:bg-slate-700/50' 
+                                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200/70'
+                                }`}
                             >
                                 🗑️
                             </button>
@@ -509,65 +538,82 @@ Expert Guidance:
                             <button 
                                 onClick={() => setIsOpen(false)}
                                 title="Close"
-                                className="text-slate-400 hover:text-white p-1.5 rounded-full hover:bg-slate-700/50 transition-colors text-xs"
+                                className={`p-1.5 rounded-full transition-colors text-xs ${
+                                    isDark 
+                                        ? 'text-slate-400 hover:text-white hover:bg-slate-700/50' 
+                                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200/70'
+                                }`}
                             >
                                 ✕
                             </button>
                         </div>
                     </div>
 
-                    {/* Settings Panel Overlay */}
-                    {showSettings && (
-                        <div className="bg-slate-800/95 border-b border-slate-700/80 p-3.5 text-xs text-slate-300 animate-in fade-in duration-200">
+                     {/* Settings Panel Overlay */}
+                     {showSettings && (
+                        <div className={`border-b p-3.5 text-xs animate-in fade-in duration-200 transition-colors ${
+                            isDark  
+                                ? 'bg-slate-800/95 border-slate-700/80 text-slate-300' 
+                                : 'bg-slate-50 border-slate-200 text-slate-700'
+                        }`}>
                             <div className="flex justify-between items-center mb-2">
-                                <span className="font-semibold text-white flex items-center space-x-1.5">
+                                <span className={`font-semibold flex items-center space-x-1.5 ${isDark ? 'text-white' : 'text-slate-900'}`}>
                                     <span>🔑</span>
                                     <span>Google Gemini API Key</span>
                                 </span>
-                                <button 
+
+                                <button
                                     onClick={() => setShowSettings(false)}
-                                    className="text-slate-400 hover:text-white text-xs"
-                                >
-                                    ✕
+                                    className={`text-xs ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-400 hover:text-slate-700'}`}
+                                    >
+                                        ✕
                                 </button>
                             </div>
-                            <p className="text-[11px] text-slate-400 mb-2 leading-relaxed">
-                                Get your free key at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-sky-400 underline">aistudio.google.com</a>. Saved securely in your browser's LocalStorage.
+                            
+                            <p className={`text-[11px] mb-2 leading-relaxed ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                                Get your free key at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-sky-500 underline font-medium">aistudio.google.com</a>. Saved securely in your browser's LocalStorage.
                             </p>
+
                             <form onSubmit={handleSaveKey} className="space-y-2">
                                 <input
                                     type="text"
-                                    value={keyInput}
+                                    value={keyIn}
                                     onChange={(e) => setKeyInput(e.target.value)}
                                     placeholder="Paste Gemini Key (AIzaSy... or AQ...)"
-                                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-sky-400 font-mono"
+                                    className={`w-full rounded-lg px-2.5 py-1.5 text-xs focus:outline-none font-mono transition-all border ${
+                                        isDark
+                                            ? 'bg-slate-900 border-slate-700 text-white placeholder-slate-500 focus:border-sky-400' 
+                                            : 'bg-white border-slate-200 text-slate-800 placeholder-slate-400 focus:border-sky-500 shadow-sm'
+                                    }`}
                                 />
+
                                 {keyStatusMessage && (
-                                    <p className={`text-[11px] font-medium ${keyStatusMessage.startsWith('✅') ? 'text-emerald-400' : keyStatusMessage.startsWith('❌') ? 'text-red-400' : 'text-sky-400'}`}>
+                                    <p className={`text-[11px] font-medium ${keyStatusMessage.startsWith('✅') ? 'text-emerald-500' : keyStatusMessage.startsWith('❌') ? 'text-red-500' : 'text-sky-500'}`}>
                                         {keyStatusMessage}
                                     </p>
                                 )}
+
                                 <div className="flex space-x-2 pt-1">
                                     <button
                                         type="submit"
                                         disabled={isValidatingKey}
                                         className="flex-1 bg-sky-600 hover:bg-sky-500 disabled:opacity-50 text-white py-1 rounded-lg font-medium transition-colors"
                                     >
-                                        {isValidatingKey ? 'Detecting Model...' : 'Test & Save Key'}
+                                       {isValidatingKey ? 'Detecting Model...' : 'Test & Save Key'}
                                     </button>
                                     {apiKey && (
                                         <button
                                             type="button"
                                             onClick={() => {
                                                 setKeyInput('')
-                                                localStorage.removeItem('skybot_gemini_api_key')
-                                                localStorage.removeItem('skybot_gemini_model')
+                                                    localStorage.removeItem('skybot_gemini_api_key')
+                                                    localStorage.removeItem('skybot_gemini_model')
                                                 setApiKey('')
                                                 setModelName('')
                                                 setKeyStatusMessage('API Key removed!')
                                                 setTimeout(() => setShowSettings(false), 1000)
                                             }}
-                                            className="px-2.5 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 rounded-lg transition-colors"
+                                            className="px-2.5 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-500 border border-red-500/30 rounded-lg transition-colors font-medium"
                                         >
                                             Remove
                                         </button>
@@ -578,10 +624,14 @@ Expert Guidance:
                     )}
 
                     {/* Live Context Banner */}
-                    <div className="bg-slate-950/50 px-4 py-1.5 border-b border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+                    <div className={`px-4 py-1.5 border-b flex items-center justify-between text-[11px] transition-colors ${
+                        isDark 
+                            ? 'bg-slate-950/50 border-slate-800/80 text-slate-400' 
+                            : 'bg-sky-50/80 border-sky-100 text-slate-600'
+                    }`}>
                         <span>📍 {location || 'Current City'}</span>
                         <span>{current?.temperature ?? '--'}°C · {current?.precipitation > 0 ? '🌧️ Rain' : '🌤️ Dry'}</span>
-                        {aqi && <span className="text-emerald-400">AQI: {aqi.aqi}</span>}
+                        {aqi && <span className="text-emerald-500 font-medium">AQI: {aqi.aqi}</span>}
                     </div>
 
                     {/* Messages Container */}
@@ -592,18 +642,25 @@ Expert Guidance:
                                 className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                             >
                                 <div 
-                                    className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 leading-relaxed shadow-md whitespace-pre-line ${
+                                    className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 leading-relaxed shadow-md whitespace-pre-line transition-all ${
                                         m.sender === 'user'
                                             ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-br-xs'
-                                            : 'bg-slate-800/90 text-slate-200 border border-slate-700/60 rounded-bl-xs'
+                                            : isDark
+
+                                                ? 'bg-slate-800/90 text-slate-200 border border-slate-700/60 rounded-bl-xs'
+                                                : 'bg-slate-100 text-slate-800 border border-slate-200/90 rounded-bl-xs shadow-sm'
                                     }`}
                                 >
                                     {m.text}
 
                                     {/* Action Card: Switch App Location */}
                                     {m.actionLocation && onSelection && (
-                                        <div className="mt-2.5 pt-2 border-t border-slate-700/60 flex items-center justify-between">
-                                            <span className="text-[10px] text-slate-400">View radar & charts:</span>
+                                        <div className={`mt-2.5 pt-2 border-t flex items-center justify-between ${
+                                            isDark ? 'border-slate-700/60' : 'border-slate-200'
+                                        }`}>
+                                            <span className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500' }`}>
+                                                View radar & charts:
+                                            </span>
 
                                             <button 
                                                 type="button"
@@ -615,9 +672,13 @@ Expert Guidance:
                                                         country: m.actionLocation.country
                                                     })
 
-                                                setIsOpen(false)
-                                            }}
-                                            className="inline-flex items-center space-x-1 bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 hover:text-white border border-sky-400/40 px-2 py-1 rounded-lg text-[10px] font-semibold transition-all transform hover:scale-105 active:scale-95"
+                                                    setIsOpen(false)
+                                                }}
+                                                className={`inline-flex items-center space-x-1 border px-2 py-1 rounded-lg text-[10px] font-semibold transition-all transform hover:scale-105 active:scale-95 ${
+                                                    isDark
+                                                        ? 'bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 hover:text-white border-sky-400/40'
+                                                        : 'bg-sky-50 hover:bg-sky-100 text-sky-600 border-sky-200'
+                                                }`}
                                             >
                                                 <span>📍 Switch to {m.actionLocation.name}</span>
                                                 <span>➔</span>
@@ -631,7 +692,11 @@ Expert Guidance:
                         {/* Typing indicator bubble */}
                         {isTyping && (
                             <div className="flex justify-start">
-                                <div className="bg-slate-800/90 border border-slate-700/60 rounded-2xl rounded-bl-xs px-3.5 py-2 text-slate-400 flex items-center space-x-1">
+                                <div className={`order rounded-2xl rounded-bl-xs px-3.5 py-2 flex items-center space-x-1 ${
+                                    isDark
+                                        ? 'bg-slate-800/90 border-slate-700/60 text-slate-400'
+                                        : 'bg-slate-100 border-slate-200 text-slate-500 shadow-sm'
+                                }`}>
                                     <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce"></span>
                                     <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0.2s]"></span>
                                     <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0.4s]"></span>
@@ -643,12 +708,20 @@ Expert Guidance:
                     </div>
 
                     {/* Quick Suggestion Chips */}
-                    <div className="px-3 py-1.5 border-t border-slate-800/60 flex items-center space-x-1.5 overflow-x-auto scrollbar-none bg-slate-950/40">
+                    <div className={`px-3 py-1.5 border-t flex items-center space-x-1.5 overflow-x-auto scrollbar-none transition-colors ${
+                        isDark
+                            ? 'border-slate-800/60 bg-slate-950/40'
+                            : 'border-slate-100 bg-slate-50/80'
+                    }`}>
                         {suggestions.map((s, idx) => (
                             <button
                                 key={idx}
                                 onClick={() => handleSend(s.query)}
-                                className="flex-shrink-0 text-[10px] font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-2.5 py-1 rounded-full border border-slate-700/50 transition-colors"
+                                className={`flex-shrink-0 text-[10px] font-medium px-2.5 py-1 rounded-full border transition-all ${
+                                    isDark
+                                        ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border-slate-700/50' 
+                                        : 'bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border-slate-200/90 shadow-xs'
+                                }`}
                             >
                                 {s.label}
                             </button>
@@ -661,20 +734,26 @@ Expert Guidance:
                             e.preventDefault()
                             handleSend()
                         }}
-                        className="p-2.5 bg-slate-900 border-t border-slate-800 flex items-center space-x-2"
+                        className={`p-2.5 border-t flex items-center space-x-2 transition-colors ${
+                            isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                        }`}
                     >
                         <input 
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             placeholder="Ask follow-up questions naturally..."
-                            className="flex-1 bg-slate-800/90 text-white placeholder-slate-500 text-xs rounded-xl px-3 py-2 border border-slate-700/60 focus:outline-none focus:border-sky-400"
+                            className={`flex-1 text-xs rounded-xl px-3 py-2 border focus:outline-none transition-all ${
+                                isDark 
+                                    ? 'bg-slate-800/90 text-white placeholder-slate-500 border-slate-700/60 focus:border-sky-400' 
+                                    : 'bg-slate-100 text-slate-800 placeholder-slate-400 border-slate-200 focus:border-sky-500 focus:bg-white'
+                            }`}
                         />
 
                         <button 
                             type="submit"
                             disabled={!input.trim() || isTyping}
-                            className="bg-sky-500 hover:bg-sky-400 disabled:opacity-40 text-white rounded-xl px-3 py-2 text-xs font-semibold transition-all shadow-md flex items-center justify-center"
+                            className="bg-sky-500 hover:bg-sky-400 disabled:opacity-40 text-white rounded-xl px-3 py-2 text-xs font-semibold transition-all shadow-md flex items-center justify-center cursor-pointer"
                         >
                              ➤
                         </button>
