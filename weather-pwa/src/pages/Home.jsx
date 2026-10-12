@@ -3,6 +3,7 @@ import { useWeatherCurrent, useWeatherDaily, useWeatherHourly, useAirQuality } f
 import { useTheme } from "../context/ThemeContext"
 import { useGeolocation } from "../hooks/useGeolocation"
 import { useNotification } from "../hooks/useNotification"
+import { useInstallPrompt } from "../hooks/useInstallPrompt"
 import CitySelector from "../components/CitySelector"
 import HourlyForecast from "../components/HourlyForecast"
 import AirQualityCard from "../components/AirQualityCard"
@@ -50,6 +51,7 @@ export default function Home() {
 
     // 3. Web Push Notification Hook
     const { permission, requestPermission, sendNotification } = useNotification()
+    const { isInstallable, promptInstall } = useInstallPrompt()
     const lastAlertKey = useRef("")
 
     const isUsingGPS = isGPSActive && coords?.lat != null && coords?.lon != null
@@ -240,6 +242,23 @@ export default function Home() {
                     </span>
 
                     <div className="flex items-center space-x-2">
+                        {/* PWA 1-Click Install Button (Auto-hidden if already installed) */}
+                        {isInstallable && (
+                            <button 
+                                type="button"
+                                onClick={promptInstall}
+                                className={`flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold transition-all duration-200 border animate-pulse ${
+                                    isDark
+                                        ? 'bg-gradient-to-r from-sky-500/20 to-blue-500/20 text-sky-300 border-sky-400/40 hover:bg-sky-500/30'
+                                        : 'bg-gradient-to-r from-sky-500 to-blue-600 text-white border-transparent hover:opacity-90 shadow-sm shadow-sky-500/30'
+                                }`}
+                                title="Install SkyPulse on your device"
+                            >
+                                <span>📲</span>
+                                <span className="text-[11px]">Install</span>
+                            </button>
+                        )}
+
                         {/* Theme Switcher Toggle Button */}
                         <button
                             type="button"
