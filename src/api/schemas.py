@@ -39,3 +39,23 @@ class ForecastResponse(BaseModel):
     model_name: str = Field(..., example="Random Forest Regressor")
     total_forecast_hours: int = Field(..., example=24)
     predictions: List[ForecastHourlyItem]
+
+class ChatQueryRequest(BaseModel):
+    query: str
+    current_city: Optional[str] = "HCM"
+    lang: Optional[str] = "vi"
+    user_id: Optional[str] = "default_user"
+
+class ChatQueryResponse(BaseModel): 
+    answer: str
+    target_location: str
+    latitude: float
+    longitude: float
+    current_temp: Optional[float] = None
+    rain_prob: Optional[float] = None
+
+class FeedbackRequest(BaseModel): 
+    query: str
+    answer: str
+    rating: int = Field(..., description="1 for Thumbs Up, -1 for Thumbs Down")
+    comment: Optional[str] = None

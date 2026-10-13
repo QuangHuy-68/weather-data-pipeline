@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTheme } from '../context/ThemeContext'
+import { API_BASE_URL } from '../config'
 
 export default function ChatAssistant({ current, hourly = [], daily = [], aqi, location, onSelection }) {
     const { theme } = useTheme()
@@ -134,6 +135,29 @@ export default function ChatAssistant({ current, hourly = [], daily = [], aqi, l
         ])
     }
 
+    const handleFeedback = async (msgIndex, queryText, answerText, rating) => {
+        try {
+            const endpoint = window.location.hostname === 'localhost'
+                ? 'http://localhost:8000/api/chat/feedback'
+                : `${API_BASE_URL}/api/chat/feedback`
+            await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    query: queryText || 'General conversation',
+                    answer: answerText,
+                    rating: rating
+                })
+            })
+            // Đánh dấu tin nhắn đã được gửi phản hồi
+            setMessages(prev => prev.map((m, idx) => 
+                idx === msgIndex ? { ...m, feedbackGiven: rating } : m
+            ))
+        } catch (err) {
+            console.warn('Feedback submission failed:', err)
+        }
+    }
+
     // Quick suggestion prompts with lifestyle & meteorological insights
     const suggestions = [
         { label: '☔ Need umbrella?', query: 'Do I need an umbrella today?' },
@@ -200,6 +224,36 @@ export default function ChatAssistant({ current, hourly = [], daily = [], aqi, l
 
         // Context-Aware Weather Reasoning Engine with Deep Meteorological Insights
     const generateBotResponse = async (userQuery) => {
+
+        // =======================================================
+        // SKYBOT KNOWLEDGE BASE & SEMANTIC ENGINE (FASTAPI)
+        // =======================================================
+        try { 
+            const endpoint = window.location.hostname === 'localhost'
+                ? 'http://localhost:8000/api/chat/ask'
+                : `${API_BASE_URL}/api/chat/ask`
+
+            const kbRes = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    query: userQuery, 
+                    current_city: location || 'HCM',
+                    lang: 'vi',
+                    user_id: localStorage.getItem('skybot_user_id') || 'user_huy' 
+                })
+            })
+
+            if (kbRes.ok) { 
+                const kbData = await kbRes.json()
+                if (kbData && kbData.answer) {
+                    return kbData.answer
+                }
+            }
+        } catch (err) {
+            console.warn('Knowledge Base API unreachable, falling back to local offline rules:', err)
+        }
+
         const q = userQuery.toLowerCase()
 
         // 1. Detect if user is asking about a different city & fetch live data on-the-fly
@@ -682,6 +736,47 @@ Expert Guidance:
                                             >
                                                 <span>📍 Switch to {m.actionLocation.name}</span>
                                                 <span>➔</span>
+                                            </button>
+                                        </div>
+                                    )}
+
+
+                                    {m.sender === 'bot' && (
+                                        <div className={`mt-2 pt-1.5 border-t flex items-center gap-2 ${
+                                            isDark ? 'border-slate-700/50' : 'border-slate-200/80'
+                                        }`}>
+                                            <span className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                                                Đánh giá:
+                                            </span>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleFeedback(idx, messages[idx - 1]?.text, m.text, 1)}
+                                                disabled={m.feedbackGiven !== undefined}
+                                                className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] transition-all ${
+                                                    m.feedbackGiven === 1
+                                                        ? 'bg-emerald-500/20 text-emerald-400 font-medium'
+                                                        : isDark
+                                                            ? 'hover:bg-slate-700 text-slate-400 hover:text-slate-200'
+                                                            : 'hover:bg-slate-200 text-slate-500 hover:text-slate-700'
+                                                }`}
+                                                title="Câu trả lời hữu ích"
+                                            >
+                                                👍 {m.feedbackGiven === 1 ? 'Đã thích' : ''}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleFeedback(idx, messages[idx - 1]?.text, m.text, -1)}
+                                                disabled={m.feedbackGiven !== undefined}
+                                                className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] transition-all ${
+                                                    m.feedbackGiven === -1
+                                                        ? 'bg-rose-500/20 text-rose-400 font-medium'
+                                                        : isDark
+                                                            ? 'hover:bg-slate-700 text-slate-400 hover:text-slate-200'
+                                                            : 'hover:bg-slate-200 text-slate-500 hover:text-slate-700'
+                                                }`}
+                                                title="Cần cải thiện"
+                                            >
+                                                👎 {m.feedbackGiven === -1 ? 'Đã ghi nhận' : ''}
                                             </button>
                                         </div>
                                     )}

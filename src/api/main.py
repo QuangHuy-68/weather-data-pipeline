@@ -2,6 +2,9 @@ import sqlite3
 import pandas as pd 
 import requests
 
+from src.knowledge.retriever import KnowledgeRetriever
+from src.api.schemas import ChatQueryRequest, ChatQueryResponse
+from src.knowledge.learning_engine import LearningEngine
 from pathlib import Path
 from typing import List, Optional 
 from fastapi import FastAPI, HTTPException, Query
@@ -12,10 +15,16 @@ from src.api.schemas import (
     WeatherCurrentResponse,
     WeatherDailyResponse,
     ForecastHourlyItem,
-    ForecastResponse
+    ForecastResponse,
+    ChatQueryResponse,
+    ChatQueryRequest,
+    FeedbackRequest
 ) 
 from datetime import datetime 
 from zoneinfo import ZoneInfo
+
+knowledge_retriever = KnowledgeRetriever()
+learning_engine = LearningEngine()
 
 app = FastAPI(
     title="🌦️ Weather Data Pipeline & ML Forecast API",
@@ -287,4 +296,142 @@ def get_ml_forecast(limit: Optional[int] = Query(24, ge=1, le=168, description="
 
     return ForecastResponse(model_name="Random Forest Regressor (Time-Series Lag)", 
                             total_forecast_hours=len(items), predictions=items)    
-        
+
+@app.post("/api/chat/ask", response_model=ChatQueryResponse, tags=["AI Knowledge Assistant"])
+def ask_weather_assistant(payload: ChatQueryRequest):
+    """
+    Intelligent Knowledge Base & Continuous Learning endpoint for SkyBot AI.
+    Features: Persistent habit memory, active entity learning, and real-time weather advice.
+    """
+    query = payload.query.strip()
+    if not query: 
+        raise HTTPException(status_code=400, detail="Query cannot be empty.")
+    user_id = payload.user_id or "default_user"
+    personalized_note = ""
+    # 1. Trích xuất địa danh từ Knowledge Base
+    matched_loc = knowledge_retriever.extract_location(query)
+    # 2. ACTIVE LEARNING: Nếu chưa có trong DB, thử tự học địa danh mới
+    if not matched_loc:
+        newly_learned = learning_engine.discover_and_learn_location(query)
+        if newly_learned:
+            matched_loc = newly_learned
+            # Nạp lại cache để Knowledge Retriever cập nhật ngay lập tức
+            knowledge_retriever._load_knowledge_cache()
+            personalized_note = " *(✨ SkyBot vừa tự học địa danh mới này!)*"
+    if matched_loc: 
+        loc_name = matched_loc["name"]
+        lat = matched_loc["latitude"]
+        lon = matched_loc["longitude"]
+    else: 
+        # 3. PERSONALIZED MEMORY: Kiểm tra xem người dùng có thói quen hỏi thành phố nào không
+        user_mem = learning_engine.get_user_memory(user_id)
+        if user_mem and user_mem.get("favorite_location"):
+            fav_name = user_mem["favorite_location"]
+            fav_loc = knowledge_retriever.extract_location(fav_name)
+            if fav_loc:
+                loc_name = fav_loc["name"]
+                lat = fav_loc["latitude"]
+                lon = fav_loc["longitude"]
+                personalized_note = f" *(📍 Tự động chọn {loc_name} theo thói quen của bạn)*"
+            else:
+                city_code = payload.current_city if payload.current_city in CITIES else "HN"
+                city_info = CITIES[city_code]
+                loc_name, lat, lon = city_info["name"], city_info["lat"], city_info["lon"]
+        else:
+            # Fallback mặc định theo thành phố đang chọn trên App
+            city_code = payload.current_city if payload.current_city in CITIES else "HN"
+            city_info = CITIES[city_code]
+            loc_name, lat, lon = city_info["name"], city_info["lat"], city_info["lon"]
+    # 4. Phân loại ý định (Intent)
+    intent = knowledge_retriever.detect_intent(query)
+    # 5. Xử lý câu hỏi FAQ từ Knowledge Base & Mô hình ML
+    if intent.startswith("faq:"): 
+        topic_key = intent.split(":", 1)[1]
+        faq_answer = knowledge_retriever.match_faq(topic_key, lang=payload.lang)
+        if faq_answer: 
+            if topic_key == "ml_model_info" and Path(PREDICTIONS_FILE).exists():
+                try:
+                    df_pred = pd.read_csv(PREDICTIONS_FILE).dropna(subset=["predicted_temperature"]).head(4)
+                    sample_lines = [f"  • {str(row['time']).split(' ')[-1][:5]}: {round(float(row['predicted_temperature']), 1)}°C" for _, row in df_pred.iterrows()]
+                    faq_answer += "\n\n🔮 **Dự báo nhiệt độ thời gian thực từ Model Champion (4 giờ tới):**\n" + "\n".join(sample_lines) + "\n*(Độ chính xác R²: 90.3% - Sai số trung bình MAE: 0.50°C)*"
+                except Exception as ex:
+                    print(f"ML forecast extraction warning: {ex}")
+            # Ghi nhật ký tương tác để học tiếp
+            learning_engine.log_interaction(user_id, query, intent, loc_name)
+            return ChatQueryResponse(
+                answer=f"💡 [Tri thức SkyBot]: {faq_answer}",
+                target_location=loc_name,
+                latitude=lat,
+                longitude=lon,
+                intent=intent
+            )
+    # 6. Lấy dữ liệu thời tiết thực tế
+    current_temp, humidity, current_rain, max_rain_prob, wind_speed = 28.0, 70.0, 0.0, 10.0, 10.0
+    try:
+        url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m&hourly=precipitation_probability&timezone=auto"
+        res = requests.get(url, timeout=5)
+        if res.status_code == 200: 
+            w_data = res.json()
+            curr = w_data.get("current", {})
+            current_temp = curr.get("temperature_2m", 28.0)
+            humidity = curr.get("relative_humidity_2m", 70.0)
+            current_rain = curr.get("precipitation", 0.0)
+            wind_speed = curr.get("wind_speed_10m", 10.0)
+            hourly_prob = w_data.get("hourly", {}).get("precipitation_probability", [])
+            curr_h = datetime.now(ZoneInfo("Asia/Ho_Chi_Minh")).hour
+            next_12h = hourly_prob[curr_h: curr_h + 12]
+            if next_12h:
+                max_rain_prob = max(next_12h)
+    except Exception as e: 
+        print(f"Weather API fetch warning: {e}")
+    # 7. Đánh giá cẩm nang Brand Hub
+    if intent in ["umbrella", "clothing", "workout", "laundry", "car_wash"]: 
+        advice = knowledge_retriever.evaluate_rule(
+            category=intent,
+            temperature=current_temp,
+            max_rain_prob=max_rain_prob,
+            current_rain=current_rain,
+            humidity=humidity,
+            lang=payload.lang
+        ) 
+        answer = f"📍 Thời tiết **{loc_name}** ({current_temp}°C, độ ẩm {humidity}%){personalized_note}:\n👉 {advice}"
+    else: 
+        rain_desc = "đang có mưa" if current_rain > 0 else f"nguy cơ mưa cao nhất 12h tới là {round(max_rain_prob)}%"
+        answer = (
+            f"📍 Thời tiết hiện tại ở **{loc_name}**{personalized_note}:\n"
+            f"• Nhiệt độ: **{current_temp}°C**\n"
+            f"• Độ ẩm: **{humidity}%** | Gió: **{wind_speed} km/h**\n"
+            f"• Khả năng mưa: **{rain_desc}**.\n"
+            f"👉 Bạn có thể hỏi tôi về việc mang ô, mặc gì, phơi đồ, rửa xe hoặc chạy bộ tại {loc_name} nhé!"
+        )
+    # 8. GHI NHẬT KÝ VÀ HỌC THÓI QUEN NGƯỜI DÙNG
+    learning_engine.log_interaction(user_id, query, intent, loc_name)
+    return ChatQueryResponse(
+        answer=answer,
+        target_location=loc_name,
+        latitude=lat, 
+        longitude=lon,
+        intent=intent,
+        current_temp=current_temp,
+        rain_prob=max_rain_prob
+    )
+
+# =======================================================
+# 6. User Feedback Loop Endpoint (👍 / 👎)
+# =======================================================
+@app.post("/api/chat/feedback", tags=["AI Chatbot"])
+def submit_chat_feedback(payload: FeedbackRequest):
+    """
+    Records thumbs up (+1) or thumbs down (-1) user feedback
+    to continuously audit and improve SkyBot's intelligence.
+    """
+    learning_engine.record_feedback(
+        query=payload.query,
+        answer=payload.answer,
+        rating=payload.rating,
+        comment=payload.comment
+    )
+    return {
+        "status": "success",
+        "message": "Thank you for your feedback! SkyBot has recorded this to improve."
+    }
