@@ -10,6 +10,7 @@ import AirQualityCard from "../components/AirQualityCard"
 import ChatAssistant from "../components/ChatAssistant"
 import WeatherRadar from "../components/WeatherRadar"
 import WeatherBackground from "../components/WeatherBackground"
+import { HeroWeatherIcon } from "../components/WeatherIcons"
 import {
     AreaChart, 
     Area,
@@ -340,7 +341,8 @@ export default function Home() {
                 ) : current ? (
                     <>
                         <div className={`relative overflow-hidden rounded-3xl p-6 mb-6 backdrop-blur-xl transition-all shadow-2xl bg-gradient-to-br ${p('gradient')} border ${p('border')}`}>
-                            <div className="flex justify-between items-start">
+                            <div className="flex justify-between items-center">
+                                {/* Bên trái: Nhiệt độ & trạng thái */}
                                 <div>
                                     <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Current temperature</p>
                                     <div className="flex items-baseline space-x-2 mt-1">
@@ -354,6 +356,16 @@ export default function Home() {
                                         <span>{p('heroEmoji')} {p('name')}</span>
                                     </p>
                                 </div>
+
+                                {/* ⭐ Bên phải: ICON LỚN TỎA SÁNG CỬ ĐỘNG (MỚI THÊM) ⭐ */}
+                                <div className="mr-2">
+                                    <HeroWeatherIcon 
+                                        code={hourly?.[0]?.code ?? 0}
+                                        isDay={hourly?.[0]?.isDay ?? 1}
+                                        rainProb={hourly?.[0]?.rainProb ?? 0}
+                                        weatherMode={weatherMode}
+                                    />
+                                </div>
                             </div> 
 
                             <div className={`mt-4 pt-4 border-t flex justify-between text-xs ${
@@ -362,7 +374,7 @@ export default function Home() {
                                 <span>Updated: {current.time?.replace("T", " ") || "Today"}</span>
                                 <span>Station: {current.location}</span>
                             </div>
-                        </div>               
+                        </div>              
 
                         {/* Smart Weather Alert Banner */}
                         {alert && (

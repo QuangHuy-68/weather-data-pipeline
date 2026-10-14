@@ -1,5 +1,6 @@
 import { getWeatherIcon } from '../hooks/useWeather'
 import { useTheme } from '../context/ThemeContext'
+import WeatherIcon from './WeatherIcons'
 
 export default function HourlyForecast({ data = [], loading = false }) {
     const { theme } = useTheme()
@@ -42,15 +43,14 @@ export default function HourlyForecast({ data = [], loading = false }) {
                 style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
             >
                 {data.map((item, index) => {
-                    const icon = getWeatherIcon(item.code, item.isDay, item.rainProb)
                     const isNow = item.displayTime === 'Now'
 
                     return (
                         <div
                             key={index}
-                            className="flex flex-col items-center flex-shrink-0 min-w-[52px] py-1 space-y-1.5"
+                            className="flex flex-col items-center flex-shrink-0 min-w-[54px] py-1 space-y-1.5"
                         >
-                            {/* Time */}
+                            {/* 1. Time */}
                             <span className={`text-xs ${
                                 isNow 
                                     ? isDark ? 'text-sky-400 font-bold' : 'text-sky-600 font-bold'
@@ -59,7 +59,15 @@ export default function HourlyForecast({ data = [], loading = false }) {
                                 {item.displayTime}
                             </span>
 
-                            {/* Rain Probability (if > 10%) */}
+                            {/* 2. ⭐ ANIMATED WEATHER ICON (MỚI THÊM) ⭐ */}
+                            <WeatherIcon 
+                                code={item.code} 
+                                isDay={item.isDay} 
+                                rainProb={item.rainProb} 
+                                size="sm" 
+                            />
+
+                            {/* 3. Rain Probability (if > 10%) */}
                             <div className="h-4 flex items-center justify-center">
                                 {item.rainProb > 10 ? (
                                     <span className={`text-[10px] font-bold tracking-tight ${
@@ -72,7 +80,7 @@ export default function HourlyForecast({ data = [], loading = false }) {
                                 )} 
                             </div>
 
-                            {/* Temperature */}
+                            {/* 4. Temperature */}
                             <span className={`text-sm font-bold ${
                                 isDark ? 'text-white' : 'text-slate-900'
                             }`}>

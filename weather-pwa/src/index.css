@@ -37,3 +37,80 @@
     0%, 100% { opacity: 0.25; transform: translateY(0px) scale(1); }
     50%      { opacity: 0.55; transform: translateY(-20px) scale(1.05); }
 }
+
+/* ─────────────────────────────────────────────────────────────
+ * LESSON 4: ANIMATED WEATHER ICON KEYFRAMES
+ * ───────────────────────────────────────────────────────────── */
+
+/* Sun icon: Gentle pulsating glow and subtle spin */
+@keyframes weatherSun {
+    0%, 100% { transform: scale(1) rotate(0deg); filter: brightness(1); }
+    50%      { transform: scale(1.12) rotate(10deg); filter: brightness(1.2); }
+}
+.animate-weather-sun {
+    animation: weatherSun 3.5s ease-in-out infinite;
+    display: inline-block;
+}
+
+/* Rain icon: Drip bounce effect */
+@keyframes weatherRain {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(2.5px); }
+}
+.animate-weather-rain {
+    animation: weatherRain 1.4s ease-in-out infinite;
+    display: inline-block;
+}
+
+/* Heavy rain: Faster bounce */
+@keyframes weatherRainHeavy {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(3px) scale(0.96); }
+}
+.animate-weather-rain-heavy {
+    animation: weatherRainHeavy 0.9s ease-in-out infinite;
+    display: inline-block;
+}
+
+/* Storm icon: Shake vibration with light flash */
+@keyframes weatherStorm {
+    0%, 100% { transform: translateX(0) scale(1); filter: brightness(1); }
+    15%      { transform: translateX(-2px) scale(1.05); filter: brightness(1.35); }
+    30%      { transform: translateX(2px) scale(1); filter: brightness(1); }
+    45%      { transform: translateX(-1px); filter: brightness(1.2); }
+    60%      { transform: translateX(0); filter: brightness(1); }
+}
+.animate-weather-storm {
+    animation: weatherStorm 2.2s ease-in-out infinite;
+    display: inline-block;
+}
+
+/* Cloud icon: Floating sideways gently */
+@keyframes weatherCloud {
+    0%, 100% { transform: translateX(0); }
+    50%      { transform: translateX(3px); }
+}
+.animate-weather-cloud {
+    animation: weatherCloud 3s ease-in-out infinite;
+    display: inline-block;
+}
+
+/* Moon icon: Gentle breathing */
+@keyframes weatherMoon {
+    0%, 100% { transform: scale(1); opacity: 0.85; }
+    50%      { transform: scale(1.08); opacity: 1; }
+}
+.animate-weather-moon {
+    animation: weatherMoon 4s ease-in-out infinite;
+    display: inline-block;
+}
+
+/* Fog icon: Fade breathing */
+@keyframes weatherFog {
+    0%, 100% { opacity: 0.65; transform: scale(0.98); }
+    50%      { opacity: 1; transform: scale(1.05); }
+}
+.animate-weather-fog {
+    animation: weatherFog 3.5s ease-in-out infinite;
+    display: inline-block;
+}
