@@ -227,7 +227,7 @@ export default function Home() {
             isDark ? 'bg-transparent text-white' : 'bg-transparent text-slate-900'
         }`}>
             <WeatherBackground current={current} hourly={hourly} />
-            <div className="max-w-3xl mx-auto p-4 md:p-8 pb-28">
+            <div className="relative z-10 max-w-3xl mx-auto p-4 md:p-8 pb-28">
                 
                 {/* Header Row 1: Location Badge on left, Alert Bell + Live API on right */}
                 <div className="flex items-center justify-between mb-2 pt-2">
@@ -348,7 +348,7 @@ export default function Home() {
                                     </div>
 
                                     <p className={`font-medium mt-2 flex items-center ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                                        <span className="mr-1.5">{current.precipitation > 0 ? "🌧️ Rainy" : "🌤️ Cool, partly cloudy"}</span>
+                                        <span>{current.precipitation > 0 ? "Rainy" : "Cool, partly cloudy"}</span>
                                     </p>
                                 </div>
 
@@ -357,7 +357,7 @@ export default function Home() {
                             <div className={`mt-4 pt-4 border-t flex justify-between text-xs ${
                                 isDark ? 'border-slate-700/50 text-slate-400' : 'border-slate-200 text-slate-500'
                             }`}>
-                                <span>🕒 Updated: {current.time?.replace("T", " ") || "Today"}</span>
+                                <span>Updated: {current.time?.replace("T", " ") || "Today"}</span>
                                 <span>Station: {current.location}</span>
                             </div>
                         </div>                

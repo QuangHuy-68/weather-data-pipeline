@@ -31,7 +31,6 @@ export default function HourlyForecast({ data = [], loading = false }) {
             <div className={`flex items-center space-x-2 border-b pb-2.5 mb-3 ${
                 isDark ? 'border-slate-700/40 text-slate-300' : 'border-slate-100 text-slate-700'
             }`}>
-                <span className="text-sm">🕒</span>
                 <span className="text-[11px] font-semibold uppercase tracking-wider">
                     24-Hour Forecast
                 </span>
@@ -59,9 +58,6 @@ export default function HourlyForecast({ data = [], loading = false }) {
                             }`}>
                                 {item.displayTime}
                             </span>
-                            
-                            {/* Weather Icon */}
-                            <span className="text-2xl select-none my-0.5">{icon}</span>
 
                             {/* Rain Probability (if > 10%) */}
                             <div className="h-4 flex items-center justify-center">
