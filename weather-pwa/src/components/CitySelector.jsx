@@ -83,8 +83,8 @@ export default function CitySelector({
             {/* Global Autocomplete Search Bar */}
             <div ref={searchContainerRef} className="relative w-full">
                 <div className="relative flex items-center">
-                    <span className="absolute left-3.5 text-slate-400 select-none text-sm">
-                        {loadingSearch ? '⏳' : '🔍'}
+                    <span className="absolute left-3.5 text-slate-400 select-none text-xs">
+                        {loadingSearch ? '...' : ''}
                     </span>
                     <input 
                         type="text"
@@ -185,9 +185,7 @@ export default function CitySelector({
                                 : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-900 shadow-sm"
                     }`}
                 >
-                    <span className={loadingGPS ? "animate-spin" : ""}>
-                        {loadingGPS ? "⏳" : "📍"}
-                    </span>
+                    {loadingGPS && <span className="text-[10px]">...</span>}
 
                     <span>{loadingGPS ? "Locating..." : "My location"}</span>
                 </button>

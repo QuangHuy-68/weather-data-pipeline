@@ -75,7 +75,6 @@ export default function Home() {
         lon: activeLon,
         name: activeName
     })
-
     const { 
         data: daily,
         loading: loadingDaily 
@@ -225,7 +224,7 @@ export default function Home() {
 
     return (
         <div className={`min-h-screen w-full overflow-x-hidden transition-colors duration-300 ${
-            isDark ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'
+            isDark ? 'bg-transparent text-white' : 'bg-transparent text-slate-900'
         }`}>
             <WeatherBackground current={current} hourly={hourly} />
             <div className="max-w-3xl mx-auto p-4 md:p-8 pb-28">
@@ -353,9 +352,6 @@ export default function Home() {
                                     </p>
                                 </div>
 
-                                <div className="text-5xl select-none">
-                                    {current.precipitation > 0 ? "🌧️" : current.temperature > 30 ? "☀️" : "⛅"}
-                                </div>
                             </div> 
 
                             <div className={`mt-4 pt-4 border-t flex justify-between text-xs ${
