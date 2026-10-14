@@ -8,7 +8,13 @@ export default function WeatherBackground({ current, hourly }) {
     
     // 1. Time & Weather Detection
     const currentHour = new Date().getHours()
+    const isSunrise = currentHour >= 5 && currentHour < 7
+    const isSunset = currentHour >= 17 && currentHour < 19
+    const isNoon = currentHour >= 11 && currentHour < 14
+    const isMidnight = currentHour >= 23 || currentHour < 4
     const isNight = currentHour < 6 || currentHour >= 18
+
+
     const weatherCode = hourly?.[0]?.code ?? 0
     const rainProb = hourly?.[0]?.rainProb ?? 0
     const precipitation = current?.precipitation ?? 0
@@ -66,7 +72,7 @@ export default function WeatherBackground({ current, hourly }) {
     return (
         <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 transition-all duration-1000">
             
-            {/* ── 1. CINEMATIC ATMOSPHERIC SKY GRADIENT ── */}
+            {/* ── 1. CINEMATIC ATMOSPHERIC SKY GRADIENT (TIME-OF-DAY ADAPTIVE) ── */}
             <div className={`absolute inset-0 transition-all duration-1000 ${
                 isStormy
                     ? isDark
@@ -76,16 +82,36 @@ export default function WeatherBackground({ current, hourly }) {
                         ? isDark
                             ? 'bg-gradient-to-b from-[#080d1a] via-[#0d1627] to-[#040812]'
                             : 'bg-gradient-to-b from-[#cbd5e1] via-[#e2e8f0] to-[#f1f5f9]'
-                        : isNight
-                            ? 'bg-gradient-to-b from-[#020617] via-[#0b1329] to-[#020617]'
-                            : isHotSun
-                                ? isDark
-                                    ? 'bg-gradient-to-b from-[#241407] via-[#0f172a] to-[#020617]'
-                                    : 'bg-gradient-to-b from-[#fef3c7] via-[#f0f9ff] to-[#ffffff]'
-                                : isDark
-                                    ? 'bg-gradient-to-b from-[#0f172a] via-[#1e293b] to-[#020617]'
-                                    : 'bg-gradient-to-b from-[#e0f2fe] via-[#f8fafc] to-[#ffffff]'
+                    : isSunrise
+                        ? isDark
+                            ? 'bg-gradient-to-b from-[#2d124d]/60 via-[#581c87]/30 to-[#020617]' // Tím hồng bình minh
+                            : 'bg-gradient-to-b from-[#fed7aa] via-[#fce7f3] to-[#ffffff]'      // Vàng hồng bình minh
+                    : isSunset
+                        ? isDark
+                            ? 'bg-gradient-to-b from-[#4c0519]/50 via-[#2e1065]/40 to-[#020617]' // Tím đỏ hoàng hôn
+                            : 'bg-gradient-to-b from-[#fde68a] via-[#f472b6]/30 to-[#e0e7ff]'  // Cam tím hoàng hôn
+                    : isMidnight
+                        ? 'bg-gradient-to-b from-[#01040f] via-[#040b1e] to-[#000206]'           // Xanh đen nửa đêm
+                    : isNoon && isHotSun
+                        ? isDark
+                            ? 'bg-gradient-to-b from-[#241407] via-[#0f172a] to-[#020617]'      // Nắng gắt
+                            : 'bg-gradient-to-b from-[#fef3c7] via-[#f0f9ff] to-[#ffffff]'
+                        : isDark
+                            ? 'bg-gradient-to-b from-[#0f172a] via-[#1e293b] to-[#020617]'
+                            : 'bg-gradient-to-b from-[#e0f2fe] via-[#f8fafc] to-[#ffffff]'
             }`}/>
+
+            {/* ── 2. GOLDEN HOUR GLOW (Hào quang chân trời khi Bình minh & Hoàng hôn) ── */}
+            {(isSunrise || isSunset) && !isRaining && (
+                <div 
+                    className="absolute -bottom-20 left-1/2 -translate-x-1/2 w-[120vw] h-96 rounded-full pointer-events-none opacity-45 blur-3xl transition-all duration-1000"
+                    style={{
+                        background: isSunrise 
+                            ? 'radial-gradient(ellipse at center, rgba(251, 146, 60, 0.45) 0%, rgba(244, 114, 182, 0) 70%)'
+                            : 'radial-gradient(ellipse at center, rgba(244, 63, 94, 0.45) 0%, rgba(139, 92, 246, 0) 70%)'
+                    }}
+                />
+            )}
 
             {/* ── 2. VIGNETTE SHADOW (Tạo chiều sâu điện ảnh 4 góc) ── */}
             <div className="absolute inset-0 bg-radial from-transparent via-transparent to-black/40 pointer-events-none" />
@@ -186,9 +212,13 @@ export default function WeatherBackground({ current, hourly }) {
                 <div className="absolute -top-28 -right-28 w-[450px] h-[450px] rounded-full blur-3xl opacity-35 animate-pulse pointer-events-none bg-amber-400/80" />
             )}
 
-            {/* ── 5. TWINKLING NIGHT STARS (Đêm quang đãng) ── */}
+            {/* ── 5. TWINKLING NIGHT STARS & MOON GLOW (Đêm quang đãng) ── */}
             {isNight && !isRaining && (
                 <div className="absolute inset-0">
+                    {/* Vầng sáng mặt trăng dịu mát */}
+                    <div className="absolute top-10 right-12 w-48 h-48 rounded-full bg-sky-200/10 blur-2xl pointer-events-none" />
+
+                    {/* Bầu trời sao */}
                     {stars.map(star => (
                         <div
                             key={star.id}
