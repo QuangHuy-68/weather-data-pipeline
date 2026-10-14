@@ -15,27 +15,11 @@ export function useWeatherCurrent({ city = 'HCM', lat = null, lon = null, name =
     const [error, setError] = useState(null)
 
     useEffect(() => { 
+        let isMounted = true
         setLoading(true)
         setError(null)
 
-        if ((city === 'HCM' || !city) && lat === null && lon === null) { 
-            fetch(`${API_BASE_URL}/weather/current`)
-                .then(res => {
-                    if (!res.ok) throw new Error(`API error: ${res.status}`)
-                    return res.json()
-                })
-
-                .then(json => { 
-                    setData(json)
-                    setLoading(false)
-                })
-                .catch(() => {
-                    fetchLiveOpenMeteoCurrent(10.8231, 106.6297, "Ho Chi Minh City")
-                })
-
-            return
-        }
-
+        // 1. Phân giải toạ độ thành phố
         let targetLat = lat
         let targetLon = lon
         let locationName = name || "Your GPS Location"
@@ -47,37 +31,65 @@ export function useWeatherCurrent({ city = 'HCM', lat = null, lon = null, name =
             locationName = cityInfo.name
         }
 
-        fetchLiveOpenMeteoCurrent(targetLat, targetLon, locationName)
+        // 2. Fetch kèm cơ chế Auto-Retry (Tối đa 3 lần nếu gặp 503)
+        fetchWithRetry(targetLat, targetLon, locationName, 3)
 
-        function fetchLiveOpenMeteoCurrent(latitude, longitude, name) {
+        async function fetchWithRetry(latitude, longitude, locName, retriesLeft = 3) {
             const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation&timezone=Asia%2FHo_Chi_Minh`
 
-            fetch(url)
-                .then(res => {
-                    if (!res.ok) throw new Error(`Weather API error: ${res.status}`)
-                    return res.json()
-                })
+            try {
+                const res = await fetch(url)
+                
+                // Nếu bị 503 (Server bận), tự động chờ và thử lại
+                if ((res.status === 503 || res.status === 429) && retriesLeft > 0) {
+                    await new Promise(resolve => setTimeout(resolve, 800))
+                    return fetchWithRetry(latitude, longitude, locName, retriesLeft - 1)
+                }
 
-                .then(json => {
-                    const c = json.current || {}
+                if (!res.ok) throw new Error(`Weather API status: ${res.status}`)
+
+                const json = await res.json()
+                const c = json.current || {}
+
+                if (isMounted) {
                     setData({
                         time: c.time || new Date().toISOString(),
-                        location: name,
-                        temperature: c.temperature_2m ?? 0,
-                        humidity: c.relative_humidity_2m ?? 0,
+                        location: locName,
+                        temperature: c.temperature_2m ?? 28,
+                        humidity: c.relative_humidity_2m ?? 70,
                         wind_speed: c.wind_speed_10m ?? 0, 
                         precipitation: c.precipitation ?? 0
                     })
                     setLoading(false)
-                })
-                .catch(err => { 
+                }
+            } catch (err) {
+                if (retriesLeft > 0) {
+                    await new Promise(resolve => setTimeout(resolve, 1000))
+                    return fetchWithRetry(latitude, longitude, locName, retriesLeft - 1)
+                }
+                
+                if (isMounted) {
+                    // Fallback an toàn: Dùng dữ liệu ước tính thay vì làm sập UI
+                    setData(prev => prev || {
+                        time: new Date().toISOString(),
+                        location: locName,
+                        temperature: 28,
+                        humidity: 75,
+                        wind_speed: 10,
+                        precipitation: 0
+                    })
                     setError(err.message)
                     setLoading(false)
-                })
+                }
+            }
+        }
+
+        return () => {
+            isMounted = false
         }
     }, [city, lat, lon])
 
-    return { data, loading }
+    return { data, loading, error }
 }
 
 
