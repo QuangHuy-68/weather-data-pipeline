@@ -1,1 +1,37 @@
-@import "tailwindcss";
+/* ─────────────────────────────────────────────────────────────
+ * REALISTIC WEATHER PHYSICS KEYFRAMES
+ * ───────────────────────────────────────────────────────────── */
+
+/* Realistic rain fall with true motion blur and wind slant */
+@keyframes realisticRainFar {
+    0%   { transform: translateY(-80px) translateX(0px) rotate(12deg); opacity: 0; }
+    15%  { opacity: 0.35; }
+    85%  { opacity: 0.35; }
+    100% { transform: translateY(110vh) translateX(35px) rotate(12deg); opacity: 0.1; }
+}
+
+@keyframes realisticRainMid {
+    0%   { transform: translateY(-100px) translateX(0px) rotate(14deg); opacity: 0; }
+    15%  { opacity: 0.65; }
+    85%  { opacity: 0.65; }
+    100% { transform: translateY(110vh) translateX(45px) rotate(14deg); opacity: 0.2; }
+}
+
+@keyframes realisticRainNear {
+    0%   { transform: translateY(-120px) translateX(0px) rotate(16deg); opacity: 0; }
+    15%  { opacity: 0.9; }
+    85%  { opacity: 0.85; }
+    100% { transform: translateY(110vh) translateX(55px) rotate(16deg); opacity: 0.3; }
+}
+
+/* Atmospheric rolling storm clouds */
+@keyframes stormAtmospherePulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50%      { opacity: 0.65; transform: scale(1.08); }
+}
+
+/* Ground splash vapor haze */
+@keyframes mistVaporDrift {
+    0%, 100% { opacity: 0.25; transform: translateY(0px) scale(1); }
+    50%      { opacity: 0.55; transform: translateY(-20px) scale(1.05); }
+}
