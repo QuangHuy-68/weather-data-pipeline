@@ -13,12 +13,12 @@ export default function WeatherBackground({ current, hourly }) {
 
     // Generate static rain drops for smooth CSS animation
     const rainDrops = useMemo(() => {
-        return Array.from({ length: 40 }).map((_, i) => ({
+        return Array.from({ length: 65 }).map((_, i) => ({
             id: i,
             left: `${Math.random() * 100}%`,
-            delay: `${Math.random() * 1.5}s`,
-            duration: `${0.6 + Math.random() * 0.4}s`,
-            opacity: 0.2 + Math.random() * 0.4
+            delay: `${Math.random() * 1.8}s`,
+            duration: `${0.7 + Math.random() * 0.5}s`,
+            opacity: 0.4 + Math.random() * 0.5
         }))
     }, [])
 
@@ -53,14 +53,15 @@ export default function WeatherBackground({ current, hourly }) {
                                 : 'bg-gradient-to-b from-sky-50 via-slate-50 to-white'
             }`}/>
 
-            {/* 2. RAIN EFFECT: Falling diagonal water drops */}
+                        {/* 2. RAIN EFFECT: Mưa rơi nghiêng óng ánh */}
             {isRaining && (
                 <div className="absolute inset-0">
                     <style>{`
                         @keyframes rainDropFall {
-                            0% { transform: translateY(-30px) rotate(15deg); opacity: 0; }
-                            50% { opacity: 0.6; }
-                            100% { transform: translateY(105vh) rotate(15deg); opacity: 0.1; }
+                            0% { transform: translateY(-40px) translateX(0px) rotate(15deg); opacity: 0; }
+                            20% { opacity: 0.8; }
+                            90% { opacity: 0.8; }
+                            100% { transform: translateY(105vh) translateX(30px) rotate(15deg); opacity: 0.2; }
                         }
                     `}</style>
                     {rainDrops.map(drop => (
@@ -69,13 +70,14 @@ export default function WeatherBackground({ current, hourly }) {
                             style={{
                                 position: 'absolute',
                                 left: drop.left,
-                                top: '-20px',
-                                width: '1.5px',
-                                height: '24px',
+                                top: '-30px',
+                                width: '2px',
+                                height: '28px',
+                                borderRadius: '9999px',
                                 background: isDark
-                                    ? 'linear-gradient(to bottom, rgba(56, 189, 248, 0.6). rgba(255, 255, 255, 0.2))'
-                                    : 'linear-gradient(to bottom, rgba(14, 165, 233, 0.7), rgba(56, 189, 248, 0.3))',
-
+                                    ? 'linear-gradient(to bottom, rgba(56, 189, 248, 0.9), rgba(255, 255, 255, 0.4))'
+                                    : 'linear-gradient(to bottom, rgba(14, 165, 233, 0.9), rgba(56, 189, 248, 0.5))',
+                                boxShadow: isDark ? '0 0 4px rgba(56, 189, 248, 0.6)' : 'none',
                                 animation: `rainDropFall ${drop.duration} linear infinite`,
                                 animationDelay: drop.delay, 
                                 opacity: drop.opacity
