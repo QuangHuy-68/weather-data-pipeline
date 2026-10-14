@@ -268,7 +268,7 @@ export default function Home() {
                             }`}
                             title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
                         >
-                            <span>{isDark ? "Light" : "Dark"}</span>
+
                             <span className="text-[11px] font-semibold">{isDark ? "Light" : "Dark"}</span>
                         </button>
 
