@@ -9,6 +9,7 @@ import HourlyForecast from "../components/HourlyForecast"
 import AirQualityCard from "../components/AirQualityCard"
 import ChatAssistant from "../components/ChatAssistant"
 import WeatherRadar from "../components/WeatherRadar"
+import WeatherBackground from "../components/WeatherBackground"
 import {
     AreaChart, 
     Area,
@@ -168,7 +169,7 @@ export default function Home() {
                     badge: '/favicon.svg'
                 })
             } else if (current.temperature >= 33) {
-                sendNotification(`☀️ Heatwave Warning: ${current.location}`, {
+                sendNotification(`Heatwave Warning: ${current.location}`, {
                     body: `High outdoor temperature of ${current.temperature}°C. Stay hydrated and avoid prolonged sun exposure!`,
                     icon: '/pwa-192x192.png',
                     badge: '/favicon.svg'
@@ -188,7 +189,6 @@ export default function Home() {
             return {
                 type: "rain",
                 bg: "bg-blue-500/20 border-blue-500/40 text-blue-400",
-                icon: "🌧️", 
                 title: currentRainProb >= 70 ? "High chance of rain" : "Rain is forecast",
                 desc: current.precipitation > 0 
                     ? `Rain detected in the area (${current.precipitation} mm). Bring an umbrella or raincoat!`
@@ -200,7 +200,6 @@ export default function Home() {
             return {
                 type: "hot",
                 bg: "bg-orange-500/20 border-orange-500/40 text-orange-400",
-                icon: "☀️",
                 title: "Heatwave warning",
                 desc: "Outdoor temperature is quite high. Remember to apply sunscreen and stay hydrated!"
             }
@@ -209,7 +208,6 @@ export default function Home() {
         return {
             type: "good",
             bg: isDark ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-300" : "bg-emerald-500/10 border-emerald-300 text-emerald-700", 
-            icon: "🌤️",
             title: "Ideal weather",
             desc: "The weather is cool and pleasant—perfect for outdoor activities!"
         }
@@ -229,6 +227,7 @@ export default function Home() {
         <div className={`min-h-screen w-full overflow-x-hidden transition-colors duration-300 ${
             isDark ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'
         }`}>
+            <WeatherBackground current={current} hourly={hourly} />
             <div className="max-w-3xl mx-auto p-4 md:p-8 pb-28">
                 
                 {/* Header Row 1: Location Badge on left, Alert Bell + Live API on right */}
@@ -238,7 +237,7 @@ export default function Home() {
                             ? 'text-sky-400 bg-sky-400/10 border-sky-400/20' 
                             : 'text-sky-600 bg-sky-100 border-sky-200'
                     }`}>
-                        {isGPSActive ? "📍 Your GPS Location" : `📍 ${current?.location || "Vietnam"}`}
+                        {isGPSActive ? "Your GPS Location" : `${current?.location || "Vietnam"}`}
                     </span>
 
                     <div className="flex items-center space-x-2">
@@ -254,7 +253,6 @@ export default function Home() {
                                 }`}
                                 title="Install SkyPulse on your device"
                             >
-                                <span>📲</span>
                                 <span className="text-[11px]">Install</span>
                             </button>
                         )}
@@ -270,7 +268,7 @@ export default function Home() {
                             }`}
                             title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
                         >
-                            <span>{isDark ? "☀️" : "🌙"}</span>
+                            <span>{isDark ? "Light" : "Dark"}</span>
                             <span className="text-[11px] font-semibold">{isDark ? "Light" : "Dark"}</span>
                         </button>
 
@@ -287,7 +285,6 @@ export default function Home() {
                             }`}
                             title={permission === 'granted' ? 'Alerts enabled (Click to test)' : 'Enable push notifications'}
                         >
-                            <span>{permission === 'granted' ? '🔔' : '🔕'}</span>
                             <span className="text-[11px]">{permission === 'granted' ? 'Alerts On' : 'Alerts'}</span>
                         </button>
 
@@ -389,7 +386,7 @@ export default function Home() {
                                 isDark ? 'bg-slate-800/50 border border-slate-700/50' : 'bg-white/90 border border-slate-200/80 shadow-sm shadow-slate-200/40'
                             }`}>
                                 <div className="flex items-center space-x-2 mb-2">
-                                    <span className="p-1.5 rounded-lg bg-orange-400/10 text-orange-400 text-sm">🌡️</span>
+                                    <span className="p-1.5 rounded-lg bg-orange-400/10 text-orange-400 text-sm">TEMPERATURE</span>
                                     <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Temperature</span>
                                 </div>
                                 <p className="text-2xl font-bold text-orange-500">{current.temperature}°C</p>
@@ -400,7 +397,7 @@ export default function Home() {
                                 isDark ? 'bg-slate-800/50 border border-slate-700/50' : 'bg-white/90 border border-slate-200/80 shadow-sm shadow-slate-200/40'
                             }`}>
                                 <div className="flex items-center space-x-2 mb-2">
-                                    <span className="p-1.5 rounded-lg bg-blue-400/10 text-blue-400 text-sm">💧</span>
+                                    <span className="p-1.5 rounded-lg bg-blue-400/10 text-blue-400 text-sm">HUMIDITY</span>
                                     <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Humidity</span>
                                 </div>
                                 <p className="text-2xl font-bold text-blue-500">{current.humidity}%</p>
@@ -411,7 +408,7 @@ export default function Home() {
                                 isDark ? 'bg-slate-800/50 border border-slate-700/50' : 'bg-white/90 border border-slate-200/80 shadow-sm shadow-slate-200/40'
                             }`}>
                                 <div className="flex items-center space-x-2 mb-2">
-                                    <span className="p-1.5 rounded-lg bg-emerald-400/10 text-emerald-400 text-sm">💨</span>
+                                    <span className="p-1.5 rounded-lg bg-emerald-400/10 text-emerald-400 text-sm">WIND SPEED</span>
                                     <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Wind Speed</span>
                                 </div>
                                 <p className="text-2xl font-bold text-emerald-500">{current.wind_speed ?? 0}
@@ -424,7 +421,7 @@ export default function Home() {
                                 isDark ? 'bg-slate-800/50 border border-slate-700/50' : 'bg-white/90 border border-slate-200/80 shadow-sm shadow-slate-200/40'
                             }`}>
                                 <div className="flex items-center space-x-2 mb-2">
-                                    <span className="p-1.5 rounded-lg bg-sky-400/10 text-sky-400 text-sm">🌧️</span>
+                                    <span className="p-1.5 rounded-lg bg-sky-400/10 text-sky-400 text-sm">RAINFALL</span>
                                     <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Rainfall</span>
                                 </div>
                                 <p className="text-2xl font-bold text-sky-500">{current.precipitation} 
@@ -446,7 +443,6 @@ export default function Home() {
                 }`}>
                     <div className="flex justify-between items-center mb-4">
                         <h2 className={`text-sm font-semibold flex items-center ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                            <span className="mr-2">📈</span>
                             7-Day Temperature Trend
                         </h2>
                         <span className="text-[11px] text-orange-500 font-medium bg-orange-400/10 px-2 py-0.5 rounded-md">
@@ -487,7 +483,6 @@ export default function Home() {
                 }`}>
                     <div className="flex justify-between items-center mb-4">
                         <h2 className={`text-sm font-semibold flex items-center ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                            <span className="mr-2">🌧️</span>
                             Daily Rainfall (mm)
                         </h2>
                         <span className="text-[11px] text-sky-500 font-medium bg-sky-400/10 px-2 py-0.5 rounded-md">
