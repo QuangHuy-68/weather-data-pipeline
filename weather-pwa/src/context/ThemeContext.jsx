@@ -1,12 +1,34 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+// src/context/ThemeContext.jsx
+import { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react'
+import { computeWeatherTheme, WEATHER_PALETTES } from '../hooks/useWeatherTheme'
 
 const ThemeContext = createContext()
 
 export function ThemeProvider({ children }) {
+    // 1. Manual Dark / Light toggle preference
     const [theme, setTheme] = useState(() => {
         return localStorage.getItem('skypulse_theme') || 'dark'
     })
 
+    // 2. Weather data stream (populated from Home.jsx)
+    const [weatherSource, setWeatherSource] = useState({ current: null, hourly: [] })
+
+    // Method allowing pages to sync current weather data
+    const setWeatherData = useCallback((current, hourly) => {
+        setWeatherSource({ current, hourly: hourly || [] })
+    }, [])
+
+    // Compute weather-adaptive palette whenever weather changes
+    const weatherTheme = useMemo(() => {
+        if (!weatherSource.current) {
+            return { weatherMode: 'clear', palette: WEATHER_PALETTES.clear }
+        }
+        return computeWeatherTheme(weatherSource.current, weatherSource.hourly)
+    }, [weatherSource])
+
+    const isDark = theme === 'dark'
+
+    // Synchronize HTML root and body classes
     useEffect(() => {
         localStorage.setItem('skypulse_theme', theme) 
         if (theme === 'dark') {
@@ -22,8 +44,28 @@ export function ThemeProvider({ children }) {
         setTheme(prev => prev === 'dark' ? 'light' : 'dark')
     }
 
+    /**
+     * Helper: Automatically resolves the class based on current Dark or Light mode.
+     * Example: p('gradient') => returns palette.gradient.dark or palette.gradient.light
+     */
+    const p = useCallback((key) => {
+        const val = weatherTheme.palette[key]
+        if (val && typeof val === 'object' && ('dark' in val || 'light' in val)) {
+            return isDark ? val.dark : val.light
+        }
+        return val
+    }, [weatherTheme.palette, isDark])
+
     return (
-        <ThemeContext.Provider value={{ theme, toggleTheme }}>
+        <ThemeContext.Provider value={{ 
+            theme, 
+            toggleTheme, 
+            isDark,
+            weatherMode: weatherTheme.weatherMode,
+            palette: weatherTheme.palette,
+            setWeatherData,
+            p
+        }}>
             {children}
         </ThemeContext.Provider>
     )

@@ -23,7 +23,7 @@ import {
 } from "recharts"
 
 export default function Home() {
-    const { theme, toggleTheme } = useTheme()
+    const { theme, toggleTheme, setWeatherData, p } = useTheme()
     const isDark = theme === 'dark'
 
     // 1. Location state management (with localStorage persistence)
@@ -176,6 +176,13 @@ export default function Home() {
             }
         }
     }, [current, permission, sendNotification])
+
+    
+    useEffect(() => {
+        if (current) {
+            setWeatherData(current, hourly)
+        }
+    }, [current, hourly, setWeatherData])
 
     // Smart weather alert generator for UI banner (synced with hourly rain probability)
     const getWeatherAlert = () => { 
@@ -332,11 +339,7 @@ export default function Home() {
                     </div>
                 ) : current ? (
                     <>
-                        <div className={`relative overflow-hidden rounded-3xl p-6 mb-6 backdrop-blur-xl transition-all ${
-                            isDark 
-                                ? 'bg-gradient-to-br from-sky-500/20 via-slate-800/80 to-slate-900/90 border border-sky-500/30 text-white shadow-2xl' 
-                                : 'bg-gradient-to-br from-sky-100/90 via-white to-sky-50/70 border border-sky-200/80 text-slate-900 shadow-lg shadow-sky-100/50'
-                        }`}>
+                        <div className={`relative overflow-hidden rounded-3xl p-6 mb-6 backdrop-blur-xl transition-all shadow-2xl bg-gradient-to-br ${p('gradient')} border ${p('border')}`}>
                             <div className="flex justify-between items-start">
                                 <div>
                                     <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Current temperature</p>
@@ -344,14 +347,13 @@ export default function Home() {
                                         <span className={`text-6xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                                             {current.temperature}
                                         </span>
-                                        <span className="text-xl font-medium text-sky-500">°C</span>
+                                        <span className="text-xl font-medium" style={{ color: p('accent') }}>°C</span>
                                     </div>
 
                                     <p className={`font-medium mt-2 flex items-center ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                                        <span>{current.precipitation > 0 ? "Rainy" : "Cool, partly cloudy"}</span>
+                                        <span>{p('heroEmoji')} {p('name')}</span>
                                     </p>
                                 </div>
-
                             </div> 
 
                             <div className={`mt-4 pt-4 border-t flex justify-between text-xs ${
@@ -360,7 +362,7 @@ export default function Home() {
                                 <span>Updated: {current.time?.replace("T", " ") || "Today"}</span>
                                 <span>Station: {current.location}</span>
                             </div>
-                        </div>                
+                        </div>               
 
                         {/* Smart Weather Alert Banner */}
                         {alert && (
