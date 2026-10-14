@@ -24,7 +24,7 @@ import {
 } from "recharts"
 
 export default function Home() {
-    const { theme, toggleTheme, setWeatherData, p } = useTheme()
+    const { theme, toggleTheme, setWeatherData, p, weatherMode } = useTheme()
     const isDark = theme === 'dark'
 
     // 1. Location state management (with localStorage persistence)
