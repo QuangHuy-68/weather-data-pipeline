@@ -378,51 +378,64 @@ export default function Home() {
                         {/* ⭐ 24-Hour Hourly Forecast Timeline (Apple Weather Style) ⭐ */}
                         <HourlyForecast data={hourly} loading={loadingHourly} />
 
-                        {/* 4 Detail Metric Cards */}
+                                                {/* 4 Detail Metric Cards (Adaptive Weather Borders & Accent Glow) */}
                         <div className="grid grid-cols-2 gap-3 mb-6">
-                            <div className={`rounded-2xl p-4 backdrop-blur-md transition-all ${
-                                isDark ? 'bg-slate-800/50 border border-slate-700/50' : 'bg-white/90 border border-slate-200/80 shadow-sm shadow-slate-200/40'
-                            }`}>
+                            <div className={`rounded-2xl p-4 backdrop-blur-md transition-all duration-300 border ${
+                                isDark ? 'bg-slate-800/40 border-slate-700/60' : 'bg-white/80 border-slate-200/90 shadow-sm'
+                            }`} style={{ borderColor: isDark ? `${p('accent')}33` : undefined }}>
                                 <div className="flex items-center space-x-2 mb-2">
-                                    <span className="p-1.5 rounded-lg bg-orange-400/10 text-orange-400 text-sm">TEMPERATURE</span>
+                                    <span className="p-1.5 rounded-lg text-xs font-bold" style={{ backgroundColor: `${p('accent')}20`, color: p('accent') }}>
+                                        TEMP
+                                    </span>
                                     <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Temperature</span>
                                 </div>
-                                <p className="text-2xl font-bold text-orange-500">{current.temperature}°C</p>
-                                <p className={`text-[10px] mt-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Feels like {Math.round(current.temperature + 1)}°C</p>
+                                <p className="text-2xl font-bold" style={{ color: p('accent') }}>{current.temperature}°C</p>
+                                <p className={`text-[10px] mt-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                                    Feels like {Math.round(current.temperature + 1)}°C
+                                </p>
                             </div>
 
-                            <div className={`rounded-2xl p-4 backdrop-blur-md transition-all ${
-                                isDark ? 'bg-slate-800/50 border border-slate-700/50' : 'bg-white/90 border border-slate-200/80 shadow-sm shadow-slate-200/40'
+                            <div className={`rounded-2xl p-4 backdrop-blur-md transition-all duration-300 border ${
+                                isDark ? 'bg-slate-800/40 border-slate-700/60' : 'bg-white/80 border-slate-200/90 shadow-sm'
                             }`}>
                                 <div className="flex items-center space-x-2 mb-2">
-                                    <span className="p-1.5 rounded-lg bg-blue-400/10 text-blue-400 text-sm">HUMIDITY</span>
+                                    <span className="p-1.5 rounded-lg bg-sky-400/10 text-sky-400 text-xs font-bold">
+                                        HUMIDITY
+                                    </span>
                                     <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Humidity</span>
                                 </div>
-                                <p className="text-2xl font-bold text-blue-500">{current.humidity}%</p>
-                                <p className={`text-[10px] mt-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{current.humidity > 80 ? "High humidity" : "Well-ventilated"}</p>
+                                <p className="text-2xl font-bold text-sky-400">{current.humidity}%</p>
+                                <p className={`text-[10px] mt-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                                    {current.humidity > 80 ? "High humidity" : "Well-ventilated"}
+                                </p>
                             </div>
 
-                            <div className={`rounded-2xl p-4 backdrop-blur-md transition-all ${
-                                isDark ? 'bg-slate-800/50 border border-slate-700/50' : 'bg-white/90 border border-slate-200/80 shadow-sm shadow-slate-200/40'
+                            <div className={`rounded-2xl p-4 backdrop-blur-md transition-all duration-300 border ${
+                                isDark ? 'bg-slate-800/40 border-slate-700/60' : 'bg-white/80 border-slate-200/90 shadow-sm'
                             }`}>
                                 <div className="flex items-center space-x-2 mb-2">
-                                    <span className="p-1.5 rounded-lg bg-emerald-400/10 text-emerald-400 text-sm">WIND SPEED</span>
+                                    <span className="p-1.5 rounded-lg bg-emerald-400/10 text-emerald-400 text-xs font-bold">
+                                        WIND
+                                    </span>
                                     <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Wind Speed</span>
                                 </div>
-                                <p className="text-2xl font-bold text-emerald-500">{current.wind_speed ?? 0}
+                                <p className="text-2xl font-bold text-emerald-400">
+                                    {current.wind_speed ?? 0}
                                     <span className="text-xs font-normal ml-1">km/h</span>
                                 </p>
                                 <p className={`text-[10px] mt-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Gentle pleasant breeze</p>
                             </div>
 
-                            <div className={`rounded-2xl p-4 backdrop-blur-md transition-all ${
-                                isDark ? 'bg-slate-800/50 border border-slate-700/50' : 'bg-white/90 border border-slate-200/80 shadow-sm shadow-slate-200/40'
+                            <div className={`rounded-2xl p-4 backdrop-blur-md transition-all duration-300 border ${
+                                isDark ? 'bg-slate-800/40 border-slate-700/60' : 'bg-white/80 border-slate-200/90 shadow-sm'
                             }`}>
                                 <div className="flex items-center space-x-2 mb-2">
-                                    <span className="p-1.5 rounded-lg bg-sky-400/10 text-sky-400 text-sm">RAINFALL</span>
+                                    <span className="p-1.5 rounded-lg bg-blue-400/10 text-blue-400 text-xs font-bold">
+                                        RAIN
+                                    </span>
                                     <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Rainfall</span>
                                 </div>
-                                <p className="text-2xl font-bold text-sky-500">{current.precipitation} 
+                                <p className="text-2xl font-bold text-blue-400">{current.precipitation} 
                                     <span className="text-xs font-normal ml-1">mm</span>
                                 </p>
                                 <p className={`text-[10px] mt-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Measured over the past hour</p>
@@ -435,15 +448,18 @@ export default function Home() {
                     </div>
                 )}
 
-                {/* Chart 1: 7-Day Temperature Trend */}
-                <div className={`rounded-3xl p-4 mb-6 backdrop-blur-md transition-all ${
-                    isDark ? 'bg-slate-800/40 border border-slate-700/50 text-white' : 'bg-white/90 border border-slate-200/80 text-slate-900 shadow-sm shadow-slate-200/40'
+                                {/* Chart 1: 7-Day Temperature Trend (Adaptive Color Accent) */}
+                <div className={`rounded-3xl p-4 mb-6 backdrop-blur-md transition-all duration-300 border ${
+                    isDark ? 'bg-slate-800/40 border-slate-700/50 text-white' : 'bg-white/90 border-slate-200/80 text-slate-900 shadow-sm'
                 }`}>
                     <div className="flex justify-between items-center mb-4">
                         <h2 className={`text-sm font-semibold flex items-center ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
                             7-Day Temperature Trend
                         </h2>
-                        <span className="text-[11px] text-orange-500 font-medium bg-orange-400/10 px-2 py-0.5 rounded-md">
+                        <span 
+                            className="text-[11px] font-medium px-2 py-0.5 rounded-md"
+                            style={{ backgroundColor: `${p('accent')}20`, color: p('accent') }}
+                        >
                             AVG Temp (°C)
                         </span>
                     </div>
@@ -454,9 +470,9 @@ export default function Home() {
                         <ResponsiveContainer width="100%" height={170}>
                             <AreaChart data={formattedDaily}>
                                 <defs>
-                                    <linearGradient id="tempGradient" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#f97316" stopOpacity={0.4}/>
-                                        <stop offset="95%" stopColor="#f97316" stopOpacity={0.0}/>
+                                    <linearGradient id="weatherTempGradient" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor={p('accent')} stopOpacity={0.4}/>
+                                        <stop offset="95%" stopColor={p('accent')} stopOpacity={0.0}/>
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#334155" : "#e2e8f0"} opacity={0.6} />
@@ -469,7 +485,14 @@ export default function Home() {
                                     fontSize: '12px',
                                     color: isDark ? '#ffffff' : '#0f172a'
                                 }} />
-                                <Area type="monotone" dataKey="temp" stroke="#f97316" strokeWidth={2.5} fill="url(#tempGradient)" name="AVG Temp (°C)" />
+                                <Area 
+                                    type="monotone" 
+                                    dataKey="temp" 
+                                    stroke={p('accent')} 
+                                    strokeWidth={2.5} 
+                                    fill="url(#weatherTempGradient)" 
+                                    name="AVG Temp (°C)" 
+                                />
                             </AreaChart>
                         </ResponsiveContainer>
                     )}
