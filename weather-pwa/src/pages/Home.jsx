@@ -155,7 +155,7 @@ export default function Home() {
     useEffect(() => {
         if (!current || permission !== 'granted') return
 
-        const condition = current.precipitation > 0 ? 'rain' : current.temperature >= 33 ? 'heat' : 'normal'
+                const condition = current.precipitation > 0 ? 'rain' : current.temperature >= 33 ? 'heat' : current.temperature <= 5 ? 'cold' : 'normal'
         const alertKey = `${current.location}_${condition}`
 
         // Trigger notification only once per weather state change (anti-spam)
@@ -171,6 +171,12 @@ export default function Home() {
             } else if (current.temperature >= 33) {
                 sendNotification(`Heatwave Warning: ${current.location}`, {
                     body: `High outdoor temperature of ${current.temperature}°C. Stay hydrated and avoid prolonged sun exposure!`,
+                    icon: '/pwa-192x192.png',
+                    badge: '/favicon.svg'
+                })
+            } else if (current.temperature <= 5) {
+                sendNotification(`🥶 Freezing Alert: ${current.location}`, {
+                    body: `Freezing outdoor temperature (${current.temperature}°C). Keep warm and wear thermal layers!`,
                     icon: '/pwa-192x192.png',
                     badge: '/favicon.svg'
                 })
@@ -203,17 +209,34 @@ export default function Home() {
             }
         }
 
-        if (current.temperature >= 33) {
+                if (current.temperature >= 33) {
             return {
                 type: "hot",
+                icon: "🔥",
                 bg: "bg-orange-500/20 border-orange-500/40 text-orange-400",
                 title: "Heatwave warning",
                 desc: "Outdoor temperature is quite high. Remember to apply sunscreen and stay hydrated!"
             }
         }
 
+        // ⭐ Cảnh báo giá rét / nhiệt độ âm dưới 5°C
+        if (current.temperature <= 5) {
+            return {
+                type: "freezing",
+                icon: current.temperature <= 0 ? "🥶" : "❄️",
+                bg: isDark 
+                    ? "bg-cyan-500/20 border-cyan-500/40 text-cyan-300" 
+                    : "bg-cyan-500/10 border-cyan-300 text-cyan-800",
+                title: current.temperature <= 0 ? "Freezing Warning 🥶" : "Cold Weather Advisory ❄️",
+                desc: current.temperature <= 0
+                    ? `Sub-zero cold (${current.temperature}°C). Extreme freezing conditions—wear heavy thermal layers!`
+                    : `Outdoor temperature is very chilly (${current.temperature}°C). Remember a warm coat before going out!`
+            }
+        }
+
         return {
             type: "good",
+            icon: "✨",
             bg: isDark ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-300" : "bg-emerald-500/10 border-emerald-300 text-emerald-700", 
             title: "Ideal weather",
             desc: "The weather is cool and pleasant—perfect for outdoor activities!"
