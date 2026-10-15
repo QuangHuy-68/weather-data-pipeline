@@ -1,8 +1,8 @@
 /**
  * ═══════════════════════════════════════════════════════════
- *  LESSON 4 — Animated Weather Icons & Micro-interactions
- *  Component wrapper cho emoji icons với CSS animation
- *  theo loại thời tiết (sun=glow, rain=drip, storm=shake, fog=fade...)
+ *  Animated Weather Icons & Micro-interactions
+ *  Component wrapper for emoji icons with CSS animation
+ *  matching weather type (sun=glow, rain=drip, storm=shake, fog=fade, snow=drift...)
  * ═══════════════════════════════════════════════════════════
  */
 
@@ -14,6 +14,9 @@ import { getWeatherIcon } from '../hooks/useWeather'
 function getAnimationClass(code, rainProb, isDay) {
     // Thunderstorm — flash + shake
     if (code >= 95) return 'animate-weather-storm'
+
+    // Snowfall — gentle cloud breathing (reuse cloud float for snow)
+    if (code >= 71 && code <= 77) return 'animate-weather-fog'
 
     // Heavy rain or high probability — drip animation
     if ((code >= 61 && code <= 82) || rainProb >= 70) return 'animate-weather-rain-heavy'
@@ -80,6 +83,7 @@ export function HeroWeatherIcon({ code = 0, isDay = 1, rainProb = 0, weatherMode
         hot: 'bg-amber-400/20 shadow-amber-400/30',
         foggy: 'bg-slate-400/15 shadow-slate-400/20',
         cloudy: 'bg-zinc-400/15 shadow-zinc-400/20',
+        snowy: 'bg-sky-300/20 shadow-sky-300/30',
     }
 
     const glow = glowColors[weatherMode] || glowColors.clear

@@ -23,6 +23,9 @@ export default function WeatherBackground({ current, hourly }) {
     const isStormy = weatherCode >= 95
     const isRaining = precipitation > 0 || rainProb >= 40 || isStormy
     const isHotSun = !isRaining && !isNight && temperature >= 32
+    const isSnowing = weatherCode >= 71 && weatherCode <= 77
+    const isCloudy = (weatherCode >=2 && weatherCode <= 3) || isRaining
+    const isFroggy = weatherCode === 45 || weatherCode === 48
 
     // 2. LAYER 1: Far Rain (Nhỏ, mờ, rơi chậm - tạo cảm giác không gian xa)
     const farRain = useMemo(() => {
@@ -66,6 +69,31 @@ export default function WeatherBackground({ current, hourly }) {
             delay: `${Math.random() * 3}s`,
             duration: `${2 + Math.random() * 2}s`,
             size: `${1 + Math.random() * 2}px`
+        }))
+    }, [])
+
+    // 6. Snowflakes for snowy weather
+    const snowflakes = useMemo(() => {
+        return Array.from({ length: 60 }).map((_, i) => ({
+            id: i,
+            left: `${Math.random() * 105}%`,
+            delay: `${Math.random() * 5}s`,
+            duration: `${4 + Math.random() * 4}s`,
+            size: `${3 + Math.random() * 5}px`,
+            opacity: 0.4 + Math.random() * 0.5,
+        }))
+    }, [])
+
+    // 7. Floating cloud particles for cloudy / rainy conditions
+    const clouds = useMemo(() => {
+        return Array.from({ length: 4 }).map((_, i) => ({
+            id: i,
+            top: `${5 + Math.random() * 25}%`,
+            delay: `${i * 6 + Math.random() * 4}s`,
+            duration: `${22 + Math.random() * 12}s`,
+            width: `${180 + Math.random() * 140}px`,
+            height: `${50 + Math.random() * 40}px`,
+            opacity: 0.15 + Math.random() * 0.2,
         }))
     }, [])
 
@@ -207,12 +235,101 @@ export default function WeatherBackground({ current, hourly }) {
                 </div>
             )}
 
-            {/* ── 4. WARM RADIATING SUN (Trời nắng) ── */}
+            {/* ── 4. ⚡ LIGHTNING FLASH (Chớp sét toàn màn hình khi giông) ── */}
+            {isStormy && (
+                <div 
+                    className="absolute inset-0 animate-lightning-flash pointer-events-none z-10"
+                    style={{
+                        background: isDark  
+                            ? 'radial-gradient(ellipse at 40% 20%, rgba(167, 139, 250, 0.6) 0%, rgba(255, 255, 255, 0.15) 40%, transparent 75%)'
+                            : 'radial-gradient(ellipse at 40% 20%, rgba(139, 92, 246, 0.3) 0%, rgba(255, 255, 255, 0.4) 40%, transparent 75%)',
+                    }}
+                />
+            )}
+
+            {/* ── 5. ❄️ SNOWFALL EFFECT (Tuyết rơi nhẹ khi WMO 71-77) ── */}
+            {isSnowing && (
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    {snowflakes.map(flake => (
+                        <div 
+                            key={`snow-${flake.id}`}
+                            style={{
+                                position: 'absolute',
+                                left: flake.left,
+                                top: '-20px',
+                                width: flake.size,
+                                height: flake.size,
+                                borderRadius: '50%',
+                                backgroundColor: isDark ? '#ffffff' : '#94a3b8',
+                                opacity: flake.opacity,
+                                filter: 'blur(0.5px)',
+                                animation: `snowfallDrift ${flake.duration} linear infinite`,
+                                animationDelay: flake.delay,
+                            }}
+                        />
+                    ))}
+                </div>
+            )}
+
+            {/* ── 6. ☁️ FLOATING CLOUD DRIFT (Mây trôi ngang khi mây/mưa) ── */}
+            {isCloudy && (
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    {clouds.map(cloud => (
+                        <div    
+                            key={`cloud-${cloud.id}`}
+                            style={{
+                                position: 'absolute',
+                                top: cloud.top,
+                                width: cloud.width,
+                                height: cloud.height,
+                                borderRadius: '9999px',
+                                background: isDark  
+                                    ? 'radial-gradient(ellipse, rgba(148, 163, 184, 0.12) 0%, transparent 70%)'
+                                    : 'radial-gradient(ellipse, rgba(203, 213, 225, 0.35) 0%, transparent 70%)',
+
+                                filter: 'blur(8px)',
+                                opacity: cloud.opacity,
+                                animation: `cloudDrift ${cloud.duration} linear infinite`,
+                                animationDelay: cloud.delay
+                            }}
+                        />
+                    ))}
+                </div>
+            )}
+
+            {/* ── 7. 🌫️ DENSE FOG OVERLAY (Sương mù dày khi WMO 45/48) ── */}
+            {isFroggy && (
+                <>
+                    <div
+                        className="absolute inset-0 pointer-events-none"
+                        style={{
+                            background: isDark
+                                ? 'linear-gradient(to bottom, rgba(100, 116, 139, 0.15) 0%, rgba(71, 85, 105, 0.25) 50%, rgba(51, 65, 85, 0.1) 100%)'
+                                : 'linear-gradient(to bottom, rgba(226, 232, 240, 0.4) 0%, rgba(203, 213, 225, 0.5) 50%, rgba(241, 245, 249, 0.3) 100%',
+                            
+                            filter: 'blur(20px)',
+                            animation: 'fogOverlayPulse 8s ease-in-out infinite',
+                        }}
+                    />
+                    <div 
+                        className="absolute bottom-0 left-0 right-0 h-[50vh] pointer-events-none"
+                        style={{
+                            background: isDark
+                                ? 'radial-gradient(ellipse at bottom, rgba(148, 163, 184, 0.15) 0%, transparent 80%)'
+                                : 'radial-gradient(ellipse at bottom, rgba(203, 213, 225, 0.4) 0%, transparent 80%)',
+                            filter: 'blur(40px)',
+                            animation: 'mistVaporDrift 10s ease-in-out infinite',
+                        }}
+                    /> 
+                </>
+            )}
+
+            {/* ── 8. WARM RADIATING SUN (Trời nắng) ── */}
             {isHotSun && (
                 <div className="absolute -top-28 -right-28 w-[450px] h-[450px] rounded-full blur-3xl opacity-35 animate-pulse pointer-events-none bg-amber-400/80" />
             )}
 
-            {/* ── 5. TWINKLING NIGHT STARS & MOON GLOW (Đêm quang đãng) ── */}
+            {/* ── 9. TWINKLING NIGHT STARS & MOON GLOW (Đêm quang đãng) ── */}
             {isNight && !isRaining && (
                 <div className="absolute inset-0">
                     {/* Vầng sáng mặt trăng dịu mát */}

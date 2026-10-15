@@ -123,6 +123,26 @@ export const WEATHER_PALETTES = {
         },
         glow: 'shadow-zinc-400/15',
         heroEmoji: '☁️'
+    },
+
+    // 7. Snowfall / Winter Weather
+    snowy: {
+        name: 'Snowfall',
+        accent: '#7dd3fc', // Sky 300
+        gradient: {
+            dark: 'from-sky-800/20 via-slate-800/85 to-indigo-950/90',
+            light: 'from-sky-50/90 via-white to-indigo-50/60',
+        },
+        border: {
+            dark: 'border-sky-400/30',
+            light: 'border-sky-200/80',
+        },
+        badge: {
+            dark: 'bg-sky-300/10 text-sky-300 border-sky-400/20',
+            light: 'bg-sky-50 text-sky-600 border-sky-200',
+        },
+        glow: 'shadow-sky-300/20',
+        heroEmoji: '❄️'
     }
 };
 
@@ -144,22 +164,27 @@ export function computeWeatherTheme(current, hourly = []) {
         return { weatherMode: 'stormy', palette: WEATHER_PALETTES.stormy };
     }
 
-    // 2. Check for Active Rain or High Rain Probability
+    // 2. Check for Snowfall (WMO code 71-77: snow / snow grains)
+    if (weatherCode >= 71 && weatherCode <= 77) {
+        return { weatherMode: 'snowy', palette: WEATHER_PALETTES.snowy };
+    }
+
+    // 3. Check for Active Rain or High Rain Probability
     if (precipitation > 0 || rainProb >= 60) {
         return { weatherMode: 'rainy', palette: WEATHER_PALETTES.rainy };
     }
 
-    // 3. Check for Heatwave condition (temperature >= 33°C)
+    // 4. Check for Heatwave condition (temperature >= 33°C)
     if (temp >= 33) {
         return { weatherMode: 'hot', palette: WEATHER_PALETTES.hot };
     }
 
-    // 4. Check for Fog / Saturated Humidity
+    // 5. Check for Fog / Saturated Humidity
     if (weatherCode === 45 || weatherCode === 48 || (humidity > 90 && temp < 26)) {
         return { weatherMode: 'foggy', palette: WEATHER_PALETTES.foggy };
     }
 
-    // 5. Check for Cloudy / Overcast conditions
+    // 6. Check for Cloudy / Overcast conditions
     if (weatherCode >= 2 && weatherCode <= 3) {
         return { weatherMode: 'cloudy', palette: WEATHER_PALETTES.cloudy };
     }

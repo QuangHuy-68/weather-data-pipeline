@@ -510,15 +510,18 @@ export default function Home() {
                     )}
                 </div>
 
-                {/* Chart 2: Daily Rainfall */}
-                <div className={`rounded-3xl p-4 mb-6 backdrop-blur-md transition-all ${
-                    isDark ? 'bg-slate-800/40 border border-slate-700/50 text-white' : 'bg-white/90 border border-slate-200/80 text-slate-900 shadow-sm shadow-slate-200/40'
+                                {/* Chart 2: Daily Rainfall (Adaptive Color Accent) */}
+                <div className={`rounded-3xl p-4 mb-6 backdrop-blur-md transition-all duration-300 border ${
+                    isDark ? 'bg-slate-800/40 border-slate-700/50 text-white' : 'bg-white/90 border-slate-200/80 text-slate-900 shadow-sm shadow-slate-200/40'
                 }`}>
                     <div className="flex justify-between items-center mb-4">
                         <h2 className={`text-sm font-semibold flex items-center ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
                             Daily Rainfall (mm)
                         </h2>
-                        <span className="text-[11px] text-sky-500 font-medium bg-sky-400/10 px-2 py-0.5 rounded-md">
+                        <span 
+                            className="text-[11px] font-medium px-2 py-0.5 rounded-md"
+                            style={{ backgroundColor: `${p('accent')}20`, color: p('accent') }}
+                        >
                             Total Rain (mm)
                         </span>
                     </div>
@@ -528,6 +531,12 @@ export default function Home() {
                     ) : (
                         <ResponsiveContainer width="100%" height={150}>
                             <BarChart data={formattedDaily}>
+                                <defs>
+                                    <linearGradient id="weatherRainGradient" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stopColor={p('accent')} stopOpacity={0.9}/>
+                                        <stop offset="100%" stopColor={p('accent')} stopOpacity={0.4}/>
+                                    </linearGradient>
+                                </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#334155" : "#e2e8f0"} opacity={0.6} />
                                 <XAxis dataKey="shortDate" stroke={isDark ? "#94a3b8" : "#64748b"} tick={{ fontSize: 10 }} />
                                 <YAxis stroke={isDark ? "#94a3b8" : "#64748b"} tick={{ fontSize: 10 }} width={25} />
@@ -538,7 +547,7 @@ export default function Home() {
                                     fontSize: '12px',
                                     color: isDark ? '#ffffff' : '#0f172a'
                                 }} />
-                                <Bar dataKey="rain" fill="#38bdf8" radius={[6, 6, 0, 0]} name="Rainfall (mm)" />
+                                <Bar dataKey="rain" fill="url(#weatherRainGradient)" radius={[6, 6, 0, 0]} name="Rainfall (mm)" />
                             </BarChart>
                         </ResponsiveContainer>
                     )}
