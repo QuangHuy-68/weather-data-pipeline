@@ -8,7 +8,7 @@ const navItems = [
 
 export default function BottomNav() {
     const location = useLocation()
-    const { theme } = useTheme()
+    const { theme, p } = useTheme()
     const isDark = theme === 'dark'
 
     // Weather-adaptive accent color for active tab
