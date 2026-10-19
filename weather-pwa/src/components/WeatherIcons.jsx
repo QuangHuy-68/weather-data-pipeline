@@ -75,7 +75,7 @@ export default function WeatherIcon({ code = 0, isDay = 1, rainProb = 0, size = 
 export function HeroWeatherIcon({ code = 0, isDay = 1, rainProb = 0, weatherMode = 'clear' }) {
     let effectiveCode = code 
     let effectiveRainProb = rainProb
-    if (weatherMode === 'rainy' && effectiveRainPRob < 40 && effectiveCode < 50) { 
+    if (weatherMode === 'rainy' && effectiveRainProb < 40 && effectiveCode < 50) { 
         effectiveCode = 61
         effectiveRainProb = 75
     } else if (weatherMode === 'stormy' && effectiveCode < 95) {

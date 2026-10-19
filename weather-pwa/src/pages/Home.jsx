@@ -637,7 +637,7 @@ export default function Home() {
                                 <div className="mr-2 flex flex-col items-center">
                                     <HeroWeatherIcon 
                                         code={hourly?.[0]?.code ?? current?.weather_code ?? 0}
-                                        isDay={hourly?.[0]?.isDay ?? hourly?.[0]?.isDay ?? 1}
+                                        isDay={current?.is_day ?? hourly?.[0]?.isDay ?? 1}
                                         rainProb={current?.precipitation > 0 ? 80 : (hourly?.[0]?.rainProb ?? 0)}
                                         weatherMode={weatherMode}
                                     />
