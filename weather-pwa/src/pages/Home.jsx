@@ -253,6 +253,36 @@ export default function Home() {
         temp: d.avg_temperature ? Math.round(d.avg_temperature * 10) / 10 : 0 
     })) : []
 
+    // ── Helper: Tính nhiệt độ cảm nhận (Feels Like) chuẩn xác dựa vào nhiệt độ, độ ẩm và gió
+    const computeFeelsLike = (temp, humidity, wind) => {
+        if (temp == null) return 0
+        
+        const e = (humidity / 100) * 6.105 * Math.exp((17.27 * temp) / (237.7 + temp))
+        const feels = temp + 0.33 * e -0.7 * (wind / 3.6) - 4.0
+        return Math.round(feels * 10) / 10
+    }
+
+    const feelsLikeTemp = current ? computeFeelsLike(current.temperature, current.humidity, current.wind_speed ?? 0) : null
+    const feelsLikeDiff = feelsLikeTemp != null && current ? Math.round((feelsLikeTemp - current.temperature) * 10) / 10 : 0
+    const feelsLikeDesc = feelsLikeDiff > 1.5 
+        ? "Humidity makes it feel warmer"
+        : feelsLikeDiff < -1.5
+            ? "Wind makes it feel cooler"
+            : "Similar to actual temp"
+
+    // ── Helper: Mô tả sức gió theo chuẩn thang đo Beaufort
+    const getWindDescription = (speedKmh) => {
+        if (speedKmh < 5) return "Calm air"
+        if (speedKmh < 20) return "Gentle breeze"
+        if (speedKmh < 39) return "Moderate breeze"
+        if (speedKmh < 62) return "Strong breeze"
+        return "Gale warning!"
+    }
+
+    // ── Nhiệt độ Cao / Thấp trong ngày từ dữ liệu daily
+    const todayMax = daily?.[0]?.max_temperature ?? (current ? Math.round(current.temperature + 2) : 32)
+    const todayMin = daily?.[0]?.min_temperature ?? (current ? Math.round(current.temperature - 3) : 24)
+
     return (
         <div className={`min-h-screen w-full overflow-x-hidden transition-colors duration-300 ${
             isDark ? 'bg-transparent text-white' : 'bg-transparent text-slate-900'
@@ -363,25 +393,41 @@ export default function Home() {
                     </div>
                 ) : current ? (
                     <>
-                        <div className={`relative overflow-hidden rounded-3xl p-6 mb-6 backdrop-blur-xl transition-all shadow-2xl bg-gradient-to-br ${p('gradient')} border ${p('border')}`}>
+                                                <div className={`relative overflow-hidden rounded-3xl p-6 mb-6 backdrop-blur-xl transition-all shadow-2xl bg-gradient-to-br ${p('gradient')} border ${p('border')}`}>
                             <div className="flex justify-between items-center">
-                                {/* Bên trái: Nhiệt độ & trạng thái */}
+                                {/* Bên trái: Nhiệt độ, Trạng thái & Min/Max */}
                                 <div>
-                                    <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Current temperature</p>
+                                    <p className={`text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                                        Current Temperature
+                                    </p>
                                     <div className="flex items-baseline space-x-2 mt-1">
-                                        <span className={`text-6xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                                        <span className={`text-6xl sm:text-7xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                                             {current.temperature}
                                         </span>
-                                        <span className="text-xl font-medium" style={{ color: p('accent') }}>°C</span>
+                                        <span className="text-2xl font-bold" style={{ color: p('accent') }}>°C</span>
                                     </div>
 
-                                    <p className={`font-medium mt-2 flex items-center ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                                    {/* Trạng thái thời tiết */}
+                                    <p className={`font-semibold text-sm sm:text-base mt-2 flex items-center ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
                                         <span>{p('heroEmoji')} {p('name')}</span>
                                     </p>
+
+                                    {/* ⭐ CHỈ SỐ HIGH / LOW CHUẨN APPLE WEATHER ⭐ */}
+                                    <div className="flex items-center space-x-3 mt-2 text-xs font-medium">
+                                        <span className={`px-2 py-0.5 rounded-full ${isDark ? 'bg-slate-800/80 text-rose-300' : 'bg-rose-50 text-rose-600'}`}>
+                                            H: {todayMax}°
+                                        </span>
+                                        <span className={`px-2 py-0.5 rounded-full ${isDark ? 'bg-slate-800/80 text-sky-300' : 'bg-sky-50 text-sky-600'}`}>
+                                            L: {todayMin}°
+                                        </span>
+                                        <span className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                                            Feels like {feelsLikeTemp ?? current.temperature}°
+                                        </span>
+                                    </div>
                                 </div>
 
-                                {/* ⭐ Bên phải: ICON LỚN TỎA SÁNG CỬ ĐỘNG (MỚI THÊM) ⭐ */}
-                                <div className="mr-2">
+                                {/* Bên phải: ICON LỚN TỎA SÁNG CỬ ĐỘNG */}
+                                <div className="mr-2 flex flex-col items-center">
                                     <HeroWeatherIcon 
                                         code={hourly?.[0]?.code ?? 0}
                                         isDay={hourly?.[0]?.isDay ?? 1}
@@ -391,13 +437,13 @@ export default function Home() {
                                 </div>
                             </div> 
 
-                            <div className={`mt-4 pt-4 border-t flex justify-between text-xs ${
+                            <div className={`mt-5 pt-3.5 border-t flex justify-between text-[11px] ${
                                 isDark ? 'border-slate-700/50 text-slate-400' : 'border-slate-200 text-slate-500'
                             }`}>
                                 <span>Updated: {current.time?.replace("T", " ") || "Today"}</span>
                                 <span>Station: {current.location}</span>
                             </div>
-                        </div>              
+                        </div>        
 
                         {/* Smart Weather Alert Banner */}
                         {alert && (
@@ -413,43 +459,46 @@ export default function Home() {
                         {/* ⭐ 24-Hour Hourly Forecast Timeline (Apple Weather Style) ⭐ */}
                         <HourlyForecast data={hourly} loading={loadingHourly} />
 
-                                                {/* 4 Detail Metric Cards (Adaptive Weather Borders & Accent Glow) */}
+                                                {/* 4 Detail Metric Cards (Apple Weather Glassmorphism & Smart Descriptions) */}
                         <div className="grid grid-cols-2 gap-3 mb-6">
+                            {/* Card 1: FEELS LIKE */}
                             <div className={`rounded-2xl p-4 backdrop-blur-md transition-all duration-300 border ${
                                 isDark ? 'bg-slate-800/40 border-slate-700/60' : 'bg-white/80 border-slate-200/90 shadow-sm'
                             }`} style={{ borderColor: isDark ? `${p('accent')}33` : undefined }}>
                                 <div className="flex items-center space-x-2 mb-2">
-                                    <span className="p-1.5 rounded-lg text-xs font-bold" style={{ backgroundColor: `${p('accent')}20`, color: p('accent') }}>
-                                        TEMP
+                                    <span className="p-1 rounded-md text-[10px] font-bold" style={{ backgroundColor: `${p('accent')}20`, color: p('accent') }}>
+                                        FEEL
                                     </span>
-                                    <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Temperature</span>
+                                    <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Feels Like</span>
                                 </div>
-                                <p className="text-2xl font-bold" style={{ color: p('accent') }}>{current.temperature}°C</p>
-                                <p className={`text-[10px] mt-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                                    Feels like {Math.round(current.temperature + 1)}°C
+                                <p className="text-2xl font-bold" style={{ color: p('accent') }}>{feelsLikeTemp ?? current.temperature}°C</p>
+                                <p className={`text-[10px] mt-1 line-clamp-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                                    {feelsLikeDesc}
                                 </p>
                             </div>
 
+                            {/* Card 2: HUMIDITY */}
                             <div className={`rounded-2xl p-4 backdrop-blur-md transition-all duration-300 border ${
                                 isDark ? 'bg-slate-800/40 border-slate-700/60' : 'bg-white/80 border-slate-200/90 shadow-sm'
                             }`}>
                                 <div className="flex items-center space-x-2 mb-2">
-                                    <span className="p-1.5 rounded-lg bg-sky-400/10 text-sky-400 text-xs font-bold">
-                                        HUMIDITY
+                                    <span className="p-1 rounded-md bg-sky-400/10 text-sky-400 text-[10px] font-bold">
+                                        HUMID
                                     </span>
                                     <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Humidity</span>
                                 </div>
                                 <p className="text-2xl font-bold text-sky-400">{current.humidity}%</p>
-                                <p className={`text-[10px] mt-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                                    {current.humidity > 80 ? "High humidity" : "Well-ventilated"}
+                                <p className={`text-[10px] mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                                    {current.humidity > 80 ? "Saturated humidity" : current.humidity > 60 ? "Comfortable level" : "Dry air conditions"}
                                 </p>
                             </div>
 
+                            {/* Card 3: WIND SPEED */}
                             <div className={`rounded-2xl p-4 backdrop-blur-md transition-all duration-300 border ${
                                 isDark ? 'bg-slate-800/40 border-slate-700/60' : 'bg-white/80 border-slate-200/90 shadow-sm'
                             }`}>
                                 <div className="flex items-center space-x-2 mb-2">
-                                    <span className="p-1.5 rounded-lg bg-emerald-400/10 text-emerald-400 text-xs font-bold">
+                                    <span className="p-1 rounded-md bg-emerald-400/10 text-emerald-400 text-[10px] font-bold">
                                         WIND
                                     </span>
                                     <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Wind Speed</span>
@@ -458,22 +507,32 @@ export default function Home() {
                                     {current.wind_speed ?? 0}
                                     <span className="text-xs font-normal ml-1">km/h</span>
                                 </p>
-                                <p className={`text-[10px] mt-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Gentle pleasant breeze</p>
+                                <p className={`text-[10px] mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                                    {getWindDescription(current.wind_speed ?? 0)}
+                                </p>
                             </div>
 
+                            {/* Card 4: RAINFALL / PRECIPITATION */}
                             <div className={`rounded-2xl p-4 backdrop-blur-md transition-all duration-300 border ${
                                 isDark ? 'bg-slate-800/40 border-slate-700/60' : 'bg-white/80 border-slate-200/90 shadow-sm'
                             }`}>
                                 <div className="flex items-center space-x-2 mb-2">
-                                    <span className="p-1.5 rounded-lg bg-blue-400/10 text-blue-400 text-xs font-bold">
+                                    <span className="p-1 rounded-md bg-blue-400/10 text-blue-400 text-[10px] font-bold">
                                         RAIN
                                     </span>
-                                    <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Rainfall</span>
+                                    <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Precipitation</span>
                                 </div>
-                                <p className="text-2xl font-bold text-blue-400">{current.precipitation} 
+                                <p className="text-2xl font-bold text-blue-400">
+                                    {current.precipitation} 
                                     <span className="text-xs font-normal ml-1">mm</span>
                                 </p>
-                                <p className={`text-[10px] mt-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Measured over the past hour</p>
+                                <p className={`text-[10px] mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                                    {current.precipitation > 0 
+                                        ? "Rain active in past hour" 
+                                        : hourly?.[0]?.rainProb > 0 
+                                            ? `Rain chance: ${hourly[0].rainProb}%` 
+                                            : "No rain in past hour"}
+                                </p>
                             </div>
                         </div>
                     </>
