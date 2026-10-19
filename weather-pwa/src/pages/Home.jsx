@@ -447,16 +447,53 @@ export default function Home() {
                     </div>
                 )}
 
-                {/* Hero Card: Current Weather */}
+                                {/* Hero & Metric Cards Skeleton Loading (Apple Shimmer Wave) */}
                 {loadingCurrent ? (
-                    <div className={`animate-pulse rounded-3xl h-48 border mb-6 flex items-center justify-center ${
-                        isDark ? 'bg-slate-800/60 border-slate-700/50 text-slate-400' : 'bg-white/80 border-slate-200 text-slate-500'
-                    }`}>
-                        <p className="text-sm">Loading meteorological data...</p>
+                    <div className="space-y-6 mb-6">
+                        {/* 1. Hero Card Skeleton */}
+                        <div className={`relative overflow-hidden rounded-3xl p-6 backdrop-blur-xl border animate-shimmer shadow-xl ${
+                            isDark ? 'bg-slate-900/40 border-white/10' : 'bg-white/60 border-white/80 shadow-slate-200/50'
+                        }`}>
+                            <div className="flex justify-between items-center">
+                                <div className="space-y-3">
+                                    <div className={`h-3 w-28 rounded-full ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
+                                    <div className={`h-14 w-36 rounded-2xl ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
+                                    <div className={`h-4 w-44 rounded-full ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
+                                    <div className="flex space-x-2 pt-1">
+                                        <div className={`h-5 w-14 rounded-full ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
+                                        <div className={`h-5 w-14 rounded-full ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
+                                    </div>
+                                </div>
+                                <div className={`w-20 h-20 rounded-full mr-2 ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
+                            </div>
+                            <div className={`mt-5 pt-3.5 border-t flex justify-between ${isDark ? 'border-white/10' : 'border-slate-200'}`}>
+                                <div className={`h-3 w-32 rounded-full ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
+                                <div className={`h-3 w-28 rounded-full ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
+                            </div>
+                        </div>
+
+                        {/* 2. 4 Metric Cards Skeleton */}
+                        <div className="grid grid-cols-2 gap-3">
+                            {[1, 2, 3, 4].map((i) => (
+                                <div 
+                                    key={i} 
+                                    className={`rounded-2xl p-4 backdrop-blur-xl border animate-shimmer space-y-2.5 ${
+                                        isDark ? 'bg-slate-900/40 border-white/10' : 'bg-white/60 border-white/80'
+                                    }`}
+                                >
+                                    <div className="flex items-center space-x-2">
+                                        <div className={`h-4 w-10 rounded-md ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
+                                        <div className={`h-3 w-16 rounded-full ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
+                                    </div>
+                                    <div className={`h-7 w-20 rounded-xl ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
+                                    <div className={`h-2.5 w-28 rounded-full ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 ) : current ? (
                     <>
-                                                <div className={`relative overflow-hidden rounded-3xl p-6 mb-6 backdrop-blur-xl transition-all shadow-2xl bg-gradient-to-br ${p('gradient')} border ${p('border')}`}>
+                        <div className={`relative overflow-hidden rounded-3xl p-6 mb-6 backdrop-blur-xl transition-all shadow-2xl bg-gradient-to-br ${p('gradient')} border ${p('border')}`}>
                             <div className="flex justify-between items-center">
                                 {/* Bên trái: Nhiệt độ, Trạng thái & Min/Max */}
                                 <div>
@@ -516,6 +553,7 @@ export default function Home() {
                                     <div className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-sm">
                                         {alert.icon}
                                     </div>
+
 
                                     {/* Nội dung thông báo */}
                                     <div className="flex-1 min-w-0">

@@ -8,14 +8,22 @@ export default function HourlyForecast({ data = [], loading = false }) {
 
     if (loading) {
         return (
-            <div className={`backdrop-blur-xl rounded-3xl p-4 border mb-6 animate-pulse h-36 flex items-center justify-center transition-all ${
+            <div className={`backdrop-blur-xl rounded-3xl p-4 border mb-6 animate-shimmer shadow-xl ${
                 isDark 
                     ? 'bg-slate-900/40 border-white/10' 
-                    : 'bg-white/60 border-white/60 shadow-lg shadow-slate-200/50'
+                    : 'bg-white/60 border-white/80 shadow-slate-200/50'
             }`}>
-                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                    Loading 24-hour forecast...
-                </p>
+                <div className={`h-3 w-32 rounded-full mb-3.5 ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
+                <div className="flex items-center space-x-3 overflow-hidden pb-1">
+                    {[1, 2, 3, 4, 5, 6].map(i => (
+                        <div key={i} className={`flex flex-col items-center flex-shrink-0 min-w-[56px] py-2 px-1.5 rounded-2xl space-y-2 ${isDark ? 'bg-white/5' : 'bg-white/50'}`}>
+                            <div className={`h-2.5 w-8 rounded-full ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
+                            <div className={`w-7 h-7 rounded-full ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
+                            <div className={`h-2.5 w-6 rounded-full ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
+                            <div className={`h-4 w-7 rounded-md ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
+                        </div>
+                    ))}
+                </div>
             </div>
         )
     }
