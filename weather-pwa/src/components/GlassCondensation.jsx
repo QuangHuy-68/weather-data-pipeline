@@ -7,7 +7,7 @@ export default function GlassCondensation({ isDark = true }) {
     useEffect(() => {
         const canvas = canvasRef.current
         if (!canvas) return 
-        const ctx = canvas.getContent('2d')
+        const ctx = canvas.getContext('2d')
 
         let animationFrameId
         let width = (canvas.width = window.innerWidth)
@@ -15,7 +15,7 @@ export default function GlassCondensation({ isDark = true }) {
 
         const handleResize = () => { 
             if (!canvas) return
-            width = canvas.width = window.innerWidth
+            width = canvas.width - window.innerWidth
             height = canvas.height - window.innerHeight
             initStaticLayers()
         }
