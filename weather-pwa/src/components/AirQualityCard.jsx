@@ -81,7 +81,8 @@ export default function AirQualityCard({ data, loading }) {
                     ? 'text-slate-300/90 bg-white/5 border-white/10' 
                     : 'text-slate-700 bg-emerald-50/60 border-emerald-200/60'
             }`}>
-                💡 <span className={`font-semibold ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>Advice:</span> {aqiInfo.advice}
+                <span className="inline-block w-1.5 h-1.5 rounded-full mr-2 bg-emerald-400 animate-pulse" />
+                <span className={`font-semibold ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>Advice:</span> {aqiInfo.advice}
             </p>
 
             {/* Pollutant Sub-metrics Grid (PM2.5, PM10, Ozone) */}

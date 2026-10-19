@@ -247,6 +247,10 @@ export function useWeatherHourly ({ city = 'HCM', lat = null, lon = null } = {})
                 const temps = h.temperature_2m || []
                 const probs = h.precipitation_probability || []
                 const codes = h.weather_code || []
+                const precips = h.precipitation || []
+                const daily = json.daily || []
+                const sunrises = daily.sunrise || []
+                const sunsets = daily.sunset || []
 
                 // Match current hour in local time
                 const now = new Date()
@@ -263,29 +267,99 @@ export function useWeatherHourly ({ city = 'HCM', lat = null, lon = null } = {})
                     if (startIndex === -1) startIndex = 0
                 }
 
-                // Slice next 24 hours starting from current hour\
-                const next24Hours = []
-                for (let i = startIndex; i < Math.min(startIndex + 24, times.length); i++) {
+                const startTimeStr = times[startIndex] || currentHourStr
+                const endIndex = Math.min(startIndex +  24, times.length)
+                const endTimeStr = times[endIndex - 1] || '9999-99-99T99:99'
+                
+                const sunEvents = []
+                sunrises.forEach(s => { 
+                    if (s > startTimeStr && s <= endTimeStr) { 
+                        sunEvents.push({ time: s, type: 'sunrise', label: 'Sunrise' })
+                    }
+                })
+
+                sunsets.forEach(s => { 
+                    if (s > startTimeStr && s <= endTimeStr) {
+                        sunEvents.push({ time: s, type: 'sunset', label: 'Sunset' })
+                    }
+                })
+
+                const timeline = []
+                for (let i = startIndex; i < endIndex; i++) { 
                     const timeStr = times[i]
                     const hourNumber = parseInt(timeStr.slice(11, 13), 10)
-                    const isNow = i === startIndex
+                    const isNow = i === startIndex 
                     const isDay = hourNumber >= 6 && hourNumber < 18 ? 1 : 0
 
-                    next24Hours.push({
-                        time: timeStr,
-                        displayTime: isNow ? 'Now' : `${timeStr.slice(11, 16)}`,
-                        temp: Math.round(temps[i] ?? 0),
-                        rainProb: probs[i] ?? 0,
-                        code: codes[i] ?? 0,
-                        isDay
-                    })
+                    if (i > startIndex) { 
+                        const prevTimeStr = times[i - 1]
+                        const ev = sunEvents[eventIdx]
+                        if (eventIdx !== -1) {
+                            timeline.push({
+                            time: ev.time,
+                            displayTime: ev.time.slice(11, 16), 
+                            isSunEvent: true,
+                            eventType: ev.type,
+                            label: ev.label,
+                            temp: Math.round(temps[i - 1] ?? temps[i] ?? 0),
+                            rainProb: 0,
+                            precip: 0, 
+                            code: 0, 
+                            isDay: ev.type === 'sunrise' ? 1 : 0
+                        })
+                        sunEvents.splice(eventIdx, 1)
+                    }
                 }
 
-                setData(next24Hours)
+                timeline.push({
+                    time: timeStr,
+                    displayTime: isNow ? 'Now' : `${timeStr.slice(11, 16)}`,
+                    temp: Math.round(temps[i] ?? 0),
+                    rainProb: probs[i] ?? 0, 
+                    precip: precips[i] ?? 0,
+                    code: codes[i] ?? 0, 
+                    isDay,
+                    isSunEvent: false
+                })
+            }
+
+            sunEvents.forEach(ev => {
+                    timeline.push({
+                        time: ev.time,
+                        displayTime: ev.time.slice(11, 16),
+                        isSunEvent: true,
+                        eventType: ev.type,
+                        label: ev.label,
+                        temp: Math.round(temps[endIndex - 1] ?? 0),
+                        rainProb: 0,
+                        precip: 0,
+                        code: 0,
+                        isDay: ev.type === 'sunrise' ? 1 : 0
+                    })
+                })
+
+                setData(timeline)
                 setLoading(false)
             })
             .catch(() => {
-                setData([])
+                const fallbackTimeline = []
+                const now = new Date()
+                for (let i = 0; i < 24; i++) { 
+                    const d = new Date(now.getTime() + i * 3600000)
+                    const h = d.getHours()
+                    fallbackTimeline.push({
+                        time: d.toString(),
+                        displayTime: i === 0 ? 'Now' :  `${String(h).padStart(2, '0')}:00`,
+                        temp: 28,
+                        rainProb: 0, 
+                        precip: 0,
+                        code: 0, 
+                        isDay: h >= 6 && h < 18 ? 1 : 0, 
+                        isSunEvent: false
+                    })
+                }
+
+                setData(fallbackTimeline)
                 setLoading(false)
             })
     }, [city, lat, lon])
