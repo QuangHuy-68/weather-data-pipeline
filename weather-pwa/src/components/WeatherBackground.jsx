@@ -6,7 +6,7 @@ export default function WeatherBackground({ current, hourly }) {
     const { theme } = useTheme()
     const isDark = theme === 'dark'
     
-    // 1. Time & Weather Detection
+    // 1. Time & Meteorological Detection
     const currentHour = new Date().getHours()
     const isSunrise = currentHour >= 5 && currentHour < 7
     const isSunset = currentHour >= 17 && currentHour < 19
@@ -14,20 +14,24 @@ export default function WeatherBackground({ current, hourly }) {
     const isMidnight = currentHour >= 23 || currentHour < 4
     const isNight = currentHour < 6 || currentHour >= 18
 
-
     const weatherCode = hourly?.[0]?.code ?? 0
     const rainProb = hourly?.[0]?.rainProb ?? 0
     const precipitation = current?.precipitation ?? 0
     const temperature = current?.temperature ?? 28
+    const windSpeed = current?.wind_speed ?? 10
 
     const isStormy = weatherCode >= 95
     const isRaining = precipitation > 0 || rainProb >= 40 || isStormy
     const isHotSun = !isRaining && !isNight && temperature >= 32
+    const isFreezing = temperature <= 0
     const isSnowing = weatherCode >= 71 && weatherCode <= 77
-    const isCloudy = (weatherCode >=2 && weatherCode <= 3) || isRaining
-    const isFroggy = weatherCode === 45 || weatherCode === 48
+    const isCloudy = (weatherCode >= 2 && weatherCode <= 3) || isRaining
+    const isFoggy = weatherCode === 45 || weatherCode === 48
 
-    // 2. LAYER 1: Far Rain (Nhỏ, mờ, rơi chậm - tạo cảm giác không gian xa)
+    // Wind-driven rain slant angle: light wind ~6° → gale ~24°
+    const rainSlant = Math.min(24, Math.max(6, Math.round(windSpeed * 0.75)))
+
+    // 2. Far Rain particles
     const farRain = useMemo(() => {
         return Array.from({ length: 45 }).map((_, i) => ({
             id: i,
@@ -38,7 +42,7 @@ export default function WeatherBackground({ current, hourly }) {
         }))
     }, [])
 
-    // 3. LAYER 2: Midground Rain (Mật độ chính, vệt nước trong suốt tự nhiên)
+    // 3. Midground Rain particles
     const midRain = useMemo(() => {
         return Array.from({ length: 55 }).map((_, i) => ({
             id: i,
@@ -49,7 +53,7 @@ export default function WeatherBackground({ current, hourly }) {
         }))
     }, [])
 
-    // 4. LAYER 3: Near Rain (Rơi sát màn hình, vệt dài, lướt rất nhanh)
+    // 4. Near Rain particles
     const nearRain = useMemo(() => {
         return Array.from({ length: 25 }).map((_, i) => ({
             id: i,
@@ -60,7 +64,19 @@ export default function WeatherBackground({ current, hourly }) {
         }))
     }, [])
 
-    // 5. Starfield for clear nights
+    // 5. Condensation droplets on window glass
+    const glassDroplets = useMemo(() => {
+        return Array.from({ length: 18 }).map((_, i) => ({
+            id: i,
+            left: `${8 + Math.random() * 84}%`,
+            top: `${10 + Math.random() * 70}%`,
+            size: `${4 + Math.random() * 6}px`,
+            delay: `${Math.random() * 5}s`,
+            duration: `${3.5 + Math.random() * 4}s`,
+        }))
+    }, [])
+
+    // 6. Starfield for clear nights
     const stars = useMemo(() => {
         return Array.from({ length: 45 }).map((_, i) => ({
             id: i,
@@ -72,7 +88,7 @@ export default function WeatherBackground({ current, hourly }) {
         }))
     }, [])
 
-    // 6. Snowflakes for snowy weather
+    // 7. Snowflakes
     const snowflakes = useMemo(() => {
         return Array.from({ length: 60 }).map((_, i) => ({
             id: i,
@@ -84,7 +100,7 @@ export default function WeatherBackground({ current, hourly }) {
         }))
     }, [])
 
-    // 7. Floating cloud particles for cloudy / rainy conditions
+    // 8. Floating cloud masses
     const clouds = useMemo(() => {
         return Array.from({ length: 4 }).map((_, i) => ({
             id: i,
@@ -100,7 +116,7 @@ export default function WeatherBackground({ current, hourly }) {
     return (
         <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 transition-all duration-1000">
             
-            {/* ── 1. CINEMATIC ATMOSPHERIC SKY GRADIENT (TIME-OF-DAY ADAPTIVE) ── */}
+            {/* ── 1. SKY GRADIENT (TIME-OF-DAY + WEATHER ADAPTIVE) ── */}
             <div className={`absolute inset-0 transition-all duration-1000 ${
                 isStormy
                     ? isDark
@@ -110,26 +126,60 @@ export default function WeatherBackground({ current, hourly }) {
                         ? isDark
                             ? 'bg-gradient-to-b from-[#080d1a] via-[#0d1627] to-[#040812]'
                             : 'bg-gradient-to-b from-[#cbd5e1] via-[#e2e8f0] to-[#f1f5f9]'
+                    : isFreezing
+                        ? isDark
+                            ? 'bg-gradient-to-b from-[#081220] via-[#0f2137] to-[#040913]'
+                            : 'bg-gradient-to-b from-[#dbeafe] via-[#eff6ff] to-[#f8fafc]'
+                    : isSnowing
+                        ? isDark
+                            ? 'bg-gradient-to-b from-[#0c1929] via-[#1a2744] to-[#0a101f]'
+                            : 'bg-gradient-to-b from-[#e0e7ff] via-[#f0f4ff] to-[#ffffff]'
                     : isSunrise
                         ? isDark
-                            ? 'bg-gradient-to-b from-[#2d124d]/60 via-[#581c87]/30 to-[#020617]' // Tím hồng bình minh
-                            : 'bg-gradient-to-b from-[#fed7aa] via-[#fce7f3] to-[#ffffff]'      // Vàng hồng bình minh
+                            ? 'bg-gradient-to-b from-[#2d124d]/60 via-[#581c87]/30 to-[#020617]'
+                            : 'bg-gradient-to-b from-[#fed7aa] via-[#fce7f3] to-[#ffffff]'
                     : isSunset
                         ? isDark
-                            ? 'bg-gradient-to-b from-[#4c0519]/50 via-[#2e1065]/40 to-[#020617]' // Tím đỏ hoàng hôn
-                            : 'bg-gradient-to-b from-[#fde68a] via-[#f472b6]/30 to-[#e0e7ff]'  // Cam tím hoàng hôn
+                            ? 'bg-gradient-to-b from-[#4c0519]/50 via-[#2e1065]/40 to-[#020617]'
+                            : 'bg-gradient-to-b from-[#fde68a] via-[#f472b6]/30 to-[#e0e7ff]'
                     : isMidnight
-                        ? 'bg-gradient-to-b from-[#01040f] via-[#040b1e] to-[#000206]'           // Xanh đen nửa đêm
+                        ? 'bg-gradient-to-b from-[#01040f] via-[#040b1e] to-[#000206]'
                     : isNoon && isHotSun
                         ? isDark
-                            ? 'bg-gradient-to-b from-[#241407] via-[#0f172a] to-[#020617]'      // Nắng gắt
+                            ? 'bg-gradient-to-b from-[#241407] via-[#0f172a] to-[#020617]'
                             : 'bg-gradient-to-b from-[#fef3c7] via-[#f0f9ff] to-[#ffffff]'
                         : isDark
                             ? 'bg-gradient-to-b from-[#0f172a] via-[#1e293b] to-[#020617]'
                             : 'bg-gradient-to-b from-[#e0f2fe] via-[#f8fafc] to-[#ffffff]'
             }`}/>
 
-            {/* ── 2. GOLDEN HOUR GLOW (Hào quang chân trời khi Bình minh & Hoàng hôn) ── */}
+            {/* ── 2. FROSTED ICE VIGNETTE (viền băng giá khi ≤ 0°C) ── */}
+            {isFreezing && (
+                <div 
+                    className="absolute inset-0 pointer-events-none z-10"
+                    style={{
+                        boxShadow: 'inset 0 0 100px rgba(125, 211, 252, 0.25), inset 0 0 40px rgba(255, 255, 255, 0.4)',
+                        border: '1px solid rgba(186, 230, 253, 0.2)',
+                        animation: 'frostGlowPulse 6s ease-in-out infinite',
+                    }}
+                />
+            )}
+
+            {/* ── 3. VOLUMETRIC SUN GOD RAYS (tia nắng xiên khi trời nắng) ── */}
+            {isHotSun && (
+                <div className="absolute -top-32 -right-32 w-[650px] h-[650px] pointer-events-none overflow-hidden">
+                    <div 
+                        className="w-full h-full rounded-full"
+                        style={{
+                            background: 'conic-gradient(from 0deg, rgba(251, 191, 36, 0.35) 0deg, transparent 25deg, rgba(245, 158, 11, 0.3) 60deg, transparent 90deg, rgba(251, 191, 36, 0.4) 140deg, transparent 180deg)',
+                            filter: 'blur(32px)',
+                            animation: 'sunRayRotate 24s ease-in-out infinite',
+                        }}
+                    />
+                </div>
+            )}
+
+            {/* ── 4. GOLDEN HOUR GLOW (bình minh / hoàng hôn) ── */}
             {(isSunrise || isSunset) && !isRaining && (
                 <div 
                     className="absolute -bottom-20 left-1/2 -translate-x-1/2 w-[120vw] h-96 rounded-full pointer-events-none opacity-45 blur-3xl transition-all duration-1000"
@@ -141,14 +191,14 @@ export default function WeatherBackground({ current, hourly }) {
                 />
             )}
 
-            {/* ── 2. VIGNETTE SHADOW (Tạo chiều sâu điện ảnh 4 góc) ── */}
+            {/* ── 5. CINEMATIC VIGNETTE SHADOW ── */}
             <div className="absolute inset-0 bg-radial from-transparent via-transparent to-black/40 pointer-events-none" />
 
-            {/* ── 3. REALISTIC RAIN EFFECT (3-LAYER DEPTH ENGINE) ── */}
+            {/* ── 6. REALISTIC RAIN (3-layer depth + wind slant + glass droplets) ── */}
             {isRaining && (
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     
-                    {/* Layer 1: Far Rain (Nền sâu - nhỏ & mờ) */}
+                    {/* Far Rain — wind-driven slant */}
                     {farRain.map(drop => (
                         <div
                             key={`far-${drop.id}`}
@@ -158,6 +208,7 @@ export default function WeatherBackground({ current, hourly }) {
                                 top: '-60px',
                                 width: '1px',
                                 height: drop.height,
+                                transform: `rotate(${rainSlant - 2}deg)`,
                                 background: isDark
                                     ? 'linear-gradient(to bottom, rgba(148, 163, 184, 0), rgba(186, 230, 253, 0.35))'
                                     : 'linear-gradient(to bottom, rgba(71, 85, 105, 0), rgba(51, 65, 85, 0.25))',
@@ -168,7 +219,7 @@ export default function WeatherBackground({ current, hourly }) {
                         />
                     ))}
 
-                    {/* Layer 2: Midground Rain (Lớp mưa tự nhiên trong suốt) */}
+                    {/* Midground Rain — wind-driven slant */}
                     {midRain.map(drop => (
                         <div
                             key={`mid-${drop.id}`}
@@ -179,6 +230,7 @@ export default function WeatherBackground({ current, hourly }) {
                                 width: '1.5px',
                                 height: drop.height,
                                 borderRadius: '9999px',
+                                transform: `rotate(${rainSlant}deg)`,
                                 background: isDark
                                     ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(224, 242, 254, 0.75))'
                                     : 'linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(56, 189, 248, 0.65))',
@@ -188,7 +240,7 @@ export default function WeatherBackground({ current, hourly }) {
                         />
                     ))}
 
-                    {/* Layer 3: Near Rain (Sát kính màn hình - vệt dài & tốc độ cao) */}
+                    {/* Near Rain — wind-driven slant */}
                     {nearRain.map(drop => (
                         <div
                             key={`near-${drop.id}`}
@@ -199,6 +251,7 @@ export default function WeatherBackground({ current, hourly }) {
                                 width: '2px',
                                 height: drop.height,
                                 borderRadius: '9999px',
+                                transform: `rotate(${rainSlant + 2}deg)`,
                                 background: isDark
                                     ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.85))'
                                     : 'linear-gradient(to bottom, rgba(14, 165, 233, 0.05), rgba(2, 132, 199, 0.8))',
@@ -209,7 +262,26 @@ export default function WeatherBackground({ current, hourly }) {
                         />
                     ))}
 
-                    {/* Ground Mist / Vapor Haze (Hơi nước bốc lên từ mặt đất khi mưa) */}
+                    {/* Condensation Droplets on Window Glass */}
+                    {glassDroplets.map(drop => (
+                        <div
+                            key={`glass-${drop.id}`}
+                            style={{
+                                position: 'absolute',
+                                left: drop.left,
+                                top: drop.top,
+                                width: drop.size,
+                                height: drop.size,
+                                borderRadius: '50%',
+                                background: 'radial-gradient(circle at 35% 35%, rgba(255,255,255,0.95), rgba(255,255,255,0.4) 60%, rgba(148,163,184,0.3))',
+                                boxShadow: '0 1px 3px rgba(0,0,0,0.3), inset 0 0 1px rgba(255,255,255,0.8)',
+                                animation: `dropletTrickle ${drop.duration} cubic-bezier(0.4,0,0.6,1) infinite`,
+                                animationDelay: drop.delay,
+                            }}
+                        />
+                    ))}
+
+                    {/* Ground Mist Vapor */}
                     <div 
                         className="absolute bottom-0 left-0 right-0 h-80 pointer-events-none"
                         style={{
@@ -221,7 +293,7 @@ export default function WeatherBackground({ current, hourly }) {
                         }}
                     />
 
-                    {/* Rolling Dark Storm Cloud Atmosphere */}
+                    {/* Storm Cloud Atmosphere */}
                     <div 
                         className="absolute -top-32 left-1/2 -translate-x-1/2 w-[120vw] h-96 rounded-full pointer-events-none"
                         style={{
@@ -235,23 +307,23 @@ export default function WeatherBackground({ current, hourly }) {
                 </div>
             )}
 
-            {/* ── 4. ⚡ LIGHTNING FLASH (Chớp sét toàn màn hình khi giông) ── */}
+            {/* ── 7. LIGHTNING FLASH ── */}
             {isStormy && (
                 <div 
                     className="absolute inset-0 animate-lightning-flash pointer-events-none z-10"
                     style={{
-                        background: isDark  
+                        background: isDark
                             ? 'radial-gradient(ellipse at 40% 20%, rgba(167, 139, 250, 0.6) 0%, rgba(255, 255, 255, 0.15) 40%, transparent 75%)'
                             : 'radial-gradient(ellipse at 40% 20%, rgba(139, 92, 246, 0.3) 0%, rgba(255, 255, 255, 0.4) 40%, transparent 75%)',
                     }}
                 />
             )}
 
-            {/* ── 5. ❄️ SNOWFALL EFFECT (Tuyết rơi nhẹ khi WMO 71-77) ── */}
+            {/* ── 8. SNOWFALL ── */}
             {isSnowing && (
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     {snowflakes.map(flake => (
-                        <div 
+                        <div
                             key={`snow-${flake.id}`}
                             style={{
                                 position: 'absolute',
@@ -271,11 +343,11 @@ export default function WeatherBackground({ current, hourly }) {
                 </div>
             )}
 
-            {/* ── 6. ☁️ FLOATING CLOUD DRIFT (Mây trôi ngang khi mây/mưa) ── */}
+            {/* ── 9. FLOATING CLOUD DRIFT ── */}
             {isCloudy && (
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     {clouds.map(cloud => (
-                        <div    
+                        <div
                             key={`cloud-${cloud.id}`}
                             style={{
                                 position: 'absolute',
@@ -283,30 +355,28 @@ export default function WeatherBackground({ current, hourly }) {
                                 width: cloud.width,
                                 height: cloud.height,
                                 borderRadius: '9999px',
-                                background: isDark  
+                                background: isDark
                                     ? 'radial-gradient(ellipse, rgba(148, 163, 184, 0.12) 0%, transparent 70%)'
                                     : 'radial-gradient(ellipse, rgba(203, 213, 225, 0.35) 0%, transparent 70%)',
-
                                 filter: 'blur(8px)',
                                 opacity: cloud.opacity,
                                 animation: `cloudDrift ${cloud.duration} linear infinite`,
-                                animationDelay: cloud.delay
+                                animationDelay: cloud.delay,
                             }}
                         />
                     ))}
                 </div>
             )}
 
-            {/* ── 7. 🌫️ DENSE FOG OVERLAY (Sương mù dày khi WMO 45/48) ── */}
-            {isFroggy && (
+            {/* ── 10. DENSE FOG OVERLAY ── */}
+            {isFoggy && (
                 <>
-                    <div
+                    <div 
                         className="absolute inset-0 pointer-events-none"
                         style={{
                             background: isDark
                                 ? 'linear-gradient(to bottom, rgba(100, 116, 139, 0.15) 0%, rgba(71, 85, 105, 0.25) 50%, rgba(51, 65, 85, 0.1) 100%)'
-                                : 'linear-gradient(to bottom, rgba(226, 232, 240, 0.4) 0%, rgba(203, 213, 225, 0.5) 50%, rgba(241, 245, 249, 0.3) 100%',
-                            
+                                : 'linear-gradient(to bottom, rgba(226, 232, 240, 0.4) 0%, rgba(203, 213, 225, 0.5) 50%, rgba(241, 245, 249, 0.3) 100%)',
                             filter: 'blur(20px)',
                             animation: 'fogOverlayPulse 8s ease-in-out infinite',
                         }}
@@ -320,22 +390,19 @@ export default function WeatherBackground({ current, hourly }) {
                             filter: 'blur(40px)',
                             animation: 'mistVaporDrift 10s ease-in-out infinite',
                         }}
-                    /> 
+                    />
                 </>
             )}
 
-            {/* ── 8. WARM RADIATING SUN (Trời nắng) ── */}
+            {/* ── 11. WARM SUN SPHERE ── */}
             {isHotSun && (
                 <div className="absolute -top-28 -right-28 w-[450px] h-[450px] rounded-full blur-3xl opacity-35 animate-pulse pointer-events-none bg-amber-400/80" />
             )}
 
-            {/* ── 9. TWINKLING NIGHT STARS & MOON GLOW (Đêm quang đãng) ── */}
-            {isNight && !isRaining && (
+            {/* ── 12. NIGHT STARS & MOON GLOW ── */}
+            {isNight && !isRaining && !isSnowing && (
                 <div className="absolute inset-0">
-                    {/* Vầng sáng mặt trăng dịu mát */}
                     <div className="absolute top-10 right-12 w-48 h-48 rounded-full bg-sky-200/10 blur-2xl pointer-events-none" />
-
-                    {/* Bầu trời sao */}
                     {stars.map(star => (
                         <div
                             key={star.id}
