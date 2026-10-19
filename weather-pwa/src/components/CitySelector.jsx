@@ -1,3 +1,4 @@
+// src/components/CitySelector.jsx
 import { useState, useEffect, useRef } from 'react'
 import { useTheme } from '../context/ThemeContext'
 
@@ -10,8 +11,9 @@ export default function CitySelector({
     onSelectGPS,
     loadingGPS
 }) {
-    const { theme } = useTheme()
+    const { theme, p } = useTheme()
     const isDark = theme === 'dark'
+    const accent = p ? p('accent') : '#38bdf8'
 
     const presetCities = [
         { id: "HCM", name: "TP.Hồ Chí Minh" },
@@ -84,7 +86,7 @@ export default function CitySelector({
             <div ref={searchContainerRef} className="relative w-full">
                 <div className="relative flex items-center">
                     <span className="absolute left-3.5 text-slate-400 select-none text-xs">
-                        {loadingSearch ? '...' : ''}
+                        {loadingSearch ? '...' : '🔍'}
                     </span>
                     <input 
                         type="text"
@@ -97,10 +99,10 @@ export default function CitySelector({
                             if (results.length > 0) setIsOpen(true)
                         }}
                         placeholder="Search any location (e.g. Da Lat, Tokyo, Paris)..."
-                        className={`w-full text-xs rounded-2xl pl-10 pr-9 py-2.5 border focus:outline-none focus:ring-1 transition-all ${
+                        className={`w-full text-xs rounded-2xl pl-10 pr-9 py-2.5 border backdrop-blur-xl focus:outline-none transition-all shadow-md ${
                             isDark
-                                ? 'bg-slate-900/90 text-white placeholder-slate-400 border-slate-700/60 focus:border-sky-400 focus:ring-sky-400/30 shadow-inner'
-                                : 'bg-white text-slate-800 placeholder-slate-400 border-slate-200/90 focus:border-sky-500 focus:ring-sky-500/20 shadow-sm'
+                                ? 'bg-slate-900/60 text-white placeholder-slate-400 border-white/10 focus:border-sky-400 focus:ring-1 focus:ring-sky-400/30'
+                                : 'bg-white/80 text-slate-800 placeholder-slate-400 border-white/80 focus:border-sky-500 focus:ring-1 focus:ring-sky-500/20 shadow-slate-200/50'
                         }`}
                     />
 
@@ -123,10 +125,10 @@ export default function CitySelector({
 
                 {/* Dropdown Results List */}
                 {isOpen && query.trim().length >= 2 && (
-                    <div className={`absolute top-full left-0 right-0 mt-1.5 z-50 backdrop-blur-2xl border rounded-2xl overflow-hidden p-1.5 animate-in fade-in slide-in-from-top-2 shadow-2xl ${
+                    <div className={`absolute top-full left-0 right-0 mt-2 z-50 backdrop-blur-2xl border rounded-2xl overflow-hidden p-1.5 animate-in fade-in slide-in-from-top-2 shadow-2xl ${
                         isDark 
-                            ? 'bg-slate-900/95 border-slate-700/80 shadow-black/80' 
-                            : 'bg-white/95 border-slate-200 shadow-slate-300/60'
+                            ? 'bg-slate-900/95 border-white/10 shadow-black/80' 
+                            : 'bg-white/95 border-white/80 shadow-slate-300/60'
                     }`}>
                         {loadingSearch ? (
                             <p className={`text-xs py-3 px-3 text-center ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
@@ -140,7 +142,7 @@ export default function CitySelector({
                                         type="button"
                                         onClick={() => handleSelectResult(item)}
                                         className={`w-full text-left px-3 py-2 rounded-xl transition-colors flex items-center justify-between text-xs group ${
-                                            isDark ? 'hover:bg-slate-800/80' : 'hover:bg-slate-100'
+                                            isDark ? 'hover:bg-white/10' : 'hover:bg-slate-100'
                                         }`}
                                     >
                                         <div> 
@@ -177,17 +179,16 @@ export default function CitySelector({
                     type="button"
                     onClick={onSelectGPS}
                     disabled={loadingGPS}
-                    className={`flex items-center space-x-1 px-2.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border ${
+                    className={`flex items-center space-x-1 px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-md transition-all duration-200 border transform active:scale-95 ${
                         isGPSActive
                             ? "bg-emerald-500 text-white border-emerald-400 shadow-md shadow-emerald-500/30 scale-105"
                             : isDark
-                                ? "bg-slate-800/80 text-slate-300 border-slate-700/60 hover:bg-slate-700 hover:text-white"
-                                : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-900 shadow-sm"
+                                ? "bg-slate-800/80 text-slate-300 border-white/10 hover:bg-slate-700 hover:text-white"
+                                : "bg-white/80 text-slate-700 border-white/80 hover:bg-white hover:text-slate-900 shadow-sm"
                     }`}
                 >
                     {loadingGPS && <span className="text-[10px]">...</span>}
-
-                    <span>{loadingGPS ? "Locating..." : "My location"}</span>
+                    <span>{loadingGPS ? "Locating..." : "📍 My location"}</span>
                 </button>
 
                 {/* Preset VN Cities */}
@@ -198,12 +199,12 @@ export default function CitySelector({
                             key={city.id} 
                             type="button"
                             onClick={() => onSelectCity(city.id)}
-                            className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border ${
+                            className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-md transition-all duration-200 border transform active:scale-95 ${
                                 isActive
                                     ? "bg-sky-500 text-white border-sky-400 shadow-md shadow-sky-500/30 scale-105"
                                     : isDark
-                                        ? "bg-slate-800/80 text-slate-300 border-slate-700/60 hover:bg-slate-700 hover:text-white"
-                                        : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-900 shadow-sm"
+                                        ? "bg-slate-800/80 text-slate-300 border-white/10 hover:bg-slate-700 hover:text-white"
+                                        : "bg-white/80 text-slate-700 border-white/80 hover:bg-white hover:text-slate-900 shadow-sm"
                             }`}
                         >
                             {city.name}   
@@ -213,7 +214,7 @@ export default function CitySelector({
 
                 {/* Custom Searched Location Pill (if active) */}
                 {customLocation && !isGPSActive && (
-                    <div className="flex items-center bg-sky-500 text-white border border-sky-400 shadow-md shadow-sky-500/30 px-3 py-1.5 rounded-full text-xs font-medium scale-105 space-x-1.5">
+                    <div className="flex items-center bg-sky-500 text-white border border-sky-400 shadow-md shadow-sky-500/30 px-3.5 py-1.5 rounded-full text-xs font-bold scale-105 space-x-1.5">
                         <span>✨ {customLocation.name}</span>
                     </div>
                 )}

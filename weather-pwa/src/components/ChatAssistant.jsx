@@ -499,14 +499,14 @@ Expert Guidance:
             {!isOpen && (
                 <button
                     onClick={() => setIsOpen(true)}
-                    className={`fixed bottom-20 right-4 z-40 rounded-full px-3.5 py-1.5 backdrop-blur-xl flex items-center space-x-2 transition-all transform hover:scale-105 active:scale-95 border ${
+                    className={`fixed bottom-20 right-4 z-40 rounded-full px-4 py-2 backdrop-blur-2xl flex items-center space-x-2.5 transition-all transform hover:scale-105 active:scale-95 border shadow-2xl ${
                         isDark
-                            ? 'bg-slate-800/95 hover:bg-slate-700 text-white border-slate-600/80 shadow-lg shadow-black/80'
-                            : 'bg-white/95 hover:bg-slate-50 text-slate-800 border-slate-200/90 shadow-lg shadow-slate-300/60'
+                            ? 'bg-slate-900/80 hover:bg-slate-800/90 text-white border-white/20 shadow-black/80'
+                            : 'bg-white/85 hover:bg-white text-slate-800 border-white/80 shadow-slate-300/60'
                     }`}
                     aria-label="Open AI Assistant"
                 >
-                    <span className="text-xs font-semibold tracking-wide">Ask SkyBot</span>
+                    <span className="text-xs font-bold tracking-wide">💬 Ask SkyBot</span>
 
                     {/* Online status indicator */}
 

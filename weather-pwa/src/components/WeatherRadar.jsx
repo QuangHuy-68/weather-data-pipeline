@@ -4,8 +4,9 @@ import 'leaflet/dist/leaflet.css'
 import { useTheme } from '../context/ThemeContext'
 
 export default function WeatherRadar({ lat = 10.8231, lon = 106.6297, locationName = 'Location' }) {
-    const { theme } = useTheme()
+    const { theme, p } = useTheme()
     const isDark = theme === 'dark'
+    const accent = p ? p('accent') : '#38bdf8'
 
     const mapRef = useRef(null)
     const mapInstance = useRef(null)
@@ -135,16 +136,18 @@ export default function WeatherRadar({ lat = 10.8231, lon = 106.6297, locationNa
         : 'Live'
 
     return (
-        <div className={`backdrop-blur-md rounded-3xl p-4 border mb-6 overflow-hidden transition-all duration-300 ${
+        <div className={`backdrop-blur-xl rounded-3xl p-4 border mb-6 overflow-hidden transition-all duration-300 shadow-xl ${
             isDark 
-                ? 'bg-slate-800/40 border-slate-700/50' 
-                : 'bg-white/80 border-slate-200/80 shadow-sm shadow-slate-200/50'
+                ? 'bg-slate-900/40 border-white/10 shadow-black/40' 
+                : 'bg-white/70 border-white/80 shadow-slate-200/60'
         }`}>
             {/* Header: Title & Time badge */}
             <div className="flex justify-between items-center mb-3">
-                <div className={`flex items-center space-x-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                    <span className="text-base">📡</span>
-                    <span className="text-[11px] font-semibold uppercase tracking-wider">Live Weather Radar</span>
+                <div className="flex items-center space-x-2">
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: accent }} />
+                    <span className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                        Live Weather Radar
+                    </span>
                 </div>
 
                 <div className="flex items-center space-x-2">
