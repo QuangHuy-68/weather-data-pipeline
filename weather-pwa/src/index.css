@@ -225,3 +225,43 @@
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(148, 163, 184, 0.45);
 }
+
+/* ─────────────────────────────────────────────────────────────
+ * PHOTOREALISTIC RAIN, GLASS CONDENSATION & STORM CLOUDS
+ * ───────────────────────────────────────────────────────────── */
+/* Mây dông tầng cao cuộn sóng chậm rãi */
+@keyframes stormShelfBillow {
+    0%, 100% { transform: translateX(-120%) scaleY(0.9); opacity: 0.75; }
+    50%      { transform:scale(1.06) translateY(-12px); opacity: 0.95; }
+}
+
+@keyframes scudCloudDrift { 
+    0%   { transform: translateX(-120%) scaleY(0.9); opacity: 0; }
+    15%  { opacity: 0.55; }
+    85%  { opacity: 0.55; }
+    100% { transform: translateX(120vw) scaleY(1.1); opacity: 0; }
+}
+
+/* Vòng nước tóe bắn khi hạt mưa chạm đáy màn hình */
+@keyframes rainSplashRing {
+    0%   { transform: scale(0.1) rotateX(65deg); opacity: 0.9; }
+    60%  { transform: scale(1.2) rotateX(65deg); opacity: 0.5; }
+    100% { transform: scale(2.2) rotateX(65deg); opacity: 0; }
+}
+
+/* Giọt nước bám kính trượt ngắt quãng tự nhiên (chảy rồi khựng lại) */
+@keyframes glassDropletMeander {
+    0%   { transform: translateY(0) scaleY(1); opacity: 0; }
+    5%   { opacity: 0.95; }
+    25%  { transform: translateY(25px) scaleY(1.25); }
+    30%  { transform: translateY(28px) scaleY(1.05); }
+    60%  { transform: translateY(90px) scaleY(1.4); }
+    65%  { transform: translateY(95px) scaleY(1.1); }
+    90%  { transform: translateY(180px) scaleY(1.6); opacity: 0.6; }
+    100% { transform: translateY(240px) scaleY(2); opacity: 0; }
+}
+/* Lớp sương hơi ẩm ngưng tụ viền kính thở nhẹ */
+@keyframes condensationHazePulse {
+    0%, 100% { opacity: 0.45; }
+    50%      { opacity: 0.7; }
+}
