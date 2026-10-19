@@ -35,7 +35,7 @@ export function useWeatherCurrent({ city = 'HCM', lat = null, lon = null, name =
         fetchWithRetry(targetLat, targetLon, locationName, 3)
 
         async function fetchWithRetry(latitude, longitude, locName, retriesLeft = 3) {
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation&timezone=Asia%2FHo_Chi_Minh`
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation,weather_code,is_day&timezone=Asia%2FHo_Chi_Minh`
 
             try {
                 const res = await fetch(url)
@@ -58,7 +58,9 @@ export function useWeatherCurrent({ city = 'HCM', lat = null, lon = null, name =
                         temperature: c.temperature_2m ?? 28,
                         humidity: c.relative_humidity_2m ?? 70,
                         wind_speed: c.wind_speed_10m ?? 0, 
-                        precipitation: c.precipitation ?? 0
+                        precipitation: c.precipitation ?? 0,
+                        weather_code: c.weather_code ?? 0,
+                        is_day: c.is_day ?? 1
                     })
                     setLoading(false)
                 }
@@ -223,7 +225,7 @@ export function getWeatherIcon(code, isDay = 1, rainProb = 0) {
 // Hook: Fetch next 24-hour weather forecast timeline
 export function useWeatherHourly ({ city = 'HCM', lat = null, lon = null } = {}) {
     const [data, setData] = useState([])
-    const[loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         setLoading(true)
@@ -237,7 +239,7 @@ export function useWeatherHourly ({ city = 'HCM', lat = null, lon = null } = {})
             targetLon = cityInfo.lon
         }
 
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${targetLat}&longitude=${targetLon}&hourly=temperature_2m,precipitation_probability,precipitation,weather_code&timezone=Asia%2FHo_Chi_Minh&forecast_days=2`
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${targetLat}&longitude=${targetLon}&hourly=temperature_2m,precipitation_probability,precipitation,weather_code&daily=sunrise,sunset&timezone=Asia%2FHo_Chi_Minh&forecast_days=2`
 
         fetch(url)
             .then(res => res.json())    
@@ -248,11 +250,11 @@ export function useWeatherHourly ({ city = 'HCM', lat = null, lon = null } = {})
                 const probs = h.precipitation_probability || []
                 const codes = h.weather_code || []
                 const precips = h.precipitation || []
-                const daily = json.daily || []
+                const daily = json.daily || {}
                 const sunrises = daily.sunrise || []
                 const sunsets = daily.sunset || []
 
-                // Match current hour in local time
+                // Xác định giờ hiện tại
                 const now = new Date()
                 const year = now.getFullYear()
                 const month = String(now.getMonth() + 1).padStart(2, '0')
@@ -268,7 +270,7 @@ export function useWeatherHourly ({ city = 'HCM', lat = null, lon = null } = {})
                 }
 
                 const startTimeStr = times[startIndex] || currentHourStr
-                const endIndex = Math.min(startIndex +  24, times.length)
+                const endIndex = Math.min(startIndex + 24, times.length)
                 const endTimeStr = times[endIndex - 1] || '9999-99-99T99:99'
                 
                 const sunEvents = []
@@ -293,37 +295,39 @@ export function useWeatherHourly ({ city = 'HCM', lat = null, lon = null } = {})
 
                     if (i > startIndex) { 
                         const prevTimeStr = times[i - 1]
-                        const ev = sunEvents[eventIdx]
+                        // Định nghĩa chính xác eventIdx để không bị lỗi ReferenceError
+                        const eventIdx = sunEvents.findIndex(e => e.time > prevTimeStr && e.time <= timeStr)
                         if (eventIdx !== -1) {
+                            const ev = sunEvents[eventIdx]
                             timeline.push({
-                            time: ev.time,
-                            displayTime: ev.time.slice(11, 16), 
-                            isSunEvent: true,
-                            eventType: ev.type,
-                            label: ev.label,
-                            temp: Math.round(temps[i - 1] ?? temps[i] ?? 0),
-                            rainProb: 0,
-                            precip: 0, 
-                            code: 0, 
-                            isDay: ev.type === 'sunrise' ? 1 : 0
-                        })
-                        sunEvents.splice(eventIdx, 1)
+                                time: ev.time,
+                                displayTime: ev.time.slice(11, 16), 
+                                isSunEvent: true,
+                                eventType: ev.type,
+                                label: ev.label,
+                                temp: Math.round(temps[i - 1] ?? temps[i] ?? 0),
+                                rainProb: 0,
+                                precip: 0, 
+                                code: 0, 
+                                isDay: ev.type === 'sunrise' ? 1 : 0
+                            })
+                            sunEvents.splice(eventIdx, 1)
+                        }
                     }
+
+                    timeline.push({
+                        time: timeStr,
+                        displayTime: isNow ? 'Now' : `${timeStr.slice(11, 16)}`,
+                        temp: Math.round(temps[i] ?? 0),
+                        rainProb: probs[i] ?? 0, 
+                        precip: precips[i] ?? 0,
+                        code: codes[i] ?? 0, 
+                        isDay,
+                        isSunEvent: false
+                    })
                 }
 
-                timeline.push({
-                    time: timeStr,
-                    displayTime: isNow ? 'Now' : `${timeStr.slice(11, 16)}`,
-                    temp: Math.round(temps[i] ?? 0),
-                    rainProb: probs[i] ?? 0, 
-                    precip: precips[i] ?? 0,
-                    code: codes[i] ?? 0, 
-                    isDay,
-                    isSunEvent: false
-                })
-            }
-
-            sunEvents.forEach(ev => {
+                sunEvents.forEach(ev => {
                     timeline.push({
                         time: ev.time,
                         displayTime: ev.time.slice(11, 16),
@@ -348,8 +352,8 @@ export function useWeatherHourly ({ city = 'HCM', lat = null, lon = null } = {})
                     const d = new Date(now.getTime() + i * 3600000)
                     const h = d.getHours()
                     fallbackTimeline.push({
-                        time: d.toString(),
-                        displayTime: i === 0 ? 'Now' :  `${String(h).padStart(2, '0')}:00`,
+                        time: d.toISOString(),
+                        displayTime: i === 0 ? 'Now' : `${String(h).padStart(2, '0')}:00`,
                         temp: 28,
                         rainProb: 0, 
                         precip: 0,
@@ -358,7 +362,6 @@ export function useWeatherHourly ({ city = 'HCM', lat = null, lon = null } = {})
                         isSunEvent: false
                     })
                 }
-
                 setData(fallbackTimeline)
                 setLoading(false)
             })

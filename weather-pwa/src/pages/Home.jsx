@@ -554,7 +554,7 @@ export default function Home() {
                     </div>
                 )}
 
-                                {/* Hero & Metric Cards Skeleton Loading (Apple Shimmer Wave) */}
+                {/* Hero & Metric Cards Skeleton Loading (Apple Shimmer Wave) */}
                 {loadingCurrent ? (
                     <div className="space-y-6 mb-6">
                         {/* 1. Hero Card Skeleton */}
@@ -636,9 +636,9 @@ export default function Home() {
                                 {/* Bên phải: ICON LỚN TỎA SÁNG CỬ ĐỘNG */}
                                 <div className="mr-2 flex flex-col items-center">
                                     <HeroWeatherIcon 
-                                        code={hourly?.[0]?.code ?? 0}
-                                        isDay={hourly?.[0]?.isDay ?? 1}
-                                        rainProb={hourly?.[0]?.rainProb ?? 0}
+                                        code={hourly?.[0]?.code ?? current?.weather_code ?? 0}
+                                        isDay={hourly?.[0]?.isDay ?? hourly?.[0]?.isDay ?? 1}
+                                        rainProb={current?.precipitation > 0 ? 80 : (hourly?.[0]?.rainProb ?? 0)}
                                         weatherMode={weatherMode}
                                     />
                                 </div>
