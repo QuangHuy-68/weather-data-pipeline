@@ -28,59 +28,63 @@ export default function GlassCondensation({ isDark = true }) {
         let microBeads = []
         let tricklingDrops = []
 
-        function initStaticLayers() {
-            const trailCount = Math.max(6, Math.floor(width / 180))
+                function initStaticLayers() {
+            // A. Dải nước chảy mảnh mai, thanh thoát (Rivulets 6px - 14px)
+            const trailCount = Math.max(5, Math.floor(width / 220))
             trails = []
             for (let i = 0; i < trailCount; i++) {
-                const startX = (i + 0.5) * (width / trailCount) + (Math.random() - 0.5) * 60
+                const startX = (i + 0.5) * (width / trailCount) + (Math.random() - 0.5) * 50
                 const points = []
                 let currX = startX
-                const segments = 18 
+                const segments = 20
                 for (let j = 0; j <= segments; j++) { 
                     const currY = (j / segments) * height
-                    currX += (Math.random() - 0.5) * 16
+                    currX += (Math.random() - 0.5) * 12
                     points.push({ x: currX, y: currY })
                 }
                 trails.push({
                     points,
-                    width: 14 + Math.random() * 20,
-                     opacity: 0.12 + Math.random() * 0.14
+                    width: 6 + Math.random() * 8, // Thu nhỏ bề rộng dải nước
+                    opacity: 0.10 + Math.random() * 0.12
                 })
             }
 
-            const dropCount = Math.max(70, Math.floor((width * height) / 12000))
+            // B. Giọt nước đọng tĩnh nhỏ nhắn, tinh tế (Bán kính 1.8px - 5.5px)
+            const dropCount = Math.max(90, Math.floor((width * height) / 9500))
             staticDrops = []
             for (let i = 0; i < dropCount; i++) { 
                 staticDrops.push({ 
                     x: Math.random() * width,
                     y: Math.random() * height,
-                    r: 3 + Math.random() * 9,
-                    elongation: 1.08 + Math.random() * 0.25, 
-                    slantAngle: (Math.random() - 0.5) * 0.2
+                    r: 1.8 + Math.random() * 3.7, // Thu nhỏ hạt nước
+                    elongation: 1.08 + Math.random() * 0.22, 
+                    slantAngle: (Math.random() - 0.5) * 0.15
                 })
             }
 
-            // C. Bụi sương mịn li ti bám kính (Micro-beads Spray)
-            const microCount = Math.max(200, Math.floor((width * height) / 4000))
+            // C. Bụi sương siêu mịn bám kính (Bán kính 0.6px - 1.6px)
+            const microCount = Math.max(220, Math.floor((width * height) / 4500))
             microBeads = []
             for (let i = 0; i < microCount; i++) {
                 microBeads.push({
                     x: Math.random() * width,
                     y: Math.random() * height,
-                    r: 0.8 + Math.random() * 1.5,
-                    opacity: 0.35 + Math.random() * 0.45
+                    r: 0.6 + Math.random() * 1.0, // Hạt sương nhỏ li ti
+                    opacity: 0.3 + Math.random() * 0.4
                 })
             }
-            // D. Giọt nước chuyển động trượt chảy chậm (Active Trickling Drops)
-            tricklingDrops = trails.slice(0, 5).map((trail, idx) => ({
+
+            // D. Giọt nước chuyển động trượt chảy chậm (Bán kính 3.5px - 6.5px)
+            tricklingDrops = trails.slice(0, 4).map((trail, idx) => ({
                 id: idx,
                 trailPoints: trail.points,
                 progress: Math.random() * 0.8,
-                speed: 0.0006 + Math.random() * 0.0009,
-                r: 6 + Math.random() * 6,
+                speed: 0.0005 + Math.random() * 0.0008,
+                r: 3.5 + Math.random() * 3.0, // Thu nhỏ giọt trượt
                 pauseCounter: 0
             }))
         }
+
         initStaticLayers()
         // ── 2. HÀM VẼ GIỌT NƯỚC QUANG HỌC 3D ──
         function drawWaterDroplet(x, y, r, elongation = 1.15, angle = 0) {
@@ -205,7 +209,7 @@ export default function GlassCondensation({ isDark = true }) {
     return (
         <canvas 
             ref={canvasRef} 
-            className="fixed inset-0 pointer-events-none z-[1] w-full h-full opacity-85"
+            className="fixed inset-0 pointer-events-none z-[1] w-full h-full opacity-75"
         />
     )
 }
