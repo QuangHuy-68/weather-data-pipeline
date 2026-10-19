@@ -191,55 +191,118 @@ export default function Home() {
         }
     }, [current, hourly, setWeatherData])
 
-    // Smart weather alert generator for UI banner (synced with hourly rain probability)
+        // Smart weather alert generator for UI banner (Hierarchical Multi-Weather Advisory)
     const getWeatherAlert = () => { 
         if (!current) return null
 
         const currentRainProb = hourly?.[0]?.rainProb || 0
-        const isRainingOrLikely = current.precipitation > 0 || currentRainProb >= 40
+        const weatherCode = hourly?.[0]?.code ?? 0
+        const wind = current.wind_speed ?? 0
 
-        if (isRainingOrLikely) {
+        // 1. Cực kỳ nguy hiểm: Giông bão sấm sét (WMO >= 95)
+        if (weatherCode >= 95) {
+            return {
+                type: "storm",
+                level: "SEVERE WARNING",
+                levelBg: "bg-purple-500 text-white",
+                icon: "⛈️",
+                bg: isDark ? "bg-purple-950/40 border-purple-500/40 text-purple-200" : "bg-purple-50 border-purple-300 text-purple-900",
+                title: "Severe Thunderstorm Warning",
+                desc: "Lightning strikes and violent squalls detected. Seek immediate indoor shelter and avoid open terrain!"
+            }
+        }
+
+        // 2. Mưa thực tế hoặc xác suất mưa cao
+        if (current.precipitation > 0 || currentRainProb >= 50) {
             return {
                 type: "rain",
-                bg: "bg-blue-500/20 border-blue-500/40 text-blue-400",
-                title: currentRainProb >= 70 ? "High chance of rain" : "Rain is forecast",
+                level: current.precipitation > 2 || currentRainProb >= 80 ? "HEAVY RAIN" : "ADVISORY",
+                levelBg: "bg-blue-500 text-white",
+                icon: "🌧️",
+                bg: isDark ? "bg-blue-950/40 border-blue-500/40 text-blue-200" : "bg-blue-50 border-blue-300 text-blue-900",
+                title: current.precipitation > 0 ? "Active Precipitation Detected" : "High Rain Probability",
                 desc: current.precipitation > 0 
-                    ? `Rain detected in the area (${current.precipitation} mm). Bring an umbrella or raincoat!`
-                    : `Rain probability is high (${currentRainProb}%). It is strongly recommended to carry rain gear!`
+                    ? `Precipitation recorded (${current.precipitation} mm). Roads may be slick—carry umbrella or waterproof gear.`
+                    : `Precipitation probability is elevated (${currentRainProb}%). Carrying portable rain gear is strongly advised.`
             }
         }
 
-                if (current.temperature >= 33) {
+        // 3. Tuyết rơi (WMO 71-77)
+        if (weatherCode >= 71 && weatherCode <= 77) {
+            return {
+                type: "snow",
+                level: "WINTER ALERT",
+                levelBg: "bg-sky-400 text-slate-900 font-bold",
+                icon: "❄️",
+                bg: isDark ? "bg-sky-950/40 border-sky-400/40 text-sky-200" : "bg-sky-50 border-sky-300 text-sky-900",
+                title: "Snow Flurries Advisory",
+                desc: "Active snowfall and frost accumulation. Watch out for icy roadways and reduced surface grip!"
+            }
+        }
+
+        // 4. Gió giật mạnh (Wind >= 35 km/h)
+        if (wind >= 35) {
+            return {
+                type: "wind",
+                level: "WIND ADVISORY",
+                levelBg: "bg-amber-500 text-white",
+                icon: "💨",
+                bg: isDark ? "bg-amber-950/40 border-amber-500/40 text-amber-200" : "bg-amber-50 border-amber-300 text-amber-900",
+                title: "High Wind Advisory",
+                desc: `Sustained winds of ${wind} km/h recorded. Secure loose rooftop objects and exercise caution while driving.`
+            }
+        }
+
+        // 5. Nắng nóng gay gắt / Sốc nhiệt (>= 33°C)
+        if (current.temperature >= 33) {
             return {
                 type: "hot",
+                level: "HEAT WARNING",
+                levelBg: "bg-orange-500 text-white",
                 icon: "🔥",
-                bg: "bg-orange-500/20 border-orange-500/40 text-orange-400",
-                title: "Heatwave warning",
-                desc: "Outdoor temperature is quite high. Remember to apply sunscreen and stay hydrated!"
+                bg: isDark ? "bg-orange-950/40 border-orange-500/40 text-orange-200" : "bg-orange-50 border-orange-300 text-orange-900",
+                title: "Extreme Heatwave Warning",
+                desc: "Elevated outdoor heat and solar intensity. Stay in shaded spaces, hydrate frequently, and use UV protection."
             }
         }
 
-        // ⭐ Cảnh báo giá rét / nhiệt độ âm dưới 5°C
+        // 6. Sương mù dày đặc (WMO 45, 48)
+        if (weatherCode === 45 || weatherCode === 48) {
+            return {
+                type: "fog",
+                level: "VISIBILITY ALERT",
+                levelBg: "bg-slate-500 text-white",
+                icon: "🌫️",
+                bg: isDark ? "bg-slate-900/50 border-slate-500/40 text-slate-200" : "bg-slate-100 border-slate-300 text-slate-800",
+                title: "Dense Fog & Mist Advisory",
+                desc: "Hazardous road visibility due to heavy atmospheric moisture. Use low-beam fog lights and maintain stopping distance."
+            }
+        }
+
+        // 7. Giá rét / Nhiệt độ âm (<= 5°C)
         if (current.temperature <= 5) {
             return {
                 type: "freezing",
+                level: current.temperature <= 0 ? "FREEZE WARNING" : "COLD ADVISORY",
+                levelBg: "bg-cyan-500 text-slate-950 font-bold",
                 icon: current.temperature <= 0 ? "🥶" : "❄️",
-                bg: isDark 
-                    ? "bg-cyan-500/20 border-cyan-500/40 text-cyan-300" 
-                    : "bg-cyan-500/10 border-cyan-300 text-cyan-800",
-                title: current.temperature <= 0 ? "Freezing Warning 🥶" : "Cold Weather Advisory ❄️",
+                bg: isDark ? "bg-cyan-950/40 border-cyan-500/40 text-cyan-200" : "bg-cyan-50 border-cyan-300 text-cyan-900",
+                title: current.temperature <= 0 ? "Sub-Zero Freezing Warning" : "Cold Weather Advisory",
                 desc: current.temperature <= 0
-                    ? `Sub-zero cold (${current.temperature}°C). Extreme freezing conditions—wear heavy thermal layers!`
-                    : `Outdoor temperature is very chilly (${current.temperature}°C). Remember a warm coat before going out!`
+                    ? `Severe freezing temperature (${current.temperature}°C). Wear multi-layered thermal apparel to protect against frostbite.`
+                    : `Crisp low temperature (${current.temperature}°C). Don a warm jacket and scarf before stepping outside.`
             }
         }
 
+        // 8. Trạng thái lý tưởng mặc định
         return {
             type: "good",
+            level: "OPTIMAL",
+            levelBg: "bg-emerald-500 text-white",
             icon: "✨",
-            bg: isDark ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-300" : "bg-emerald-500/10 border-emerald-300 text-emerald-700", 
-            title: "Ideal weather",
-            desc: "The weather is cool and pleasant—perfect for outdoor activities!"
+            bg: isDark ? "bg-emerald-950/30 border-emerald-500/30 text-emerald-200" : "bg-emerald-50/70 border-emerald-200 text-emerald-800", 
+            title: "Ideal Weather Conditions",
+            desc: "Atmospheric conditions are mild, clean, and highly favorable for outdoor activities and travel."
         }
     }
 
@@ -445,13 +508,29 @@ export default function Home() {
                             </div>
                         </div>        
 
-                        {/* Smart Weather Alert Banner */}
+                                                {/* Smart Weather Alert Banner (Glassmorphism & Severity Badge) */}
                         {alert && (
-                            <div className={`rounded-2xl p-4 mb-6 border ${alert.bg} flex items-start space-x-3 transition-all`}>
-                                <span className="text-2xl">{alert.icon}</span>
-                                <div>
-                                    <h4 className="font-semibold text-sm">{alert.title}</h4>
-                                    <p className="text-xs opacity-90 mt-0.5 leading-relaxed">{alert.desc}</p>
+                            <div className={`relative overflow-hidden rounded-3xl p-4 sm:p-5 mb-6 border backdrop-blur-xl transition-all duration-300 shadow-xl ${alert.bg}`}>
+                                <div className="flex items-start space-x-3.5">
+                                    {/* Icon Box */}
+                                    <div className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-sm">
+                                        {alert.icon}
+                                    </div>
+
+                                    {/* Nội dung thông báo */}
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center space-x-2 mb-1">
+                                            <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${alert.levelBg}`}>
+                                                {alert.level}
+                                            </span>
+                                            <h4 className="font-bold text-sm tracking-tight truncate">
+                                                {alert.title}
+                                            </h4>
+                                        </div>
+                                        <p className="text-xs opacity-90 leading-relaxed font-medium">
+                                            {alert.desc}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         )}
