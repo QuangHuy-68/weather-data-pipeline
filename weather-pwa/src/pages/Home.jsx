@@ -542,17 +542,25 @@ export default function Home() {
                     </div>
                 )}
 
-                                {/* Chart 1: 7-Day Temperature Trend (Adaptive Color Accent) */}
-                <div className={`rounded-3xl p-4 mb-6 backdrop-blur-md transition-all duration-300 border ${
-                    isDark ? 'bg-slate-800/40 border-slate-700/50 text-white' : 'bg-white/90 border-slate-200/80 text-slate-900 shadow-sm'
+                {/* Chart 1: 7-Day Temperature Trend (Ultra-Glassmorphism) */}
+                <div className={`rounded-3xl p-4 mb-6 backdrop-blur-md transition-all duration-300 border shadow-xl ${
+                    isDark ? 'bg-slate-900/45 border-white/10 text-white shadow-black/40' : 'bg-white/70 border-white/80 text-slate-900 shadow-slate-200/60' 
                 }`}>
                     <div className="flex justify-between items-center mb-4">
-                        <h2 className={`text-sm font-semibold flex items-center ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                            7-Day Temperature Trend
-                        </h2>
+                        <div className="flex items-center space-x-2">
+                            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: p('accent') }} />
+                            <h2 className={`text-sm font-bold uppercase tracking-wider ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                                7-Day Temperature Trend
+                            </h2>
+                        </div>
+                    
                         <span 
-                            className="text-[11px] font-medium px-2 py-0.5 rounded-md"
-                            style={{ backgroundColor: `${p('accent')}20`, color: p('accent') }}
+                            className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full border"
+                            style={{ 
+                                backgroundColor: `${p('accent')}15`, 
+                                color: p('accent'),
+                                borderColor: `${p('accent')}30`
+                            }}
                         >
                             AVG Temp (°C)
                         </span>
@@ -565,25 +573,27 @@ export default function Home() {
                             <AreaChart data={formattedDaily}>
                                 <defs>
                                     <linearGradient id="weatherTempGradient" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor={p('accent')} stopOpacity={0.4}/>
+                                        <stop offset="5%" stopColor={p('accent')} stopOpacity={0.45}/>
                                         <stop offset="95%" stopColor={p('accent')} stopOpacity={0.0}/>
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#334155" : "#e2e8f0"} opacity={0.6} />
+                                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#334155" : "#e2e8f0"} opacity={0.4} />
                                 <XAxis dataKey="shortDate" stroke={isDark ? "#94a3b8" : "#64748b"} tick={{ fontSize: 10 }} />
                                 <YAxis stroke={isDark ? "#94a3b8" : "#64748b"} tick={{ fontSize: 10 }} domain={['auto', 'auto']} width={25} />
                                 <Tooltip contentStyle={{ 
-                                    backgroundColor: isDark ? '#0f172a' : '#ffffff', 
-                                    border: `1px solid ${isDark ? '#334155' : '#e2e8f0'}`, 
-                                    borderRadius: '12px', 
+                                    backgroundColor: isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.95)', 
+                                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`, 
+                                    borderRadius: '16px', 
+                                    backdropFilter: 'blur(12px)',
                                     fontSize: '12px',
+                                    boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
                                     color: isDark ? '#ffffff' : '#0f172a'
                                 }} />
                                 <Area 
                                     type="monotone" 
                                     dataKey="temp" 
                                     stroke={p('accent')} 
-                                    strokeWidth={2.5} 
+                                    strokeWidth={3} 
                                     fill="url(#weatherTempGradient)" 
                                     name="AVG Temp (°C)" 
                                 />
@@ -592,17 +602,24 @@ export default function Home() {
                     )}
                 </div>
 
-                                {/* Chart 2: Daily Rainfall (Adaptive Color Accent) */}
-                <div className={`rounded-3xl p-4 mb-6 backdrop-blur-md transition-all duration-300 border ${
-                    isDark ? 'bg-slate-800/40 border-slate-700/50 text-white' : 'bg-white/90 border-slate-200/80 text-slate-900 shadow-sm shadow-slate-200/40'
+                {/* Chart 2: Daily Rainfall (Adaptive Color Accent) */}
+                <div className={`rounded-3xl p-4 mb-6 backdrop-blur-xl transition-all duration-300 border shadow-xl ${
+                    isDark ? 'bg-slate-900/45 border-white/10 text-white shadow-black/40' : 'bg-white/70 border-white/80 text-slate-900 shadow-slate-200/60'
                 }`}>
                     <div className="flex justify-between items-center mb-4">
-                        <h2 className={`text-sm font-semibold flex items-center ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                            Daily Rainfall (mm)
-                        </h2>
+                        <div className="flex items-center space-x-2">
+                            <span className="w-1.5 h-1.5 rounded-full" style={{backgroundColor: p('accent') }}/>
+                            <h2 className={`text-xs font-bold uppercase tracking-wider flex ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                                Daily Rainfall (mm)
+                            </h2>
+                        </div>
                         <span 
-                            className="text-[11px] font-medium px-2 py-0.5 rounded-md"
-                            style={{ backgroundColor: `${p('accent')}20`, color: p('accent') }}
+                            className="text-[11px] font-msemibold px-2.5 py-0.5 rounded-full border"
+                            style={{ 
+                                backgroundColor: `${p('accent')}15`, 
+                                color: p('accent'),
+                                borderColor: `${p('accent')}30` 
+                            }}
                         >
                             Total Rain (mm)
                         </span>
@@ -616,20 +633,22 @@ export default function Home() {
                                 <defs>
                                     <linearGradient id="weatherRainGradient" x1="0" y1="0" x2="0" y2="1">
                                         <stop offset="0%" stopColor={p('accent')} stopOpacity={0.9}/>
-                                        <stop offset="100%" stopColor={p('accent')} stopOpacity={0.4}/>
+                                        <stop offset="100%" stopColor={p('accent')} stopOpacity={0.35}/>
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#334155" : "#e2e8f0"} opacity={0.6} />
+                                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#334155" : "#e2e8f0"} opacity={0.4} />
                                 <XAxis dataKey="shortDate" stroke={isDark ? "#94a3b8" : "#64748b"} tick={{ fontSize: 10 }} />
                                 <YAxis stroke={isDark ? "#94a3b8" : "#64748b"} tick={{ fontSize: 10 }} width={25} />
                                 <Tooltip contentStyle={{ 
-                                    backgroundColor: isDark ? '#0f172a' : '#ffffff', 
-                                    border: `1px solid ${isDark ? '#334155' : '#e2e8f0'}`, 
-                                    borderRadius: '12px', 
+                                    backgroundColor: isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.95)', 
+                                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`, 
+                                    borderRadius: '16px', 
+                                    backdropFilter: 'blur(12px)',
                                     fontSize: '12px',
+                                    boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
                                     color: isDark ? '#ffffff' : '#0f172a'
                                 }} />
-                                <Bar dataKey="rain" fill="url(#weatherRainGradient)" radius={[6, 6, 0, 0]} name="Rainfall (mm)" />
+                                <Bar dataKey="rain" fill="url(#weatherRainGradient)" radius={[8, 8, 2, 2]} name="Rainfall (mm)" />
                             </BarChart>
                         </ResponsiveContainer>
                     )}
