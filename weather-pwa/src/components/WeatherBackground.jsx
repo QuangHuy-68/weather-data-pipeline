@@ -1,6 +1,7 @@
 // src/components/WeatherBackground.jsx
 import { useMemo } from 'react'
 import { useTheme } from '../context/ThemeContext'
+import GlassCondensation from './GlassCondensation'
 
 export default function WeatherBackground({ current, hourly }) {
     const { theme, overrideMode, overrideTime } = useTheme()
@@ -273,150 +274,154 @@ export default function WeatherBackground({ current, hourly }) {
 
             {/* ── 7. HỆ THỐNG MƯA & GIỌT NƯỚC BÁM KÍNH ĐA TẦNG ── */}
             {isRaining && (
-                <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                    
-                    {/* Tầng 1: Mưa xa (Far Rain) */}
-                    {farRain.map(drop => (
-                        <div
-                            key={`far-${drop.id}`}
+                <>
+                    {/* Canvas ngưng tụ hơi nước & giọt lệ 3D như ảnh chụp */}
+                    <GlassCondensation isDark={isDark} />
+                    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                        
+                        {/* Tầng 1: Mưa xa (Far Rain) */}
+                        {farRain.map(drop => (
+                            <div
+                                key={`far-${drop.id}`}
+                                style={{
+                                    position: 'absolute',
+                                    left: drop.left,
+                                    top: '-60px',
+                                    width: '1px',
+                                    height: drop.height,
+                                    transform: `rotate(${rainSlant - 2}deg)`,
+                                    background: isDark
+                                        ? 'linear-gradient(to bottom, rgba(148, 163, 184, 0), rgba(186, 230, 253, 0.35))'
+                                        : 'linear-gradient(to bottom, rgba(71, 85, 105, 0), rgba(51, 65, 85, 0.25))',
+                                    filter: 'blur(0.8px)',
+                                    animation: `realisticRainFar ${drop.duration} linear infinite`,
+                                    animationDelay: drop.delay,
+                                }}
+                            />
+                        ))}
+
+                        {/* Tầng 2: Mưa trung (Mid Rain) */}
+                        {midRain.map(drop => (
+                            <div
+                                key={`mid-${drop.id}`}
+                                style={{
+                                    position: 'absolute',
+                                    left: drop.left,
+                                    top: '-80px',
+                                    width: '1.5px',
+                                    height: drop.height,
+                                    borderRadius: '9999px',
+                                    transform: `rotate(${rainSlant}deg)`,
+                                    background: isDark
+                                        ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(224, 242, 254, 0.75))'
+                                        : 'linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(56, 189, 248, 0.65))',
+                                    animation: `realisticRainMid ${drop.duration} linear infinite`,
+                                    animationDelay: drop.delay,
+                                }}
+                            />
+                        ))}
+
+                        {/* Tầng 3: Mưa gần sắc nét (Near Rain) */}
+                        {nearRain.map(drop => (
+                            <div
+                                key={`near-${drop.id}`}
+                                style={{
+                                    position: 'absolute',
+                                    left: drop.left,
+                                    top: '-120px',
+                                    width: '2px',
+                                    height: drop.height,
+                                    borderRadius: '9999px',
+                                    transform: `rotate(${rainSlant + 2}deg)`,
+                                    background: isDark
+                                        ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.9))'
+                                        : 'linear-gradient(to bottom, rgba(14, 165, 233, 0.05), rgba(2, 132, 199, 0.85))',
+                                    filter: 'drop-shadow(0 0 2px rgba(255, 255, 255, 0.35))',
+                                    animation: `realisticRainNear ${drop.duration} linear infinite`,
+                                    animationDelay: drop.delay,
+                                }}
+                            />
+                        ))}
+
+                        {/* Tầng 4: Vòng nước tóe bắn (Rain Splashes khi chạm đáy) */}
+                        {splashRings.map(splash => (
+                            <div
+                                key={`splash-${splash.id}`}
+                                style={{
+                                    position: 'absolute',
+                                    left: splash.left,
+                                    bottom: splash.bottom,
+                                    width: splash.size,
+                                    height: splash.size,
+                                    borderRadius: '50%',
+                                    border: isDark ? '1.5px solid rgba(224, 242, 254, 0.7)' : '1.5px solid rgba(56, 189, 248, 0.6)',
+                                    animation: `rainSplashRing ${splash.duration} ease-out infinite`,
+                                    animationDelay: splash.delay,
+                                }}
+                            />
+                        ))}
+
+                        {/* Tầng 5: Lớp sương hơi ẩm ngưng tụ viền kính (Glass Condensation Haze) */}
+                        <div 
+                            className="absolute inset-0 pointer-events-none"
                             style={{
-                                position: 'absolute',
-                                left: drop.left,
-                                top: '-60px',
-                                width: '1px',
-                                height: drop.height,
-                                transform: `rotate(${rainSlant - 2}deg)`,
+                                boxShadow: isDark
+                                    ? 'inset 0 0 90px rgba(148, 163, 184, 0.15), inset 0 0 30px rgba(255, 255, 255, 0.08)'
+                                    : 'inset 0 0 80px rgba(203, 213, 225, 0.4), inset 0 0 25px rgba(255, 255, 255, 0.3)',
+                                animation: 'condensationHazePulse 8s ease-in-out infinite',
+                            }}
+                        />
+
+                        {/* Tầng 6: Hạt sương li ti đọng tĩnh 3D trên kính (Static Beads) */}
+                        {staticDroplets.map(drop => (
+                            <div
+                                key={`bead-${drop.id}`}
+                                style={{
+                                    position: 'absolute',
+                                    left: drop.left,
+                                    top: drop.top,
+                                    width: drop.size,
+                                    height: drop.size,
+                                    borderRadius: '50%',
+                                    background: 'radial-gradient(circle at 35% 35%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.4) 45%, rgba(148,163,184,0.2) 80%)',
+                                    boxShadow: 'inset 0.5px 0.5px 1px rgba(255,255,255,0.9), 0.5px 1px 1.5px rgba(0,0,0,0.3)',
+                                    opacity: drop.opacity,
+                                }}
+                            />
+                        ))}
+
+                        {/* Tầng 7: Giọt nước lớn trôi trượt ngắt quãng trên kính (Meandering Droplets) */}
+                        {runningDroplets.map(drop => (
+                            <div
+                                key={`running-${drop.id}`}
+                                style={{
+                                    position: 'absolute',
+                                    left: drop.left,
+                                    top: drop.top,
+                                    width: drop.size,
+                                    height: drop.size,
+                                    borderRadius: '50%',
+                                    background: 'radial-gradient(circle at 35% 30%, #ffffff 0%, rgba(255,255,255,0.7) 40%, rgba(148,163,184,0.3) 75%)',
+                                    boxShadow: 'inset 1px 1px 1.5px rgba(255,255,255,0.95), 0 2px 4px rgba(0,0,0,0.35)',
+                                    animation: `glassDropletMeander ${drop.duration} cubic-bezier(0.4, 0, 0.6, 1) infinite`,
+                                    animationDelay: drop.delay,
+                                }}
+                            />
+                        ))}
+
+                        {/* Tầng 8: Hơi sương bốc lên từ mặt đất (Ground Mist) */}
+                        <div 
+                            className="absolute bottom-0 left-0 right-0 h-72 pointer-events-none"
+                            style={{
                                 background: isDark
-                                    ? 'linear-gradient(to bottom, rgba(148, 163, 184, 0), rgba(186, 230, 253, 0.35))'
-                                    : 'linear-gradient(to bottom, rgba(71, 85, 105, 0), rgba(51, 65, 85, 0.25))',
-                                filter: 'blur(0.8px)',
-                                animation: `realisticRainFar ${drop.duration} linear infinite`,
-                                animationDelay: drop.delay,
+                                    ? 'radial-gradient(ellipse at bottom, rgba(56, 189, 248, 0.09) 0%, rgba(15, 23, 42, 0) 70%)'
+                                    : 'radial-gradient(ellipse at bottom, rgba(148, 163, 184, 0.25) 0%, rgba(255, 255, 255, 0) 70%)',
+                                filter: 'blur(30px)',
+                                animation: 'mistVaporDrift 7s ease-in-out infinite'
                             }}
                         />
-                    ))}
-
-                    {/* Tầng 2: Mưa trung (Mid Rain) */}
-                    {midRain.map(drop => (
-                        <div
-                            key={`mid-${drop.id}`}
-                            style={{
-                                position: 'absolute',
-                                left: drop.left,
-                                top: '-80px',
-                                width: '1.5px',
-                                height: drop.height,
-                                borderRadius: '9999px',
-                                transform: `rotate(${rainSlant}deg)`,
-                                background: isDark
-                                    ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(224, 242, 254, 0.75))'
-                                    : 'linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(56, 189, 248, 0.65))',
-                                animation: `realisticRainMid ${drop.duration} linear infinite`,
-                                animationDelay: drop.delay,
-                            }}
-                        />
-                    ))}
-
-                    {/* Tầng 3: Mưa gần sắc nét (Near Rain) */}
-                    {nearRain.map(drop => (
-                        <div
-                            key={`near-${drop.id}`}
-                            style={{
-                                position: 'absolute',
-                                left: drop.left,
-                                top: '-120px',
-                                width: '2px',
-                                height: drop.height,
-                                borderRadius: '9999px',
-                                transform: `rotate(${rainSlant + 2}deg)`,
-                                background: isDark
-                                    ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.9))'
-                                    : 'linear-gradient(to bottom, rgba(14, 165, 233, 0.05), rgba(2, 132, 199, 0.85))',
-                                filter: 'drop-shadow(0 0 2px rgba(255, 255, 255, 0.35))',
-                                animation: `realisticRainNear ${drop.duration} linear infinite`,
-                                animationDelay: drop.delay,
-                            }}
-                        />
-                    ))}
-
-                    {/* Tầng 4: Vòng nước tóe bắn (Rain Splashes khi chạm đáy) */}
-                    {splashRings.map(splash => (
-                        <div
-                            key={`splash-${splash.id}`}
-                            style={{
-                                position: 'absolute',
-                                left: splash.left,
-                                bottom: splash.bottom,
-                                width: splash.size,
-                                height: splash.size,
-                                borderRadius: '50%',
-                                border: isDark ? '1.5px solid rgba(224, 242, 254, 0.7)' : '1.5px solid rgba(56, 189, 248, 0.6)',
-                                animation: `rainSplashRing ${splash.duration} ease-out infinite`,
-                                animationDelay: splash.delay,
-                            }}
-                        />
-                    ))}
-
-                    {/* Tầng 5: Lớp sương hơi ẩm ngưng tụ viền kính (Glass Condensation Haze) */}
-                    <div 
-                        className="absolute inset-0 pointer-events-none"
-                        style={{
-                            boxShadow: isDark
-                                ? 'inset 0 0 90px rgba(148, 163, 184, 0.15), inset 0 0 30px rgba(255, 255, 255, 0.08)'
-                                : 'inset 0 0 80px rgba(203, 213, 225, 0.4), inset 0 0 25px rgba(255, 255, 255, 0.3)',
-                            animation: 'condensationHazePulse 8s ease-in-out infinite',
-                        }}
-                    />
-
-                    {/* Tầng 6: Hạt sương li ti đọng tĩnh 3D trên kính (Static Beads) */}
-                    {staticDroplets.map(drop => (
-                        <div
-                            key={`bead-${drop.id}`}
-                            style={{
-                                position: 'absolute',
-                                left: drop.left,
-                                top: drop.top,
-                                width: drop.size,
-                                height: drop.size,
-                                borderRadius: '50%',
-                                background: 'radial-gradient(circle at 35% 35%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.4) 45%, rgba(148,163,184,0.2) 80%)',
-                                boxShadow: 'inset 0.5px 0.5px 1px rgba(255,255,255,0.9), 0.5px 1px 1.5px rgba(0,0,0,0.3)',
-                                opacity: drop.opacity,
-                            }}
-                        />
-                    ))}
-
-                    {/* Tầng 7: Giọt nước lớn trôi trượt ngắt quãng trên kính (Meandering Droplets) */}
-                    {runningDroplets.map(drop => (
-                        <div
-                            key={`running-${drop.id}`}
-                            style={{
-                                position: 'absolute',
-                                left: drop.left,
-                                top: drop.top,
-                                width: drop.size,
-                                height: drop.size,
-                                borderRadius: '50%',
-                                background: 'radial-gradient(circle at 35% 30%, #ffffff 0%, rgba(255,255,255,0.7) 40%, rgba(148,163,184,0.3) 75%)',
-                                boxShadow: 'inset 1px 1px 1.5px rgba(255,255,255,0.95), 0 2px 4px rgba(0,0,0,0.35)',
-                                animation: `glassDropletMeander ${drop.duration} cubic-bezier(0.4, 0, 0.6, 1) infinite`,
-                                animationDelay: drop.delay,
-                            }}
-                        />
-                    ))}
-
-                    {/* Tầng 8: Hơi sương bốc lên từ mặt đất (Ground Mist) */}
-                    <div 
-                        className="absolute bottom-0 left-0 right-0 h-72 pointer-events-none"
-                        style={{
-                            background: isDark
-                                ? 'radial-gradient(ellipse at bottom, rgba(56, 189, 248, 0.09) 0%, rgba(15, 23, 42, 0) 70%)'
-                                : 'radial-gradient(ellipse at bottom, rgba(148, 163, 184, 0.25) 0%, rgba(255, 255, 255, 0) 70%)',
-                            filter: 'blur(30px)',
-                            animation: 'mistVaporDrift 7s ease-in-out infinite'
-                        }}
-                    />
-                </div>
+                    </div>
+                </>
             )}
 
             {/* ── 8. LIGHTNING FLASH ── */}
