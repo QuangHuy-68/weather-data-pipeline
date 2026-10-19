@@ -24,7 +24,8 @@ import {
 } from "recharts"
 
 export default function Home() {
-    const { theme, toggleTheme, setWeatherData, p, weatherMode } = useTheme()
+    const { theme, toggleTheme, setWeatherData, p, weatherMode, overrideMode, setOverrideMode, overrideTime, setOverrideTime } = useTheme()
+    const [showThemeModal, setShowThemeModal] = useState(false)
     const isDark = theme === 'dark'
 
     // 1. Location state management (with localStorage persistence)
@@ -380,7 +381,114 @@ export default function Home() {
                             </button>
                         )}
 
-                        {/* Theme Switcher Toggle Button */}
+                                                {/* 1. Theme Controller Button (Pure Minimalist Pill) */}
+                        <div className="relative">
+                            <button
+                                type="button"
+                                onClick={() => setShowThemeModal(!showThemeModal)}
+                                className={`flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all duration-200 border ${
+                                    overrideMode || overrideTime
+                                        ? 'bg-sky-500 text-white border-sky-400 shadow-sm'
+                                        : isDark
+                                            ? 'bg-slate-800/80 text-slate-300 border-slate-700/60 hover:text-white hover:bg-slate-700'
+                                            : 'bg-white text-slate-700 border-slate-200 hover:text-slate-900 shadow-sm'
+                                }`}
+                                title="Custom Weather & Sky Controller"
+                            >
+                                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: p('accent') }} />
+                                <span className="text-[11px] font-bold tracking-wide">
+                                    {overrideMode ? overrideMode.toUpperCase() : 'Theme'}
+                                </span>
+                            </button>
+
+                            {/* Dropdown Menu Minimalist (Thuần chữ tinh tế, không emoji) */}
+                            {showThemeModal && (
+                                <div className={`absolute right-0 top-full mt-2 z-50 w-72 rounded-3xl p-4 backdrop-blur-2xl border shadow-2xl animate-in fade-in slide-in-from-top-2 ${
+                                    isDark ? 'bg-slate-900/95 border-white/10 text-white shadow-black/80' : 'bg-white/95 border-white/80 text-slate-900 shadow-slate-300/80'
+                                }`}>
+                                    <div className="flex justify-between items-center mb-3 pb-2 border-b border-white/10">
+                                        <div className="flex items-center space-x-2">
+                                            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p('accent') }} />
+                                            <span className="text-xs font-bold uppercase tracking-wider">Atmosphere & Weather</span>
+                                        </div>
+                                        <button 
+                                            onClick={() => setShowThemeModal(false)}
+                                            className="text-xs text-slate-400 hover:text-white px-1"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+
+                                    {/* 1. Bầu trời */}
+                                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Sky Atmosphere</p>
+                                    <div className="grid grid-cols-2 gap-1.5 mb-3.5">
+                                        {[
+                                            { id: null, label: 'Auto Clock' },
+                                            { id: 'sunrise', label: 'Sunrise' },
+                                            { id: 'noon', label: 'Daylight' },
+                                            { id: 'sunset', label: 'Sunset' },
+                                            { id: 'midnight', label: 'Midnight' },
+                                        ].map(item => (
+                                            <button
+                                                key={String(item.id)}
+                                                onClick={() => setOverrideTime(item.id)}
+                                                className={`text-[11px] font-semibold py-1.5 px-2.5 rounded-xl border transition-all text-left truncate ${
+                                                    overrideTime === item.id
+                                                        ? 'bg-amber-500 text-white border-amber-400 shadow-sm'
+                                                        : isDark 
+                                                            ? 'bg-white/5 border-white/10 hover:bg-white/10 text-slate-300' 
+                                                            : 'bg-slate-100 border-slate-200 hover:bg-slate-200 text-slate-700'
+                                                }`}
+                                            >
+                                                {item.label}
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    {/* 2. Hiệu ứng thời tiết */}
+                                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Weather Layer</p>
+                                    <div className="grid grid-cols-3 gap-1.5">
+                                        {[
+                                            { id: null, label: 'Live' },
+                                            { id: 'rainy', label: 'Rain' },
+                                            { id: 'stormy', label: 'Storm' },
+                                            { id: 'snowy', label: 'Snow' },
+                                            { id: 'foggy', label: 'Fog' },
+                                            { id: 'clear', label: 'Clear' },
+                                        ].map(item => (
+                                            <button
+                                                key={String(item.id)}
+                                                onClick={() => setOverrideMode(item.id)}
+                                                className={`text-[11px] font-bold py-1.5 px-2 rounded-xl border transition-all text-center ${
+                                                    overrideMode === item.id
+                                                        ? 'bg-sky-500 text-white border-sky-400 shadow-sm'
+                                                        : isDark 
+                                                            ? 'bg-white/5 border-white/10 hover:bg-white/10 text-slate-300' 
+                                                            : 'bg-slate-100 border-slate-200 hover:bg-slate-200 text-slate-700'
+                                                }`}
+                                            >
+                                                {item.label}
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    {/* Nút Reset */}
+                                    {(overrideMode || overrideTime) && (
+                                        <button
+                                            onClick={() => {
+                                                setOverrideMode(null)
+                                                setOverrideTime(null)
+                                            }}
+                                            className="w-full mt-3 py-1.5 text-center text-xs font-bold rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/30 hover:bg-rose-500/20 transition-all"
+                                        >
+                                            Reset to Live Weather
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* 2. Theme Switcher Toggle Button */}
                         <button
                             type="button"
                             onClick={toggleTheme}
@@ -391,7 +499,6 @@ export default function Home() {
                             }`}
                             title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
                         >
-
                             <span className="text-[11px] font-semibold">{isDark ? "Light" : "Dark"}</span>
                         </button>
 
@@ -507,9 +614,9 @@ export default function Home() {
                                         <span className="text-2xl font-bold" style={{ color: p('accent') }}>°C</span>
                                     </div>
 
-                                    {/* Trạng thái thời tiết */}
+                                                                        {/* Trạng thái thời tiết */}
                                     <p className={`font-semibold text-sm sm:text-base mt-2 flex items-center ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                                        <span>{p('heroEmoji')} {p('name')}</span>
+                                        <span>{p('name')}</span>
                                     </p>
 
                                     {/* ⭐ CHỈ SỐ HIGH / LOW CHUẨN APPLE WEATHER ⭐ */}
@@ -545,17 +652,11 @@ export default function Home() {
                             </div>
                         </div>        
 
-                                                {/* Smart Weather Alert Banner (Glassmorphism & Severity Badge) */}
+                        {/* Smart Weather Alert Banner (Clean Typography & Status Dot) */}
                         {alert && (
                             <div className={`relative overflow-hidden rounded-3xl p-4 sm:p-5 mb-6 border backdrop-blur-xl transition-all duration-300 shadow-xl ${alert.bg}`}>
-                                <div className="flex items-start space-x-3.5">
-                                    {/* Icon Box */}
-                                    <div className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-sm">
-                                        {alert.icon}
-                                    </div>
-
-
-                                    {/* Nội dung thông báo */}
+                                <div className="flex items-start space-x-3">
+                                    <div className="w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0 animate-pulse" style={{ backgroundColor: p('accent') }} />
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center space-x-2 mb-1">
                                             <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${alert.levelBg}`}>

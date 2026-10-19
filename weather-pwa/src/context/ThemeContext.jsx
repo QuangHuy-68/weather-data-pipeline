@@ -13,18 +13,25 @@ export function ThemeProvider({ children }) {
     // 2. Weather data stream (populated from Home.jsx)
     const [weatherSource, setWeatherSource] = useState({ current: null, hourly: [] })
 
+    // 3. Manual Theme Overrides (Weather Mode & Sky Atmosphere Simulator)
+    const [overrideMode, setOverrideMode] = useState(null) // null = auto live weather
+    const [overrideTime, setOverrideTime] = useState(null) // null = auto clock time
+
     // Method allowing pages to sync current weather data
     const setWeatherData = useCallback((current, hourly) => {
         setWeatherSource({ current, hourly: hourly || [] })
     }, [])
 
-    // Compute weather-adaptive palette whenever weather changes
+    // Compute weather-adaptive palette (respecting manual override if set)
     const weatherTheme = useMemo(() => {
+        if (overrideMode && WEATHER_PALETTES[overrideMode]) {
+            return { weatherMode: overrideMode, palette: WEATHER_PALETTES[overrideMode] }
+        }
         if (!weatherSource.current) {
             return { weatherMode: 'clear', palette: WEATHER_PALETTES.clear }
         }
         return computeWeatherTheme(weatherSource.current, weatherSource.hourly)
-    }, [weatherSource])
+    }, [weatherSource, overrideMode])
 
     const isDark = theme === 'dark'
 
@@ -45,8 +52,7 @@ export function ThemeProvider({ children }) {
     }
 
     /**
-     * Helper: Automatically resolves the class based on current Dark or Light mode.
-     * Example: p('gradient') => returns palette.gradient.dark or palette.gradient.light
+     * Helper: Automatically resolves token based on current Dark or Light mode.
      */
     const p = useCallback((key) => {
         const val = weatherTheme.palette[key]
@@ -63,6 +69,10 @@ export function ThemeProvider({ children }) {
             isDark,
             weatherMode: weatherTheme.weatherMode,
             palette: weatherTheme.palette,
+            overrideMode,
+            setOverrideMode,
+            overrideTime,
+            setOverrideTime,
             setWeatherData,
             p
         }}>
