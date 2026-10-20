@@ -149,7 +149,7 @@ export default function WeatherBackground({ current, hourly }) {
             <div className={`absolute inset-0 transition-all duration-1000 ${
                 isStormy
                     ? 'bg-gradient-to-b from-[#070b14] via-[#0f172a] to-[#1e1b4b]'
-                : 'isSunrise'
+                : isSunrise
                     ? isRaining
                         ? 'bg-gradient-to-b from-[#2d124d]/85 via-[#4a154b]/70 to-[#040812]'
                         : 'bg-gradient-to-b from-[#2d124d] via-[#701a75] to-[#f97316]'
