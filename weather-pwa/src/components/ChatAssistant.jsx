@@ -10,7 +10,7 @@ function TypewriterMessage({ text, onDone }) {
         if (!text) return 
         let i = 0
         setDisplayed('')
-        const speed = Math.max(8, min(22, Math.floor(700 / text.length)))
+        const speed = Math.max(8, Math.min(22, Math.floor(700 / text.length)))
         const timer = setInterval(() => {
             i += 2 
             if (i >= text.length) { 
@@ -539,7 +539,7 @@ Expert Guidance:
                     {/* Online status indicator */}
 
                     <span className="relative flex h-2 w-2">
-                        <span className={`animate-ping absolute inline-flex h-full w-ful rounded-full opacity-75 ${apiKey ? 'bg-sky-400' : 'bg-emerald-400'}`}></span>
+                        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${apiKey ? 'bg-sky-400' : 'bg-emerald-400'}`}></span>
                         <span className={`relative inline-flex rounded-full h-2 w-2 ${apiKey ? 'bg-sky-400' : 'bg-emerald-400'}`}></span>
                     </span>
                 </button>
@@ -559,7 +559,7 @@ Expert Guidance:
                     }`}>
 
                         <div className="flex items-center space-x-2.5">
-                            <span className="w-2.5 h-2.5 rounded-full bg-sky-400-animate-pulse" />
+                            <span className="w-2.5 h-2.5 rounded-full bg-sky-400 animate-pulse" />
                             <div>
                                 <h3 className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-white' : 'text-slate-900'}`}>
                                     SkyBot AI
@@ -741,6 +741,10 @@ Expert Guidance:
                                             <div className="grid grid-cols-3 gap-1.5 py-2 border-t border-b border-white/10 text-[10px]">
                                                 <div>
                                                     <span className="text-slate-400 block">Humidity</span>
+                                                    <span className="font-bold">{m.weatherCard.humidity}%</span>
+                                                </div>
+                                                <div>
+                                                    <span className="text-slate-400 block">Wind</span>
                                                     <span className="font-bold">{m.weatherCard.windSpeed} km/h</span>
                                                 </div>
                                                 <div>
@@ -784,7 +788,7 @@ Expert Guidance:
                                                         : 'border-white/5 text-slate-400 hover:text-white'
                                                 }`}
                                             >
-                                                {m.feedbackGiven === 1 ? 'Helful ✓' : 'Helpful'}
+                                                {m.feedbackGiven === 1 ? 'Helpful ✓' : 'Helpful'}
                                             </button>
                                             <button 
                                                 type="button"
@@ -807,7 +811,7 @@ Expert Guidance:
                         {/* Typing indicator bubble */}
                         {isTyping && (
                             <div className="flex justify-start">
-                                <div className={`order rounded-2xl rounded-bl-xs px-3.5 py-2 flex items-center space-x-1 ${
+                                <div className={`border rounded-2xl rounded-bl-xs px-3.5 py-2 flex items-center space-x-1 ${
                                     isDark
                                         ? 'bg-slate-800/90 border-slate-700/60 text-slate-400'
                                         : 'bg-slate-100 border-slate-200 text-slate-500 shadow-sm'                                    }`}>
