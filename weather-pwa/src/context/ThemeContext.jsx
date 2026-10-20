@@ -37,15 +37,9 @@ export function ThemeProvider({ children }) {
 
     // Synchronize HTML root and body classes
     useEffect(() => {
-        localStorage.setItem('skypulse_theme', theme) 
-        if (theme === 'dark') {
-            document.documentElement.classList.add('dark')
-            document.body.className = 'bg-slate-950 text-white transition-colors duration-300'
-        } else {
-            document.documentElement.classList.remove('dark')
-            document.body.className = 'bg-slate-50 text-slate-900 transition-colors duration-300'
-        }
-    }, [theme])
+        document.documentElement.classList.add('dark')
+        document.body.className = 'bg-transparent text-white antialiased'
+    }, [])
 
     const toggleTheme = () => {
         setTheme(prev => prev === 'dark' ? 'light' : 'dark')

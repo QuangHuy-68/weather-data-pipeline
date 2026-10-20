@@ -24,7 +24,7 @@ export default function Forecast() {
     })) || []
 
     return (
-        <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'}`}>
+        <div className="min-h-screen text-white transition-colors duration-300">
             <div className="max-w-3xl mx-auto p-4 md:p-8 pb-28">
                 {/* Header Row: Badge + Theme Switcher */}
                 <div className="flex items-center justify-between mb-4 pt-2">

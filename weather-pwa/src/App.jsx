@@ -8,9 +8,7 @@ function AppContent() {
   const {theme} = useTheme()
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${
-      theme === 'dark' ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'
-    }`}>
+    <div className="min-h-screen text-white transition-colors duration-500">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/forecast" element={<Forecast />} />

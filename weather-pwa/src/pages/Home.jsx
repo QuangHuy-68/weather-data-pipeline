@@ -488,20 +488,6 @@ export default function Home() {
                             )}
                         </div>
 
-                        {/* 2. Theme Switcher Toggle Button */}
-                        <button
-                            type="button"
-                            onClick={toggleTheme}
-                            className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-200 border ${
-                                isDark
-                                    ? 'bg-slate-800/80 text-amber-300 border-slate-700/60 hover:bg-slate-700 shadow-sm'
-                                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 shadow-sm shadow-slate-200/50'
-                            }`}
-                            title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-                        >
-                            <span className="text-[11px] font-semibold">{isDark ? "Light" : "Dark"}</span>
-                        </button>
-
                         {/* Weather Alert Bell Button */}
                         <button
                             type="button"
@@ -531,7 +517,7 @@ export default function Home() {
                 </div>
 
                 {/* Header Row 2: Full-width Title */}
-                <h1 className={`text-2xl sm:text-3xl font-bold mb-4 tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                <h1 className="text-2xl sm:text-3xl font-bold mb-4 tracking-tight text-white drop-shadow-sm">
                     Current Weather
                 </h1>
 

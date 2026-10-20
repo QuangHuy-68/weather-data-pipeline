@@ -145,52 +145,48 @@ export default function WeatherBackground({ current, hourly }) {
     return (
         <div className="fixed inset-0 pointer-events-none overflow-hidden z-0 transition-all duration-1000">
             
-            {/* ── 1. SKY GRADIENT KHÍ QUYỂN ── */}
+            {/* ── 1. SKY GRADIENT KHÍ QUYỂN TỰ ĐỘNG THEO GIỜ & THỜI TIẾT ── */}
             <div className={`absolute inset-0 transition-all duration-1000 ${
                 isStormy
-                    ? isDark
-                        ? 'bg-gradient-to-b from-[#070b14] via-[#0f172a] to-[#03060c]'
-                        : 'bg-gradient-to-b from-[#334155] via-[#475569] to-[#64748b]'
-                : isSunrise
+                    ? 'bg-gradient-to-b from-[#070b14] via-[#0f172a] to-[#1e1b4b]'
+                : 'isSunrise'
                     ? isRaining
-                        ? isDark
-                            ? 'bg-gradient-to-b from-[#2d124d]/85 via-[#4a154b]/70 to-[#040812]'
-                            : 'bg-gradient-to-b from-[#fed7aa]/90 via-[#fbcfe8]/70 to-[#cbd5e1]'
-                        : isDark
-                            ? 'bg-gradient-to-b from-[#2d124d]/60 via-[#581c87]/30 to-[#020617]'
-                            : 'bg-gradient-to-b from-[#fed7aa] via-[#fce7f3] to-[#ffffff]'
+                        ? 'bg-gradient-to-b from-[#2d124d]/85 via-[#4a154b]/70 to-[#040812]'
+                        : 'bg-gradient-to-b from-[#2d124d] via-[#701a75] to-[#f97316]'
                 : isSunset
                     ? isRaining
-                        ? isDark
-                            ? 'bg-gradient-to-b from-[#4c0519]/80 via-[#2e1065]/70 to-[#040812]'
-                            : 'bg-gradient-to-b from-[#fde68a]/90 via-[#f472b6]/50 to-[#94a3b8]'
-                        : isDark
-                            ? 'bg-gradient-to-b from-[#4c0519]/50 via-[#2e1065]/40 to-[#020617]'
-                            : 'bg-gradient-to-b from-[#fde68a] via-[#f472b6]/30 to-[#e0e7ff]'
-                : isMidnight
+                        ? 'bg-gradient-to-b from-[#4c0519]/80 via-[#2e1065]/70 to-[#040812]'
+                        : 'bg-gradient-to-b from-[#1e1b4b] via-[#831843] to-[#ea580c]'
+                : isNight
                     ? isRaining
-                        ? 'bg-gradient-to-b from-[#020617] via-[#091328] to-[#01040f]'
-                        : 'bg-gradient-to-b from-[#01040f] via-[#040b1e] to-[#000206]'
-                : isRaining
-                    ? isDark
                         ? 'bg-gradient-to-b from-[#070e1b] via-[#0f1a2e] to-[#030710]'
-                        : 'bg-gradient-to-b from-[#94a3b8] via-[#cbd5e1] to-[#e2e8f0]'
+                        : 'bg-gradient-to-b from-[#020617] via-[#091328] to-[#0f172a]'
+                : isRaining 
+                    ? 'bg-gradient-to-b from-[#0f172a] via-[#1e293b] to-[#334155]'
                 : isFreezing
-                    ? isDark
-                        ? 'bg-gradient-to-b from-[#081220] via-[#0f2137] to-[#040913]'
-                        : 'bg-gradient-to-b from-[#dbeafe] via-[#eff6ff] to-[#f8fafc]'
-                : isSnowing
-                    ? isDark
-                        ? 'bg-gradient-to-b from-[#0c1929] via-[#1a2744] to-[#0a101f]'
-                        : 'bg-gradient-to-b from-[#e0e7ff] via-[#f0f4ff] to-[#ffffff]'
-                : isNoon && isHotSun
-                    ? isDark
-                        ? 'bg-gradient-to-b from-[#241407] via-[#0f172a] to-[#020617]'
-                        : 'bg-gradient-to-b from-[#fef3c7] via-[#f0f9ff] to-[#ffffff]'
-                    : isDark
-                        ? 'bg-gradient-to-b from-[#0f172a] via-[#1e293b] to-[#020617]'
-                        : 'bg-gradient-to-b from-[#e0f2fe] via-[#f8fafc] to-[#ffffff]'
+                    ? 'bg-gradient-to-b from-[#081220] via-[#0f2137] to-[#040913]'
+                 : isSnowing
+                    ? 'bg-gradient-to-b from-[#0c1929] via-[#1a2744] to-[#38bdf8]/30'
+                : isCloudy
+                    ? 'bg-gradient-to-b from-[#1e293b] via-[#334155] to-[#475569]'
+                : isFoggy
+                    ? 'bg-gradient-to-b from-[#334155] via-[#475569] to-[#64748b]'
+                : isHotSun
+                    ? 'bg-gradient-to-b from-[#0284c7] via-[#0ea5e9] to-[#fed7aa]'
+                : /* ⭐ TRỜI NẮNG TRONG XANH BAN NGÀY (DAYTIME CLEAR BLUE SKY) ⭐ */
+                  'bg-gradient-to-b from-[#0284c7] via-[#0ea5e9] to-[#38bdf8]'
             }`}/>
+
+            {/* ── 2. VẦNG HÀO QUANG MẶT TRỜI CHO TRỜI NẮNG BAN NGÀY ── */}
+            {!isRaining && !isNight && !isSunrise && !isSunset && !isStormy && !isCloudy && (
+                <div
+                    className="absolute -top-20 -right-20 w-[500px] h-[500px] pointer-events-none rounded-full"
+                    style={{
+                        background: 'radial-gradient(circle at center, rgba(255, 255, 255, 0.42) 0%, rgba(254, 240, 138, 0.2) 35%, rgba(56,189, 248, 0.12) 60%, transparent 75%)',
+                        filter: 'blur(25px)',
+                    }}
+                />
+            )}
 
             {/* ── 2. ĐÁM MÂY DÔNG TẦNG CAO U ÁM (HEAVY STORM SHELF CLOUD) ── */}
             {isRaining && (
