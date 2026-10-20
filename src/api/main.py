@@ -323,25 +323,38 @@ def ask_weather_assistant(payload: ChatQueryRequest):
         lat = matched_loc["latitude"]
         lon = matched_loc["longitude"]
     else: 
-        # 3. PERSONALIZED MEMORY: Kiểm tra xem người dùng có thói quen hỏi thành phố nào không
-        user_mem = learning_engine.get_user_memory(user_id)
-        if user_mem and user_mem.get("favorite_location"):
-            fav_name = user_mem["favorite_location"]
-            fav_loc = knowledge_retriever.extract_location(fav_name)
-            if fav_loc:
-                loc_name = fav_loc["name"]
-                lat = fav_loc["latitude"]
-                lon = fav_loc["longitude"]
-                personalized_note = f" *(📍 Tự động chọn {loc_name} theo thói quen của bạn)*"
-            else:
-                city_code = payload.current_city if payload.current_city in CITIES else "HN"
-                city_info = CITIES[city_code]
+        # 3. ƯU TIÊN 1: Lấy thành phố theo Tab người dùng đang đứng trên Web (current_city)
+        active_tab_loc = None
+        if payload.current_city:
+            # Nhận diện cả tên tiếng Việt lẫn không dấu: "Đà Nẵng", "Da Nang", "Hà Nội"...
+            active_tab_loc = knowledge_retriever.extract_location(payload.current_city)
+
+            if not active_tab_loc and payload.current_city.upper() in CITIES:
+                c_info = CITIES[payload.current_city.upper()]
+                active_tab_loc = {"name": c_info["name"], "latitude": c_info["lat"], "longitude": c_info["lon"]}
+
+        if active_tab_loc: 
+            loc_name = active_tab_loc["name"]
+            lat = active_tab_loc["latitude"]
+            lon = active_tab_loc["longitude"]
+        else: 
+            user_mem = learning_engine.get_user_memory(user_id)
+            if user_mem and user_mem.get("favorite_location"): 
+                fav_name = user_mem["favorite_location"]
+                fav_loc = knowledge_retriever.extract_location(fav_name)
+                if fav_loc: 
+                    loc_name = fav_loc["name"]
+                    lat = fav_loc["latitude"]
+                    lon = fav_loc["longitude"]
+                    personalized_note = f" *(📍 Tự động chọn {loc_name} theo thói quen của bạn)*"
+
+                else: 
+                    city_info = CITIES.get("HCM", list(CITIES.values())[0])
+                    loc_name, lat, lon = city_info["name"], city_info["lat"], city_info["lon"]
+            else: 
+                city_info = CITIES.get("HCM", list(CITIES.values())[0])
                 loc_name, lat, lon = city_info["name"], city_info["lat"], city_info["lon"]
-        else:
-            # Fallback mặc định theo thành phố đang chọn trên App
-            city_code = payload.current_city if payload.current_city in CITIES else "HN"
-            city_info = CITIES[city_code]
-            loc_name, lat, lon = city_info["name"], city_info["lat"], city_info["lon"]
+
     # 4. Phân loại ý định (Intent)
     intent = knowledge_retriever.detect_intent(query)
     # 5. Xử lý câu hỏi FAQ từ Knowledge Base & Mô hình ML
