@@ -2,6 +2,34 @@ import { useState, useRef, useEffect } from 'react'
 import { useTheme } from '../context/ThemeContext'
 import { API_BASE_URL } from '../config'
 
+function TypewriterMessage({ text, onDone }) {
+    const [displayed, setDisplayed] = useState('')
+    const completedRef = useRef(false)
+
+    useEffect(() => {
+        if (!text) return 
+        let i = 0
+        setDisplayed('')
+        const speed = Math.max(8, min(22, Math.floor(700 / text.length)))
+        const timer = setInterval(() => {
+            i += 2 
+            if (i >= text.length) { 
+                setDisplayed(text)
+                clearInterval(timer)
+                if (!completedRef.current && onDone) {
+                    completedRef.current = true
+                    onDone()
+                }
+            } else {
+                setDisplayed(text.slice(0, i))
+            }
+        }, speed)
+        return () => clearInterval(timer) 
+    }, [text, onDone])
+
+    return <span>{displayed}</span>
+}
+
 export default function ChatAssistant({ current, hourly = [], daily = [], aqi, location, onSelection }) {
     const { theme } = useTheme()
     const isDark = theme === 'dark'
@@ -160,13 +188,13 @@ export default function ChatAssistant({ current, hourly = [], daily = [], aqi, l
 
     // Quick suggestion prompts with lifestyle & meteorological insights
     const suggestions = [
-        { label: '☔ Need umbrella?', query: 'Do I need an umbrella today?' },
-        { label: '👕 What to wear?', query: 'What should I wear today?' },
-        { label: '🧺 Dry laundry?', query: 'Is it good weather to dry laundry outdoors today?' },
-        { label: '🚗 Wash car?', query: 'Should I wash my car today or will it rain soon?' },
-        { label: '☀️ UV & Sun risk?', query: 'How intense is the UV and sun exposure today?' },
-        { label: '🏃 Workout?', query: 'Is the weather good for outdoor running or exercise?' },
-        { label: '🍃 Air quality?', query: 'How is the air quality right now?' }
+        { label: 'Rain & Umbrella', query: 'Do I need an umbrella today?' },
+        { label: 'Outfit Advice', query: 'What should I wear today?' },
+        { label: 'Laundry Drying', query: 'Is it good weather to dry laundry outdoors today?' },
+        { label: 'Car Wash Guide', query: 'Should I wash my car today or will it rain soon?' },
+        { label: 'UV & Sun Index', query: 'How intense is the UV and sun exposure today?' },
+        { label: 'Outdoor Cardio', query: 'Is the weather good for outdoor running or exercise?' },
+        { label: 'Air Quality AQI', query: 'How is the air quality right now?' }
     ]
 
     // Helper: Extract target city from natural language query
@@ -477,11 +505,11 @@ Expert Guidance:
         setIsTyping(true)
 
         try {
-            const botReplyText = await generateBotResponse(textToSend)
             const targetCityName = extracttargetCity(textToSend)
             const cityData = targetCityName ? await fetchCityWeather(targetCityName) : null
+            const botReplyText = await generateBotResponse(textToSend)
 
-            setMessages(prev => [...prev, { sender: 'bot', text: botReplyText, actionLocation: cityData }])
+            setMessages(prev => [...prev, { sender: 'bot', text: botReplyText, weatherCard: cityData, isNew: true }])
         } catch (err) {
             setMessages(prev => [...prev, { sender: 'bot', text: '⚠️ Unable to process query. Please check connection or try again.' }])
         } finally {
@@ -506,7 +534,7 @@ Expert Guidance:
                     }`}
                     aria-label="Open AI Assistant"
                 >
-                    <span className="text-xs font-bold tracking-wide">💬 Ask SkyBot</span>
+                    <span className="text-xs font-bold tracking-wide">Ask SkyBot</span>
 
                     {/* Online status indicator */}
 
@@ -531,28 +559,14 @@ Expert Guidance:
                     }`}>
 
                         <div className="flex items-center space-x-2.5">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-base shadow-inner">
-                                🤖
-                            </div>
-
+                            <span className="w-2.5 h-2.5 rounded-full bg-sky-400-animate-pulse" />
                             <div>
-                                <h3 className={`text-sm font-bold leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                                <h3 className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-white' : 'text-slate-900'}`}>
                                     SkyBot AI
                                 </h3>
 
-                                <p className="text-[10px] flex items-center">
-                                    {apiKey ? (
-                                        <span className="text-sky-500 flex items-center font-medium">
-                                            <span className="w-1.5 h-1.5 rounded-full bg-sky-500 mr-1 animate-pulse"></span>
-                                            {displayModelName} Active
-                                        </span>
-                                    ) : (
-
-                                        <span className="text-emerald-500 flex items-center">
-                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 me-1"></span>
-                                            Local Engine Active
-                                        </span>
-                                    )}
+                                <p className="text-[10px] text-sky-400 font-medium">
+                                    {apiKey ? `${displayModelName} Active` : 'Local Engine Active'}
                                 </p>
                             </div>
                         </div>
@@ -565,38 +579,23 @@ Expert Guidance:
                                     setKeyInput(apiKey)
                                     setShowSettings(!showSettings)
                                 }}
-                                title="AI Engine Settings"
-                                className={`p-1.5 rounded-full transition-colors text-xs ${
-                                    isDark
-                                        ? 'text-slate-400 hover:text-white hover:bg-slate-700/50'
-                                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200/70'
-                                }`}
+                                className="px-2 py-1 rounded-lg text-[10px] font-semibold border border-white/10 text-slate-300 hover:text-white hover:bg-white/10"
                             >
-                                ⚙️
+                                Settings
                             </button>
 
                             {/* Clear conversation button */}
                             <button
                                 onClick={handleClearChat}
-                                title="Clear conversation"
-                                className={`p-1.5 rounded-full transition-colors text-xs ${
-                                    isDark 
-                                        ? 'text-slate-400 hover:text-white hover:bg-slate-700/50' 
-                                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200/70'
-                                }`}
-                            >
-                                🗑️
+                                className="px-2 py-1 rounded-lg text-[10px] font-semibold border border-white/10 text-slate-300 hover:text-white hover:bg-white/10"
+                            >   
+                                Clear
                             </button>
 
                             {/* Close drawer button */}
                             <button 
                                 onClick={() => setIsOpen(false)}
-                                title="Close"
-                                className={`p-1.5 rounded-full transition-colors text-xs ${
-                                    isDark 
-                                        ? 'text-slate-400 hover:text-white hover:bg-slate-700/50' 
-                                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200/70'
-                                }`}
+                                className="w-6 h-6 flex items-center justify-center rounded-lg text-xs font-bold text-slate-400 hover:text-white"
                             >
                                 ✕
                             </button>
@@ -705,78 +704,99 @@ Expert Guidance:
                                                 : 'bg-slate-100 text-slate-800 border border-slate-200/90 rounded-bl-xs shadow-sm'
                                     }`}
                                 >
-                                    {m.text}
-
-                                    {/* Action Card: Switch App Location */}
-                                    {m.actionLocation && onSelection && (
-                                        <div className={`mt-2.5 pt-2 border-t flex items-center justify-between ${
-                                            isDark ? 'border-slate-700/60' : 'border-slate-200'
-                                        }`}>
-                                            <span className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500' }`}>
-                                                View radar & charts:
-                                            </span>
-
-                                            <button 
-                                                type="button"
-                                                onClick={() => {
-                                                    onSelection({
-                                                        name: m.actionLocation.name,
-                                                        lat: m.actionLocation.lat,
-                                                        lon: m.actionLocation.lon,
-                                                        country: m.actionLocation.country
-                                                    })
-
-                                                    setIsOpen(false)
-                                                }}
-                                                className={`inline-flex items-center space-x-1 border px-2 py-1 rounded-lg text-[10px] font-semibold transition-all transform hover:scale-105 active:scale-95 ${
-                                                    isDark
-                                                        ? 'bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 hover:text-white border-sky-400/40'
-                                                        : 'bg-sky-50 hover:bg-sky-100 text-sky-600 border-sky-200'
-                                                }`}
-                                            >
-                                                <span>📍 Switch to {m.actionLocation.name}</span>
-                                                <span>➔</span>
-                                            </button>
-                                        </div>
+                                    {/* Chữ gõ máy tuần tự mượt mà */} 
+                                    {m.sender === 'bot' && m.isNew ? (
+                                        <TypewriterMessage
+                                            text={m.text}
+                                            onDone={() => {
+                                                m.isNew = false
+                                                    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+                                            }}
+                                        />  
+                                    ) : (
+                                        <span>{m.text}</span>
                                     )}
 
-
-                                    {m.sender === 'bot' && (
-                                        <div className={`mt-2 pt-1.5 border-t flex items-center gap-2 ${
-                                            isDark ? 'border-slate-700/50' : 'border-slate-200/80'
+                                    {/* Thẻ thời tiết mini trực quan khi hỏi thành phố khác */}
+                                    {m.weatherCard && (
+                                        <div className={`mt-3 p-3 rounded-2xl border backdrop-blur-xl transition-all ${
+                                            isDark
+                                                ? 'bg-slate-900/80 border-white/15 shadow-xl shadow-black/50'
+                                                : 'bg-slate-50 border-slate-200 shadow-md'
                                         }`}>
-                                            <span className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                                                Đánh giá:
-                                            </span>
+                                            <div className="flex justify-between items-baseline mb-2">
+                                                <div>
+                                                    <span className="text-[9px] font-bold uppercase tracking-wider text-sky-400">
+                                                        Live Station Report
+                                                    </span>
+                                                    <h4 className="text-sm font-black text-white">
+                                                        {m.weatherCard.cityName}
+                                                    </h4>
+                                                </div>
+                                                <span className="text-2xl font-black text-white">
+                                                    {m.weatherCard.temp}°C
+                                                </span>
+                                            </div>
+
+                                            <div className="grid grid-cols-3 gap-1.5 py-2 border-t border-b border-white/10 text-[10px]">
+                                                <div>
+                                                    <span className="text-slate-400 block">Humidity</span>
+                                                    <span className="font-bold">{m.weatherCard.windSpeed} km/h</span>
+                                                </div>
+                                                <div>
+                                                    <span className="text-slate-400 block">Rain Peak</span>
+                                                    <span className="font-bold text-sky-400">{m.weatherCard.maxRainProb}%</span>
+                                                </div>
+                                            </div>
+                                        
+                                            {onSelection && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        onSelection({
+                                                            name: m.weatherCard.name,
+                                                            lat: m.weatherCard.lat,
+                                                            lon: m.weatherCard.lon,
+                                                            country: m.weatherCard.country
+                                                        })
+                                                        setIsOpen(false)
+                                                    }}
+                                                    className="w-full mt-2 py-1.5 px-3 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-400/30 text-sky-400 font-semibold text-[11px] transition-all flex items-center justify-center space-x-1"
+                                                >
+                                                    <span>Switch Station to {m.weatherCard.name}</span>
+                                                    <span>→</span>
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
+                                    
+                                    {/* Nút đánh giá tối giản (không emoji) */}
+                                    {m.sender === 'bot' && (
+                                        <div className="mt-2.5 pt-1.5 border-t border-white/10 flex items-center gap-2">
+                                            <span className="text-[10px] text-slate-400">Feedback:</span>
                                             <button
                                                 type="button"
                                                 onClick={() => handleFeedback(idx, messages[idx - 1]?.text, m.text, 1)}
                                                 disabled={m.feedbackGiven !== undefined}
-                                                className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] transition-all ${
+                                                className={`px-2 py-0.5 rounded text-[10px] font-semibold border ${
                                                     m.feedbackGiven === 1
-                                                        ? 'bg-emerald-500/20 text-emerald-400 font-medium'
-                                                        : isDark
-                                                            ? 'hover:bg-slate-700 text-slate-400 hover:text-slate-200'
-                                                            : 'hover:bg-slate-200 text-slate-500 hover:text-slate-700'
+                                                        ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                                                        : 'border-white/5 text-slate-400 hover:text-white'
                                                 }`}
-                                                title="Câu trả lời hữu ích"
                                             >
-                                                👍 {m.feedbackGiven === 1 ? 'Đã thích' : ''}
+                                                {m.feedbackGiven === 1 ? 'Helful ✓' : 'Helpful'}
                                             </button>
-                                            <button
+                                            <button 
                                                 type="button"
                                                 onClick={() => handleFeedback(idx, messages[idx - 1]?.text, m.text, -1)}
                                                 disabled={m.feedbackGiven !== undefined}
-                                                className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] transition-all ${
+                                                className={`px-2 py-0.5 rounded text-[10px] font-semibold border ${
                                                     m.feedbackGiven === -1
-                                                        ? 'bg-rose-500/20 text-rose-400 font-medium'
-                                                        : isDark
-                                                            ? 'hover:bg-slate-700 text-slate-400 hover:text-slate-200'
-                                                            : 'hover:bg-slate-200 text-slate-500 hover:text-slate-700'
+                                                        ? 'bg-rose-500/20 text-rose-400 border-rose-500/30'
+                                                        : 'border-white/5 text-slate-400 hover:text-white'
                                                 }`}
-                                                title="Cần cải thiện"
                                             >
-                                                👎 {m.feedbackGiven === -1 ? 'Đã ghi nhận' : ''}
+                                                {m.feedbackGiven === -1 ? 'Recorded' : 'Report'}
                                             </button>
                                         </div>
                                     )}
@@ -790,17 +810,16 @@ Expert Guidance:
                                 <div className={`order rounded-2xl rounded-bl-xs px-3.5 py-2 flex items-center space-x-1 ${
                                     isDark
                                         ? 'bg-slate-800/90 border-slate-700/60 text-slate-400'
-                                        : 'bg-slate-100 border-slate-200 text-slate-500 shadow-sm'
-                                }`}>
-                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce"></span>
-                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0.2s]"></span>
-                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0.4s]"></span>
+                                        : 'bg-slate-100 border-slate-200 text-slate-500 shadow-sm'                                    }`}>
+                                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce"></span>
+                                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0.2s]"></span>
+                                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:0.4s]"></span>
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
 
-                        <div ref={messagesEndRef} />
-                    </div>
+                            <div ref={messagesEndRef} />
+                        </div>
 
                     {/* Quick Suggestion Chips */}
                     <div className={`px-3 py-1.5 border-t flex items-center space-x-1.5 overflow-x-auto scrollbar-none transition-colors ${
