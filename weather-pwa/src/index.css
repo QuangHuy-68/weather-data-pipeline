@@ -6,24 +6,77 @@
 
 /* Realistic rain fall with true motion blur and wind slant */
 @keyframes realisticRainFar {
-    0%   { transform: translateY(-80px) translateX(0px) rotate(12deg); opacity: 0; }
+    0%   { transform: translate3d(0, -80px, 0) rotate(var(--rain-slant, 12deg)); opacity: 0; }
     15%  { opacity: 0.35; }
     85%  { opacity: 0.35; }
-    100% { transform: translateY(110vh) translateX(35px) rotate(12deg); opacity: 0.1; }
+    100% { transform: translate3d(var(--rain-drift, 35px), 110vh, 0) rotate(var(--rain-slant, 12deg)); opacity: 0.1; }
 }
 
 @keyframes realisticRainMid {
-    0%   { transform: translateY(-100px) translateX(0px) rotate(14deg); opacity: 0; }
+    0%   { transform: translate3d(0, -100px, 0) rotate(var(--rain-slant, 14deg)); opacity: 0; }
     15%  { opacity: 0.65; }
     85%  { opacity: 0.65; }
-    100% { transform: translateY(110vh) translateX(45px) rotate(14deg); opacity: 0.2; }
+    100% { transform: translate3d(var(--rain-drift, 45px), 110vh, 0) rotate(var(--rain-slant, 14deg)); opacity: 0.2; }
 }
 
 @keyframes realisticRainNear {
-    0%   { transform: translateY(-120px) translateX(0px) rotate(16deg); opacity: 0; }
+    0%   { transform: translate3d(0, -120px, 0) rotate(var(--rain-slant, 16deg)); opacity: 0; }
     15%  { opacity: 0.9; }
     85%  { opacity: 0.85; }
-    100% { transform: translateY(110vh) translateX(55px) rotate(16deg); opacity: 0.3; }
+    100% { transform: translate3d(var(--rain-drift, 55px), 110vh, 0) rotate(var(--rain-slant, 16deg)); opacity: 0.3; }
+}
+
+/* A low, perspective-distorted wet surface grounds the rain in a real space. */
+.rain-wet-ground {
+    position: absolute;
+    z-index: 0;
+    right: -8vw;
+    bottom: -12vh;
+    left: -8vw;
+    height: 38vh;
+    overflow: hidden;
+    transform: perspective(620px) rotateX(58deg);
+    transform-origin: bottom center;
+    background:
+        linear-gradient(to bottom, rgba(186, 230, 253, 0) 0%, rgba(15, 23, 42, 0.08) 28%, rgba(2, 6, 23, 0.68) 100%),
+        repeating-linear-gradient(92deg, rgba(255,255,255,0.055) 0 1px, transparent 1px 16px);
+    mask-image: linear-gradient(to bottom, transparent, #000 25%);
+}
+
+.rain-wet-ground__reflection {
+    position: absolute;
+    inset: 16% -20% 0;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(186, 230, 253, 0.3), transparent 52%),
+        linear-gradient(105deg, transparent 18%, rgba(255,255,255,0.12) 42%, transparent 58%);
+    filter: blur(8px);
+    animation: wetGroundShimmer 5s ease-in-out infinite;
+}
+
+.rain-wet-ground__ripples {
+    position: absolute;
+    inset: 14% 0 0;
+    opacity: 0.55;
+    background-image: repeating-radial-gradient(ellipse at 32% 60%, transparent 0 14px, rgba(186, 230, 253, 0.2) 15px 16px, transparent 17px 31px);
+    background-size: 170px 86px;
+    animation: wetGroundRipples 2.8s linear infinite;
+}
+
+@keyframes wetGroundShimmer {
+    0%, 100% { transform: translateX(-5%) scaleX(0.94); opacity: 0.45; }
+    50% { transform: translateX(5%) scaleX(1.08); opacity: 0.8; }
+}
+
+@keyframes wetGroundRipples {
+    from { background-position: 0 0; }
+    to { background-position: 85px 43px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rain-wet-ground__reflection,
+    .rain-wet-ground__ripples {
+        animation: none;
+    }
 }
 
 /* Atmospheric rolling storm clouds */

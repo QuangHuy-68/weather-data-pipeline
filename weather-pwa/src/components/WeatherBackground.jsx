@@ -33,6 +33,9 @@ export default function WeatherBackground({ current, hourly }) {
 
     // Góc mưa nghiêng theo vận tốc gió thực tế (6° đến 24°)
     const rainSlant = Math.min(24, Math.max(6, Math.round(windSpeed * 0.75)))
+    // Keep the horizontal travel proportional to the visible wind angle.  The
+    // CSS animation reads these variables so every rain layer shares one wind.
+    const rainDrift = Math.round(18 + rainSlant * 2.25)
 
     // 2. Far Rain Layer (Mưa xa mờ ảo)
     const farRain = useMemo(() => {
@@ -289,7 +292,8 @@ export default function WeatherBackground({ current, hourly }) {
                                     top: '-60px',
                                     width: '1px',
                                     height: drop.height,
-                                    transform: `rotate(${rainSlant - 2}deg)`,
+                                    '--rain-slant': `${rainSlant - 2}deg`,
+                                    '--rain-drift': `${Math.round(rainDrift * 0.68)}px`,
                                     background: isDark
                                         ? 'linear-gradient(to bottom, rgba(148, 163, 184, 0), rgba(186, 230, 253, 0.35))'
                                         : 'linear-gradient(to bottom, rgba(71, 85, 105, 0), rgba(51, 65, 85, 0.25))',
@@ -311,7 +315,8 @@ export default function WeatherBackground({ current, hourly }) {
                                     width: '1.5px',
                                     height: drop.height,
                                     borderRadius: '9999px',
-                                    transform: `rotate(${rainSlant}deg)`,
+                                    '--rain-slant': `${rainSlant}deg`,
+                                    '--rain-drift': `${rainDrift}px`,
                                     background: isDark
                                         ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(224, 242, 254, 0.75))'
                                         : 'linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(56, 189, 248, 0.65))',
@@ -332,11 +337,15 @@ export default function WeatherBackground({ current, hourly }) {
                                     width: '2px',
                                     height: drop.height,
                                     borderRadius: '9999px',
-                                    transform: `rotate(${rainSlant + 2}deg)`,
+                                    '--rain-slant': `${rainSlant + 2}deg`,
+                                    '--rain-drift': `${Math.round(rainDrift * 1.28)}px`,
                                     background: isDark
                                         ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.9))'
                                         : 'linear-gradient(to bottom, rgba(14, 165, 233, 0.05), rgba(2, 132, 199, 0.85))',
                                     filter: 'drop-shadow(0 0 2px rgba(255, 255, 255, 0.35))',
+                                    boxShadow: isDark
+                                        ? '0 0 7px rgba(186, 230, 253, 0.3), inset 0 0 1px rgba(255,255,255,0.9)'
+                                        : '0 0 6px rgba(14, 165, 233, 0.25), inset 0 0 1px rgba(255,255,255,0.9)',
                                     animation: `realisticRainNear ${drop.duration} linear infinite`,
                                     animationDelay: drop.delay,
                                 }}
@@ -420,6 +429,13 @@ export default function WeatherBackground({ current, hourly }) {
                                 animation: 'mistVaporDrift 7s ease-in-out infinite'
                             }}
                         />
+
+                        {/* Mặt đường ướt ở tiền cảnh: phản xạ ánh trời và gợn nước
+                            tạo điểm tựa chiều sâu thay vì để mưa rơi trên nền phẳng. */}
+                        <div className="rain-wet-ground" aria-hidden="true">
+                            <div className="rain-wet-ground__reflection" />
+                            <div className="rain-wet-ground__ripples" />
+                        </div>
                     </div>
                 </>
             )}

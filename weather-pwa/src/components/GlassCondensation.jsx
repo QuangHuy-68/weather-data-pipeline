@@ -10,13 +10,21 @@ export default function GlassCondensation({ isDark = true }) {
         const ctx = canvas.getContext('2d')
 
         let animationFrameId
-        let width = (canvas.width = window.innerWidth)
-        let height = (canvas.height = window.innerHeight)
+        let width = 0
+        let height = 0
 
         const handleResize = () => { 
             if (!canvas) return
-            width = canvas.width - window.innerWidth
-            height = canvas.height - window.innerHeight
+            // Render at device resolution for crisp highlights, but cap DPR to
+            // keep the full-screen animation inexpensive on high-density phones.
+            const dpr = Math.min(window.devicePixelRatio || 1, 2)
+            width = window.innerWidth
+            height = window.innerHeight
+            canvas.width = Math.round(width * dpr)
+            canvas.height = Math.round(height * dpr)
+            canvas.style.width = `${width}px`
+            canvas.style.height = `${height}px`
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
             initStaticLayers()
         }
 
@@ -85,7 +93,7 @@ export default function GlassCondensation({ isDark = true }) {
             }))
         }
 
-        initStaticLayers()
+        handleResize()
         // ── 2. HÀM VẼ GIỌT NƯỚC QUANG HỌC 3D ──
         function drawWaterDroplet(x, y, r, elongation = 1.15, angle = 0) {
             ctx.save()
