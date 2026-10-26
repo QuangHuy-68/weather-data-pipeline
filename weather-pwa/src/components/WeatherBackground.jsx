@@ -173,22 +173,21 @@ export default function WeatherBackground({ current, hourly }) {
                     ? 'bg-gradient-to-b from-[#334155] via-[#475569] to-[#64748b]'
                 : isHotSun
                     ? 'bg-gradient-to-b from-[#0284c7] via-[#0ea5e9] to-[#fed7aa]'
-                : /* ⭐ TRỜI NẮNG TRONG XANH BAN NGÀY (DAYTIME CLEAR BLUE SKY) ⭐ */
-                  'bg-gradient-to-b from-[#0284c7] via-[#0ea5e9] to-[#38bdf8]'
+                : /* ⭐ TRỜI QUANG: NẮNG SỚM DỊU MÁT (#2f9bff -> #bfe6ff) ⭐ */
+                  'bg-gradient-to-b from-[#2f9bff] via-[#6cbcfd] to-[#bfe6ff]'
             }`}/>
-
-            {/* ── 2. VẦNG HÀO QUANG MẶT TRỜI CHO TRỜI NẮNG BAN NGÀY ── */}
+            {/* ── 2. VẦNG HÀO QUANG NẮNG SỚM DỊU DÀNG (#ffd966) ── */}
             {!isRaining && !isNight && !isSunrise && !isSunset && !isStormy && !isCloudy && (
                 <div
-                    className="absolute -top-20 -right-20 w-[500px] h-[500px] pointer-events-none rounded-full"
+                    className="absolute -top-24 -right-24 w-[520px] h-[520px] pointer-events-none rounded-full"
                     style={{
-                        background: 'radial-gradient(circle at center, rgba(255, 255, 255, 0.42) 0%, rgba(254, 240, 138, 0.2) 35%, rgba(56,189, 248, 0.12) 60%, transparent 75%)',
-                        filter: 'blur(25px)',
+                        background: 'radial-gradient(circle at center, rgba(255, 217, 102, 0.45) 0%, rgba(191, 230, 255, 0.25) 45%, transparent 70%)',
+                        filter: 'blur(35px)',
                     }}
                 />
             )}
 
-            {/* ── 2. ĐÁM MÂY DÔNG TẦNG CAO U ÁM (HEAVY STORM SHELF CLOUD) ── */}
+            {/* ── 3. ĐÁM MÂY DÔNG TẦNG CAO U ÁM (HEAVY STORM SHELF CLOUD) ── */}
             {isRaining && (
                 <>
                     {/* Mây dông khổng lồ bao phủ nửa trên màn hình */}

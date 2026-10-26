@@ -5,23 +5,24 @@
  * Fully supports dual Dark / Light mode styling tokens.
  */
 export const WEATHER_PALETTES = {
-    // 1. Clear / Sunny Sky (Glassmorphism trên nền trời xanh)
+    // 1. Clear / Sunny Sky (Buổi sáng nắng nhẹ, thoáng & sạch)
     clear: {
         name: 'Clear Sky',
-        accent: '#38bdf8', // Sky 400
+        accent: '#2f9bff',
+        textColor: '#0a2850',
         gradient: {
-            dark: 'from-white/20 via-white/10 to-sky-950/20 backdrop-blur-xl',
-            light: 'from-white/25 via-white/15 to-sky-900/15 backdrop-blur-xl',
+            dark: 'from-white/90 via-[#bfe6ff]/55 to-white/80 backdrop-blur-md',
+            light: 'from-white/95 via-[#bfe6ff]/60 to-white/85 backdrop-blur-md',
         },
         border: {
-            dark: 'border-white/25',
-            light: 'border-white/30',
+            dark: 'border-white/90',
+            light: 'border-white/95',
         },
         badge: {
-            dark: 'bg-white/15 text-white border-white/25',
-            light: 'bg-white/20 text-white border-white/30',
+            dark: 'bg-[#bfe6ff]/70 text-[#0a2850] border-white/80',
+            light: 'bg-[#bfe6ff]/80 text-[#0a2850] border-white/90',
         },
-        glow: 'shadow-sky-500/20',
+        glow: 'shadow-xl shadow-[#0a2850]/8',
         heroEmoji: '☀️'
     },
 

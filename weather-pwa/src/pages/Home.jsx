@@ -192,24 +192,20 @@ export default function Home() {
         }
     }, [current, hourly, setWeatherData])
 
-        // Smart weather alert generator for UI banner (Hierarchical Multi-Weather Advisory)
+    // Smart weather alert generator for UI banner (Hierarchical Multi-Weather Advisory)
     const getWeatherAlert = () => { 
         if (!current) return null
 
-        const currentRainProb = hourly?.[0]?.rainProb || 0
-        const weatherCode = hourly?.[0]?.code ?? 0
-        const wind = current.wind_speed ?? 0
-
-        // 1. Cực kỳ nguy hiểm: Giông bão sấm sét (WMO >= 95)
-        if (weatherCode >= 95) {
+        // Khi trời quang (Clear): Banner đồng bộ với trạng thái quang đãng
+        if (weatherMode === 'clear' || overrideMode === 'clear') {
             return {
-                type: "storm",
-                level: "SEVERE WARNING",
-                levelBg: "bg-purple-500 text-white",
-                icon: "⛈️",
-                bg: isDark ? "bg-purple-950/40 border-purple-500/40 text-purple-200" : "bg-purple-50 border-purple-300 text-purple-900",
-                title: "Severe Thunderstorm Warning",
-                desc: "Lightning strikes and violent squalls detected. Seek immediate indoor shelter and avoid open terrain!"
+                type: "clear",
+                level: "CLEAR SKY",
+                levelBg: "bg-[#2f9bff] text-white font-medium",
+                icon: "☀️",
+                bg: "bg-white/85 border-white text-[#0a2850] shadow-md shadow-[#0a2850]/5",
+                title: "Trời quang nắng nhẹ",
+                desc: "Không khí trong lành, thoáng đãng và sạch sẽ. Điều kiện lý tưởng cho các hoạt động ngoài trời."
             }
         }
 
@@ -586,40 +582,55 @@ export default function Home() {
                     </div>
                 ) : current ? (
                     <>
-                        <div className={`relative overflow-hidden rounded-3xl p-6 mb-6 backdrop-blur-xl transition-all shadow-2xl bg-gradient-to-br ${p('gradient')} border ${p('border')}`}>
-                            <div className="flex justify-between items-center">
-                                {/* Bên trái: Nhiệt độ, Trạng thái & Min/Max */}
+                                                {/* Main Weather Card (Sáng nhẹ, thoáng sạch, tâm điểm là con số nhiệt độ) */}
+                        <div className={`relative overflow-hidden rounded-3xl p-6 sm:p-7 mb-6 transition-all bg-gradient-to-br ${p('gradient')} border ${p('border')} ${p('glow')}`}>
+                            
+                            {/* Vầng sáng mặt trời dịu dàng ở góc card (#ffd966) */}
+                            {(weatherMode === 'clear' || overrideMode === 'clear') && (
+                                <div 
+                                    className="absolute -top-12 -right-12 w-48 h-48 rounded-full pointer-events-none"
+                                    style={{
+                                        background: 'radial-gradient(circle, rgba(255, 217, 102, 0.45) 0%, rgba(191, 230, 255, 0.2) 45%, transparent 70%)',
+                                        filter: 'blur(16px)',
+                                    }}
+                                />
+                            )}
+
+                            <div className="flex justify-between items-center relative z-10">
+                                {/* Bên trái: Nhãn thường, Con số nhiệt độ khổng lồ, Trạng thái & Min/Max */}
                                 <div>
-                                    <p className={`text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                                        Current Temperature
+                                    <p className="text-xs font-medium text-[#0a2850]/75">
+                                        Current temperature
                                     </p>
-                                    <div className="flex items-baseline space-x-2 mt-1">
-                                        <span className={`text-6xl sm:text-7xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                                    
+                                    {/* Điểm nhấn duy nhất: con số nhiệt độ thật lớn */}
+                                    <div className="flex items-baseline space-x-1.5 mt-1">
+                                        <span className="text-7xl sm:text-8xl font-black tracking-tight text-[#0a2850]">
                                             {current.temperature}
                                         </span>
-                                        <span className="text-2xl font-bold" style={{ color: p('accent') }}>°C</span>
+                                        <span className="text-2xl sm:text-3xl font-bold text-[#2f9bff]">°C</span>
                                     </div>
 
-                                                                        {/* Trạng thái thời tiết */}
-                                    <p className={`font-semibold text-sm sm:text-base mt-2 flex items-center ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                                    {/* Trạng thái thời tiết */}
+                                    <p className="font-semibold text-base mt-2 flex items-center text-[#0a2850]">
                                         <span>{p('name')}</span>
                                     </p>
 
-                                    {/* ⭐ CHỈ SỐ HIGH / LOW CHUẨN APPLE WEATHER ⭐ */}
-                                    <div className="flex items-center space-x-3 mt-2 text-xs font-medium">
-                                        <span className={`px-2 py-0.5 rounded-full ${isDark ? 'bg-slate-800/80 text-rose-300' : 'bg-rose-50 text-rose-600'}`}>
+                                    {/* Chỉ số High / Low tương phản rõ nét với text-[#0a2850] */}
+                                    <div className="flex items-center space-x-2.5 mt-2.5 text-xs font-medium">
+                                        <span className="px-2.5 py-0.5 rounded-full bg-[#bfe6ff]/70 text-[#0a2850] font-semibold border border-white/80">
                                             H: {todayMax}°
                                         </span>
-                                        <span className={`px-2 py-0.5 rounded-full ${isDark ? 'bg-slate-800/80 text-sky-300' : 'bg-sky-50 text-sky-600'}`}>
+                                        <span className="px-2.5 py-0.5 rounded-full bg-[#bfe6ff]/70 text-[#0a2850] font-semibold border border-white/80">
                                             L: {todayMin}°
                                         </span>
-                                        <span className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                                        <span className="text-[11px] text-[#0a2850]/75 font-medium">
                                             Feels like {feelsLikeTemp ?? current.temperature}°
                                         </span>
                                     </div>
                                 </div>
 
-                                {/* Bên phải: ICON LỚN TỎA SÁNG CỬ ĐỘNG */}
+                                {/* Bên phải: Icon mặt trời nắng dịu tĩnh lặng */}
                                 <div className="mr-2 flex flex-col items-center">
                                     <HeroWeatherIcon 
                                         code={hourly?.[0]?.code ?? current?.weather_code ?? 0}
@@ -630,9 +641,8 @@ export default function Home() {
                                 </div>
                             </div> 
 
-                            <div className={`mt-5 pt-3.5 border-t flex justify-between text-[11px] ${
-                                isDark ? 'border-slate-700/50 text-slate-400' : 'border-slate-200 text-slate-500'
-                            }`}>
+                            {/* Dòng chân Card */}
+                            <div className="mt-5 pt-3.5 border-t border-[#0a2850]/10 flex justify-between text-[11px] text-[#0a2850]/70 font-medium relative z-10">
                                 <span>Updated: {current.time?.replace("T", " ") || "Today"}</span>
                                 <span>Station: {current.location}</span>
                             </div>
