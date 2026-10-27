@@ -196,7 +196,12 @@ export default function Home() {
     const getWeatherAlert = () => { 
         if (!current) return null
 
-        // Khi trời quang (Clear): Banner đồng bộ với trạng thái quang đãng
+        // Khai báo lại các biến chỉ số thời tiết
+        const currentRainProb = hourly?.[0]?.rainProb || 0
+        const weatherCode = hourly?.[0]?.code ?? 0
+        const wind = current.wind_speed ?? 0
+
+        // 0. Khi trời quang (Clear): Banner đồng bộ với trạng thái quang đãng
         if (weatherMode === 'clear' || overrideMode === 'clear') {
             return {
                 type: "clear",
@@ -206,6 +211,19 @@ export default function Home() {
                 bg: "bg-white/85 border-white text-[#0a2850] shadow-md shadow-[#0a2850]/5",
                 title: "Trời quang nắng nhẹ",
                 desc: "Không khí trong lành, thoáng đãng và sạch sẽ. Điều kiện lý tưởng cho các hoạt động ngoài trời."
+            }
+        }
+
+        // 1. Cực kỳ nguy hiểm: Giông bão sấm sét (WMO >= 95)
+        if (weatherCode >= 95) {
+            return {
+                type: "storm",
+                level: "SEVERE WARNING",
+                levelBg: "bg-purple-500 text-white",
+                icon: "⛈️",
+                bg: isDark ? "bg-purple-950/40 border-purple-500/40 text-purple-200" : "bg-purple-50 border-purple-300 text-purple-900",
+                title: "Severe Thunderstorm Warning",
+                desc: "Lightning strikes and violent squalls detected. Seek immediate indoor shelter and avoid open terrain!"
             }
         }
 
@@ -223,6 +241,7 @@ export default function Home() {
                     : `Precipitation probability is elevated (${currentRainProb}%). Carrying portable rain gear is strongly advised.`
             }
         }
+    
 
         // 3. Tuyết rơi (WMO 71-77)
         if (weatherCode >= 71 && weatherCode <= 77) {
