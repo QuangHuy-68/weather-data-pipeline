@@ -31,20 +31,6 @@ export default function Forecast() {
                     <span className="text-xs font-semibold uppercase tracking-wider text-purple-400 bg-purple-400/10 px-2.5 py-1 rounded-full border border-purple-400/20">
                         🤖 Machine Learning
                     </span>
-
-                    <button
-                        type="button"
-                        onClick={toggleTheme}
-                        className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-200 border ${
-                            isDark
-                                ? 'bg-slate-800/80 text-amber-300 border-slate-700/60 hover:bg-slate-700 shadow-sm'
-                                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 shadow-sm shadow-slate-200/50'
-                        }`}
-                        title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-                    >
-                        <span>{isDark ? "☀️" : "🌙"}</span>
-                        <span className="text-[11px] font-semibold">{isDark ? "Light" : "Dark"}</span>
-                    </button>
                 </div>
 
                 {/* Title & Subtitle */}

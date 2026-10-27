@@ -318,3 +318,36 @@
     0%, 100% { opacity: 0.45; }
     50%      { opacity: 0.7; }
 }
+
+/* ─────────────────────────────────────────────────────────────
+ * PHOTOREALISTIC CLOUDS: BAY QUA BAY LẠI (SMOOTH MEANDERING FLOAT)
+ * ───────────────────────────────────────────────────────────── */
+@keyframes cloudFloat1 {
+   0%   { transform: translate3d(-40px, 0px, 0) scale(0.98); }
+   50%  { transform: translate3d(65px, -15px, 0) scale(1.02); }
+   100% { transform: translate3d(-40px, 0px, 0) scale(0.98); }
+}
+
+@keyframes cloudFloat2 {
+    0%   { transform: translate3d(50px, 0px, 0) scale(1.02); }
+    50%  { transform: translate3d(-55px, -18px, 0) scale(0.97); }
+    100% { transform: translate3d(50px, 0px, 0) scale(1.02); }
+}
+
+@keyframes cloudFloat3 { 
+    0%   { transform: translate3d(-25px, -6px, 0) scale(0.99); }
+    50%  { transform: translate3d(45px, 10px, 0) scale(1.01); }
+    100% { transform: translate3d(-25px, -6px, 0) scale(0.99); }
+}
+
+.animate-cloud-drift-1 {
+    animation: cloudFloat1 34s ease-in-out infinite alternate;
+}
+
+.animate-cloud-drift-2 {
+    animation: cloudFloat2 44s ease-in-out infinite alternate;
+}
+
+.animate-cloud-drift-3 {
+    animation: cloudFloat3 54s ease-in-out infinite alternate;
+}

@@ -25,7 +25,6 @@ export const WEATHER_PALETTES = {
         glow: 'shadow-xl shadow-[#0a2850]/8',
         heroEmoji: '☀️'
     },
-
     // 2. Rainy / Precipitation
     rainy: {
         name: 'Rain Showers',

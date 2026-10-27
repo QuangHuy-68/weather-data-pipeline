@@ -3,6 +3,89 @@ import { useMemo } from 'react'
 import { useTheme } from '../context/ThemeContext'
 import GlassCondensation from './GlassCondensation'
 
+function PhotorealisticCloud({ style, scale = 1, opacity = 0.88, animclass = "animate-cloud-drift-1"}) { 
+    return (
+        <div
+            className={`pointer-events-none select-none ${animClass}`}
+            style={{
+                position: 'absolute',
+                transformOrigin: 'center center',
+                filter: 'drop-shadow(0 18px 30px rgba(10, 40, 80, 0.08))',
+                opacity,
+                ...style,
+            }}
+        >
+            <div style={{ transform: `scale(${scale})`, position: 'relative', width: '320px', height: '100px' }}>
+                {/* 1. Thân mây nền */}
+                <div 
+                    style={{
+                        position: 'absolute',
+                        inset: 0, 
+                        borderRadius: '9999px',
+                        background: 'radial-gradient(ellipse at 50% 65%, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.82) 45%, rgba(240, 248, 255, 0) 75%)',
+                        filter: 'blur(9px)',
+                    }}
+                />
+
+                {/* 2. Vòm mây đỉnh trung tâm */}
+                <div 
+                    style={{
+                        position: 'absolute',
+                        top: '-34px',
+                        left: '32%',
+                        width: '135px',
+                        height: '115px',
+                        borderRadius: '50%',
+                        background: 'radial-gradient(circle at 45% 35%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 252, 240, 0.88) 40%, rgba(255,255, 255, 0) 72%)',
+                        filter: 'blur(7px)',
+                    }}
+                />
+
+                {/* 3. Vòm mây bên trái */}
+                <div 
+                    style={{
+                        position: 'absolute',
+                        top: '-18px',
+                        left: '12px',
+                        width: '98px',
+                        height: '92px',
+                        borderRadius: '50%',
+                        background: 'radial-gradient(circle at 45% 40%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.65) 45%, rgba(255, 255, 255, 0) 72%)',
+                        filter: 'blur(8px)',
+                    }}
+                />
+
+                {/* 4. Vòm mây bên phải */}
+                <div 
+                    style={{
+                        position: 'absolute',
+                        top: '-22px',
+                        right: '15%',
+                        width: '110px',
+                        height: '98px',
+                        borderRadius: '50%',
+                        background: 'radial-gradient(circle at 45% 40%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.65) 45%, rgba(255, 255, 255, 0) 72%)',
+                        filter: 'blur(8px)',
+                    }}
+                />
+
+                {/* 5. Đuôi mây mềm xốp */}
+                <div 
+                    style={{
+                        position: 'absolute',
+                        top: '15px',
+                        right: '-24px',
+                        width: '85px',
+                        height: '62px',
+                        borderRadius: '50%',
+                        background: 'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0) 70%)',
+                        filter: 'blur(6px)',
+                    }}
+                />
+            </div>
+        </div>
+    )
+}
 export default function WeatherBackground({ current, hourly }) {
     const { theme, overrideMode, overrideTime } = useTheme()
     const isDark = theme === 'dark'
@@ -471,28 +554,32 @@ export default function WeatherBackground({ current, hourly }) {
                 </div>
             )}
 
-            {/* ── 10. MÂY TRỜI QUANG (KHI KHÔNG MƯA) ── */}
-            {isCloudy && !isRaining && (
+            {/* ── 10. MÂY TRỜI QUANG CHÂN THẬT (BAY QUA BAY LẠI BỒNG BỀNH) ── */}
+            {!isRaining && !isStormy && !isFoggy && (
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                    {scudClouds.map(cloud => (
-                        <div
-                            key={`cloud-fair-${cloud.id}`}
-                            style={{
-                                position: 'absolute',
-                                top: cloud.top,
-                                width: cloud.width,
-                                height: cloud.height,
-                                borderRadius: '9999px',
-                                background: isDark
-                                    ? 'radial-gradient(ellipse, rgba(148, 163, 184, 0.15) 0%, transparent 70%)'
-                                    : 'radial-gradient(ellipse, rgba(203, 213, 225, 0.4) 0%, transparent 70%)',
-                                filter: 'blur(10px)',
-                                opacity: cloud.opacity,
-                                animation: `cloudDrift ${cloud.duration * 1.5} linear infinite`,
-                                animationDelay: cloud.delay,
-                            }}
-                        />
-                    ))}
+                    {/* Tầng 1: Mây lớn bên trái đón nắng sớm */}
+                    <PhotorealisticCloud
+                        style={{ top: '8%', left: '4%' }}
+                        scale={1.08}
+                        opacity={0.9}
+                        animclass="animate-cloud-drift-1"
+                    />
+
+                    {/* Tầng 2: Mây tầng trung bên phải lượn êm dịu */}
+                    <PhotorealisticCloud
+                        style={{ top: '20%', right: '3%' }}
+                        scale={0.92}
+                        opacity={0.82}
+                        animClass="animate-cloud-drift-2"
+                    />
+
+                    {/* Tầng 3: Mây xa mờ ảo tạo chiều sâu 3D */}
+                    <PhotorealisticCloud
+                        style={{ top: '32%', left: '33%' }}
+                        scale={0.76}
+                        opacity={0.62}
+                        animclass="animate-cloud-drift-3"
+                    />
                 </div>
             )}
 
