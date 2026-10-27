@@ -372,9 +372,7 @@ export default function WeatherBackground({ current, hourly }) {
                                     height: drop.height,
                                     '--rain-slant': `${rainSlant - 2}deg`,
                                     '--rain-drift': `${Math.round(rainDrift * 0.68)}px`,
-                                    background: isDark
-                                        ? 'linear-gradient(to bottom, rgba(148, 163, 184, 0), rgba(186, 230, 253, 0.35))'
-                                        : 'linear-gradient(to bottom, rgba(71, 85, 105, 0), rgba(51, 65, 85, 0.25))',
+                                    background: 'linear-gradient(to bottom, rgba(148, 163, 184, 0), rgba(148, 163, 184, 0.4))',
                                     filter: 'blur(0.8px)',
                                     animation: `realisticRainFar ${drop.duration} linear infinite`,
                                     animationDelay: drop.delay,
@@ -395,9 +393,7 @@ export default function WeatherBackground({ current, hourly }) {
                                     borderRadius: '9999px',
                                     '--rain-slant': `${rainSlant}deg`,
                                     '--rain-drift': `${rainDrift}px`,
-                                    background: isDark
-                                        ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(224, 242, 254, 0.75))'
-                                        : 'linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(56, 189, 248, 0.65))',
+                                    background: 'linear-gradient(to bottom, rgba(203, 213, 225, 0.05), rgba(148, 163, 184, 0.65))',
                                     animation: `realisticRainMid ${drop.duration} linear infinite`,
                                     animationDelay: drop.delay,
                                 }}
@@ -417,13 +413,9 @@ export default function WeatherBackground({ current, hourly }) {
                                     borderRadius: '9999px',
                                     '--rain-slant': `${rainSlant + 2}deg`,
                                     '--rain-drift': `${Math.round(rainDrift * 1.28)}px`,
-                                    background: isDark
-                                        ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.9))'
-                                        : 'linear-gradient(to bottom, rgba(14, 165, 233, 0.05), rgba(2, 132, 199, 0.85))',
+                                    background: 'linear-gradient(to bottom, rgba(226, 232, 240, 0.1), rgba(100, 116, 139, 0.75))',
                                     filter: 'drop-shadow(0 0 2px rgba(255, 255, 255, 0.35))',
-                                    boxShadow: isDark
-                                        ? '0 0 7px rgba(186, 230, 253, 0.3), inset 0 0 1px rgba(255,255,255,0.9)'
-                                        : '0 0 6px rgba(14, 165, 233, 0.25), inset 0 0 1px rgba(255,255,255,0.9)',
+                                    boxShadow: '0 0 3px rgba(100, 116, 139, 0.4), inset 0 0 1px rgba(255, 255, 255, 0.6)',
                                     animation: `realisticRainNear ${drop.duration} linear infinite`,
                                     animationDelay: drop.delay,
                                 }}
@@ -441,7 +433,7 @@ export default function WeatherBackground({ current, hourly }) {
                                     width: splash.size,
                                     height: splash.size,
                                     borderRadius: '50%',
-                                    border: isDark ? '1.5px solid rgba(224, 242, 254, 0.7)' : '1.5px solid rgba(56, 189, 248, 0.6)',
+                                    border: '1.5px solid rgba(148, 163, 184, 0.55)',
                                     animation: `rainSplashRing ${splash.duration} ease-out infinite`,
                                     animationDelay: splash.delay,
                                 }}
@@ -488,8 +480,8 @@ export default function WeatherBackground({ current, hourly }) {
                                     width: drop.size,
                                     height: drop.size,
                                     borderRadius: '50%',
-                                    background: 'radial-gradient(circle at 35% 30%, #ffffff 0%, rgba(255,255,255,0.7) 40%, rgba(148,163,184,0.3) 75%)',
-                                    boxShadow: 'inset 1px 1px 1.5px rgba(255,255,255,0.95), 0 2px 4px rgba(0,0,0,0.35)',
+                                    background: 'radial-gradient(circle at 35% 35%, rgba(241, 245, 249, 0.8) 0%, rgba(148, 163, 184, 0.4) 50%, rgba(71, 85, 105, 0.3) 85%)',
+                                    boxShadow: 'inset 0.5px 0.5px 1px rgba(255, 255, 255, 0.6), 0.5px 1px 2px rgba(15, 23, 42, 0.45)',
                                     animation: `glassDropletMeander ${drop.duration} cubic-bezier(0.4, 0, 0.6, 1) infinite`,
                                     animationDelay: drop.delay,
                                 }}

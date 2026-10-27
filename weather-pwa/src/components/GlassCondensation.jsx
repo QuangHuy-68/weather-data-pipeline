@@ -142,50 +142,42 @@ export default function GlassCondensation({ isDark = true }) {
             ctx.restore()
 
             // 2. Thân giọt nước thủy tinh thấu kính khúc xạ (Lens Refraction Body)
-            const bodyGrad = ctx.createRadialGradient(-rx * 0.3, -ry * 0.35, r * 0.1, 0, 0, ry)
-            if (isDark) {
-                bodyGrad.addColorStop(0, 'rgba(255, 255, 255, 0.85)')
-                bodyGrad.addColorStop(0.25, 'rgba(186, 230, 253, 0.3)')
-                bodyGrad.addColorStop(0.65, 'rgba(15, 23, 42, 0.35)')
-                bodyGrad.addColorStop(0.9, 'rgba(2, 6, 23, 0.7)')
-                bodyGrad.addColorStop(1, 'rgba(0, 0, 0, 0.85)')
-            } else {
-                bodyGrad.addColorStop(0, 'rgba(255, 255, 255, 0.98)')
-                bodyGrad.addColorStop(0.25, 'rgba(224, 242, 254, 0.5)')
-                bodyGrad.addColorStop(0.65, 'rgba(148, 163, 184, 0.3)')
-                bodyGrad.addColorStop(0.9, 'rgba(51, 65, 85, 0.65)')
-                bodyGrad.addColorStop(1, 'rgba(15, 23, 42, 0.8)')
-            }
+            const bodyGrad = ctx.createRadialGradient(-rx * 0.28, -ry * 0.32, r * 0.08, 0, 0, ry)
+           
+            bodyGrad.addColorStop(0, 'rgba(241, 245, 249, 0.85)')
+            bodyGrad.addColorStop(0.2, 'rgba(203, 213, 225, 0.45)')
+            bodyGrad.addColorStop(0.55, 'rgba(148, 163, 184, 0.35)')
+            bodyGrad.addColorStop(0.85, 'rgba(71, 85, 105, 0.65)')
+            bodyGrad.addColorStop(1, 'rgba(15, 23, 42, 0.88)')
+            
             ctx.fillStyle = bodyGrad
             ctx.fill()
 
             // 3. Viền tối quang học khúc xạ mặt kính (Meniscus Perimeter Edge)
             ctx.lineWidth = Math.min(1.2, Math.max(0.65, r * 0.14))
-            ctx.strokeStyle = isDark ? 'rgba(0, 0, 0, 0.7)' : 'rgba(15, 23, 42, 0.5)'
+            ctx.strokeStyle = 'rgba(226, 232, 240, 0.48)'
             ctx.stroke()
 
             // 4. Ánh sáng hội tụ ở đáy (Caustic Glow - khúc xạ qua lưng giọt nước)
             ctx.beginPath()
             ctx.ellipse(0, ry * 0.52, rx * 0.68, ry * 0.28, 0, 0, Math.PI)
-            ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(255, 255, 255, 0.88)'
+            ctx.fillStyle = 'rgba(226, 232, 240, 0.48)'
             ctx.fill()
 
             // 5. Đốm sáng đỉnh sắc nét có hào quang tỏa lóa (Glint with Bloom)
             ctx.beginPath()
-            const glintRx = rx * 0.32
-            const glintRy = Math.min(ry * 0.22, r * 0.3)
-            ctx.ellipse(-rx * 0.32, -ry * 0.38, glintRx, glintRy, -Math.PI / 5, 0, Math.PI * 2)
-            ctx.fillStyle = '#ffffff'
+            const glintRx = rx * 0.26
+            const glintRy = Math.min(ry * 0.18, r * 0.25)
+            ctx.ellipse(-rx * 0.3, -ry * 0.36, glintRx, glintRy, -Math.PI / 5, 0, Math.PI * 2)
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'
             ctx.shadowColor = 'rgba(255, 255, 255, 0.95)'
-            ctx.shadowBlur = Math.max(2, r * 0.5)
             ctx.fill()
-            ctx.shadowBlur = 0
 
             // 6. Đốm phản xạ phụ li ti ở góc đối diện
             if (r > 3) {
                 ctx.beginPath()
-                ctx.arc(rx * 0.3, ry * 0.36, Math.max(0.65, r * 0.11), 0, Math.PI * 2)
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.75)'
+                ctx.arc(rx * 0.28, ry * 0.34, Math.max(0.55, r * 0.09), 0, Math.PI * 2)
+                ctx.fillStyle = 'rgba(226, 232, 240, 0.5)'
                 ctx.fill()
             }
 
@@ -207,9 +199,7 @@ export default function GlassCondensation({ isDark = true }) {
                 ctx.lineWidth = trail.width
                 ctx.lineCap = 'round'
                 ctx.lineJoin = 'round'
-                ctx.strokeStyle = isDark
-                    ? `rgba(255, 255, 255, ${trail.opacity * 0.5})`
-                    : `rgba(255, 255, 255, ${trail.opacity * 1.3})`
+                ctx.strokeStyle = `rgba(148, 163, 184, ${trail.opacity * 0.55})`                        
                 ctx.stroke()
                 ctx.restore()
             })
@@ -218,9 +208,7 @@ export default function GlassCondensation({ isDark = true }) {
             microBeads.forEach(bead => {
                 ctx.beginPath()
                 ctx.arc(bead.x, bead.y, bead.r, 0, Math.PI * 2)
-                ctx.fillStyle = isDark
-                    ? `rgba(255, 255, 255, ${bead.opacity})`
-                    : `rgba(255, 255, 255, ${bead.opacity * 1.25})`
+                ctx.fillStyle = `rgba(203, 213, 225, ${bead.opacity * 0.75})`
                 ctx.fill()
             })
 
@@ -284,7 +272,7 @@ export default function GlassCondensation({ isDark = true }) {
                     }
                     ctx.lineWidth = Math.max(1.8, td.r * 0.6)
                     ctx.lineCap = 'round'
-                    ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(255, 255, 255, 0.45)'
+                    ctx.strokeStyle = 'rgba(148, 163, 184, 0.35)'
                     ctx.stroke()
                     ctx.restore()
                 }
