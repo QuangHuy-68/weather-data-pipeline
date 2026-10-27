@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 import { useTheme } from '../context/ThemeContext'
 import GlassCondensation from './GlassCondensation'
 
-function PhotorealisticCloud({ style, scale = 1, opacity = 0.88, animclass = "animate-cloud-drift-1"}) { 
+function PhotorealisticCloud({ style, scale = 1, opacity = 0.88, animClass = "animate-cloud-drift-1"}) { 
     return (
         <div
             className={`pointer-events-none select-none ${animClass}`}
@@ -562,7 +562,7 @@ export default function WeatherBackground({ current, hourly }) {
                         style={{ top: '8%', left: '4%' }}
                         scale={1.08}
                         opacity={0.9}
-                        animclass="animate-cloud-drift-1"
+                        animClass="animate-cloud-drift-1"
                     />
 
                     {/* Tầng 2: Mây tầng trung bên phải lượn êm dịu */}
@@ -578,7 +578,7 @@ export default function WeatherBackground({ current, hourly }) {
                         style={{ top: '32%', left: '33%' }}
                         scale={0.76}
                         opacity={0.62}
-                        animclass="animate-cloud-drift-3"
+                        animClass="animate-cloud-drift-3"
                     />
                 </div>
             )}
