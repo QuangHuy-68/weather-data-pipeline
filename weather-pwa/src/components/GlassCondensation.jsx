@@ -191,6 +191,7 @@ export default function GlassCondensation({ isDark = true }) {
             // A. Vẽ các dải nước chảy mờ nền (Rivulets)
             trails.forEach(trail => {
                 ctx.save()
+                ctx.filter = 'blur(4.5px)'
                 ctx.beginPath()
                 ctx.moveTo(trail.points[0].x, trail.points[0].y)
                 for (let i = 1; i < trail.points.length; i++) {
@@ -201,6 +202,7 @@ export default function GlassCondensation({ isDark = true }) {
                 ctx.lineJoin = 'round'
                 ctx.strokeStyle = `rgba(148, 163, 184, ${trail.opacity * 0.55})`                        
                 ctx.stroke()
+                ctx.filter = 'none'
                 ctx.restore()
             })
 
@@ -265,6 +267,7 @@ export default function GlassCondensation({ isDark = true }) {
                 // Vẽ vệt nước ẩm (Trailing Wake) sau đuôi giọt nước
                 if (td.trailHistory.length > 2) {
                     ctx.save()
+                    ctx.filter = 'blur(2.5px)'
                     ctx.beginPath()
                     ctx.moveTo(td.trailHistory[0].x, td.trailHistory[0].y)
                     for (let i = 1; i < td.trailHistory.length; i++) {
@@ -274,6 +277,7 @@ export default function GlassCondensation({ isDark = true }) {
                     ctx.lineCap = 'round'
                     ctx.strokeStyle = 'rgba(148, 163, 184, 0.35)'
                     ctx.stroke()
+                    ctx.filter = 'none'
                     ctx.restore()
                 }
 
