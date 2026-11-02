@@ -76,8 +76,8 @@ export function HeroWeatherIcon({ code = 0, isDay = 1, rainProb = 0, weatherMode
     let effectiveCode = code 
     let effectiveRainProb = rainProb
     
-    // Khi trời quang (clear): bắt buộc hiển thị mặt trời nắng ☀️ và tĩnh lặng
-    if (weatherMode === 'clear' || code === 0) {
+    // Khi thời tiết quang đãng và xác suất mưa thấp: hiển thị mặt trời nắng tĩnh lặng
+    if (weatherMode === 'clear' && effectiveRainProb < 30 && effectiveCode === 0) {
         effectiveCode = 0
         effectiveRainProb = 0
     } else if (weatherMode === 'rainy' && effectiveRainProb < 40 && effectiveCode < 50) { 
@@ -87,7 +87,7 @@ export function HeroWeatherIcon({ code = 0, isDay = 1, rainProb = 0, weatherMode
         effectiveCode = 95
         effectiveRainProb = 90
     }
-    
+
     const icon = getWeatherIcon(effectiveCode, isDay, effectiveRainProb)
     // Khi trời quang: yên lặng, không lặp animation rung lắc
     const animClass = weatherMode === 'clear' ? '' : getAnimationClass(effectiveCode, effectiveRainProb, isDay)

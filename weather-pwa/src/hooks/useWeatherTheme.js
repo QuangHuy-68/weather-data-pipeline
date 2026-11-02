@@ -169,8 +169,12 @@ export function computeWeatherTheme(current, hourly = []) {
         return { weatherMode: 'snowy', palette: WEATHER_PALETTES.snowy };
     }
 
-    // 3. Check for Active Rain or High Rain Probability
-    if (precipitation > 0 || rainProb >= 60) {
+    // 3. Check for Active Rain, Rain codes, or Significant Rain Probability
+    const isRainCode = (weatherCode >= 51 && weatherCode <= 67) || (weatherCode >= 80 && weatherCode <= 82);
+    const nextFewHoursRain = (hourly || []).slice(0, 3).map(h => h.rainProb || 0);
+    const maxUpcomingRain = nextFewHoursRain.length > 0 ? Math.max(...nextFewHoursRain) : 0;
+
+    if (precipitation > 0 || rainProb >= 40 || isRainCode || maxUpcomingRain >= 60) {
         return { weatherMode: 'rainy', palette: WEATHER_PALETTES.rainy };
     }
 

@@ -193,28 +193,30 @@ export default function Home() {
     }, [current, hourly, setWeatherData])
 
     // Smart weather alert generator for UI banner (Hierarchical Multi-Weather Advisory)
-    const getWeatherAlert = () => { 
+    const getWeatherAlert = () => {
         if (!current) return null
 
-        // Khai báo lại các biến chỉ số thời tiết
-        const currentRainProb = hourly?.[0]?.rainProb || 0
-        const weatherCode = hourly?.[0]?.code ?? 0
-        const wind = current.wind_speed ?? 0
+        const currentRainProb = hourly?.[0]?.rainProb || 0 
+        const weatherCode = hourly?.[0]?.code ?? current?.weather_code ?? 0
+        const wind = current.wind_speed ?? 0 
+        const isRainCode = (weatherCode >= 51 && weatherCode <= 67) || (weatherCode >= 80 && weatherCode <= 82)
 
-        // 0. Khi trời quang (Clear): Banner đồng bộ với trạng thái quang đãng
-        if (weatherMode === 'clear' || overrideMode === 'clear') {
-            return {
+        const next4Hours = (hourly || []).slice(0, 4)
+        const peakRainSlot = next4Hours.find(h => (h.rainProb || 0) >= 60)
+        const maxUpcomingRain = next4Hours.length > 0 ? Math.max(...next4Hours.map(h => h.rainProb || 0)) : 0 
+
+        if (overrideMode === 'clear') { 
+            return { 
                 type: "clear",
                 level: "CLEAR SKY",
                 levelBg: "bg-[#2f9bff] text-white font-medium",
                 icon: "☀️",
                 bg: "bg-white/85 border-white text-[#0a2850] shadow-md shadow-[#0a2850]/5",
-                title: "Trời quang nắng nhẹ",
-                desc: "Không khí trong lành, thoáng đãng và sạch sẽ. Điều kiện lý tưởng cho các hoạt động ngoài trời."
+                title: "Clear skies and mild sunshine ",
+                desc: "The air is fresh, open, and clean-ideal conditions for outdoor activities."
             }
         }
 
-        // 1. Cực kỳ nguy hiểm: Giông bão sấm sét (WMO >= 95)
         if (weatherCode >= 95) {
             return {
                 type: "storm",
@@ -227,21 +229,26 @@ export default function Home() {
             }
         }
 
-        // 2. Mưa thực tế hoặc xác suất mưa cao
-        if (current.precipitation > 0 || currentRainProb >= 50) {
+        if (current.precipitation > 0 || currentRainProb >= 40 || isRainCode || maxUpcomingRain >= 60) {
+            const isPouringNow = current.precipitation > 0
             return {
                 type: "rain",
-                level: current.precipitation > 2 || currentRainProb >= 80 ? "HEAVY RAIN" : "ADVISORY",
+                level: isPouringNow || currentRainProb >= 80 || maxUpcomingRain >= 80 ? "HEAVY RAIN" : "RAIN ADVISORY",
                 levelBg: "bg-blue-500 text-white",
                 icon: "🌧️",
                 bg: isDark ? "bg-blue-950/40 border-blue-500/40 text-blue-200" : "bg-blue-50 border-blue-300 text-blue-900",
-                title: current.precipitation > 0 ? "Active Precipitation Detected" : "High Rain Probability",
-                desc: current.precipitation > 0 
+                title: isPouringNow 
+                    ? "Active Precipitation Detected" 
+                    : maxUpcomingRain >= 60 
+                        ? `Nguy cơ mưa lớn sắp tới (${maxUpcomingRain}%)`
+                        : "Khả năng mưa cao",
+                desc: isPouringNow 
                     ? `Precipitation recorded (${current.precipitation} mm). Roads may be slick—carry umbrella or waterproof gear.`
-                    : `Precipitation probability is elevated (${currentRainProb}%). Carrying portable rain gear is strongly advised.`
+                    : peakRainSlot
+                        ? `Khả năng mưa đạt đỉnh ${maxUpcomingRain}% vào lúc ${peakRainSlot.displayTime || peakRainSlot.time}. Hãy mang theo ô hoặc áo mưa khi ra ngoài.`
+                        : `Xác suất mưa đang ở mức cao (${currentRainProb}%). Nên chuẩn bị đồ che mưa.`
             }
         }
-    
 
         // 3. Tuyết rơi (WMO 71-77)
         if (weatherCode >= 71 && weatherCode <= 77) {
@@ -310,15 +317,15 @@ export default function Home() {
             }
         }
 
-        // 8. Trạng thái lý tưởng mặc định
+        // 8. Trạng thái trời quang / lý tưởng (chỉ khi không có mưa, bão hoặc thời tiết cực đoan)
         return {
-            type: "good",
-            level: "OPTIMAL",
-            levelBg: "bg-emerald-500 text-white",
-            icon: "✨",
-            bg: isDark ? "bg-emerald-950/30 border-emerald-500/30 text-emerald-200" : "bg-emerald-50/70 border-emerald-200 text-emerald-800", 
-            title: "Ideal Weather Conditions",
-            desc: "Atmospheric conditions are mild, clean, and highly favorable for outdoor activities and travel."
+            type: "clear",
+            level: "CLEAR SKY",
+            levelBg: "bg-[#2f9bff] text-white font-medium",
+            icon: "☀️",
+            bg: "bg-white/85 border-white text-[#0a2850] shadow-md shadow-[#0a2850]/5",
+            title: "Trời quang nắng nhẹ",
+            desc: "Không khí trong lành, thoáng đãng và sạch sẽ. Điều kiện lý tưởng cho các hoạt động ngoài trời."
         }
     }
 
