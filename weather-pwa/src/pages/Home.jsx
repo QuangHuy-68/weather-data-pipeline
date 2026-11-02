@@ -240,13 +240,13 @@ export default function Home() {
                 title: isPouringNow 
                     ? "Active Precipitation Detected" 
                     : maxUpcomingRain >= 60 
-                        ? `Nguy cơ mưa lớn sắp tới (${maxUpcomingRain}%)`
-                        : "Khả năng mưa cao",
+                        ? `Heavy Rain Approaching (${maxUpcomingRain}%)`
+                        : "High Rain Probability",
                 desc: isPouringNow 
-                    ? `Precipitation recorded (${current.precipitation} mm). Roads may be slick—carry umbrella or waterproof gear.`
+                    ? `Precipitation recorded (${current.precipitation} mm). Roads may be slick—carry an umbrella or waterproof gear.`
                     : peakRainSlot
-                        ? `Khả năng mưa đạt đỉnh ${maxUpcomingRain}% vào lúc ${peakRainSlot.displayTime || peakRainSlot.time}. Hãy mang theo ô hoặc áo mưa khi ra ngoài.`
-                        : `Xác suất mưa đang ở mức cao (${currentRainProb}%). Nên chuẩn bị đồ che mưa.`
+                        ? `Rain probability peaks at ${maxUpcomingRain}% at ${peakRainSlot.displayTime || peakRainSlot.time}. Be sure to carry an umbrella or raincoat.`
+                        : `Precipitation probability is elevated (${currentRainProb}%). Keeping rain gear handy is advised.`
             }
         }
 
@@ -324,8 +324,8 @@ export default function Home() {
             levelBg: "bg-[#2f9bff] text-white font-medium",
             icon: "☀️",
             bg: "bg-white/85 border-white text-[#0a2850] shadow-md shadow-[#0a2850]/5",
-            title: "Trời quang nắng nhẹ",
-            desc: "Không khí trong lành, thoáng đãng và sạch sẽ. Điều kiện lý tưởng cho các hoạt động ngoài trời."
+            title: "Clear Skies & Mild Sunshine",
+            desc: "The air is fresh, open, and clean—ideal conditions for outdoor activities."
         }
     }
 
