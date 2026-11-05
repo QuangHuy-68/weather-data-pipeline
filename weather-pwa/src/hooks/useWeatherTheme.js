@@ -170,14 +170,15 @@ export function computeWeatherTheme(current, hourly = []) {
     }
 
     // 3. Check for Active Rain, Rain codes, or Significant Rain Probability
-    const isRainCode = (weatherCode >= 51 && weatherCode <= 67) || (weatherCode >= 80 && weatherCode <= 82);
+    const isRainCode = (weatherCode >=51 && weatherCode <= 67) || (weatherCode >= 80 && weatherCode <=82);
     const nextFewHoursRain = (hourly || []).slice(0, 3).map(h => h.rainProb || 0);
     const maxUpcomingRain = nextFewHoursRain.length > 0 ? Math.max(...nextFewHoursRain) : 0;
+    const isRealRain = precipitation > 0 || rainProb >= 40 || maxUpcomingRain >= 60 || (isRainCode && rainProb >= 30);
 
-    if (precipitation > 0 || rainProb >= 40 || isRainCode || maxUpcomingRain >= 60) {
+    if (isRealRain) {
         return { weatherMode: 'rainy', palette: WEATHER_PALETTES.rainy };
     }
-
+    
     // 4. Check for Heatwave condition (temperature >= 33°C)
     if (temp >= 33) {
         return { weatherMode: 'hot', palette: WEATHER_PALETTES.hot };

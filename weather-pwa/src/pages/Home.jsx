@@ -229,8 +229,10 @@ export default function Home() {
             }
         }
 
-        if (current.precipitation > 0 || currentRainProb >= 40 || isRainCode || maxUpcomingRain >= 60) {
-            const isPouringNow = current.precipitation > 0
+        const isPouringNow = current.precipitation > 0
+        const isHighChance = currentRainProb >= 40 || (isRainCode && currentRainProb >= 30)
+        const isImminentRain = maxUpcomingRain >= 60
+        if (isPouringNow || isHighChance || isImminentRain) {
             return {
                 type: "rain",
                 level: isPouringNow || currentRainProb >= 80 || maxUpcomingRain >= 80 ? "HEAVY RAIN" : "RAIN ADVISORY",
@@ -239,9 +241,9 @@ export default function Home() {
                 bg: isDark ? "bg-blue-950/40 border-blue-500/40 text-blue-200" : "bg-blue-50 border-blue-300 text-blue-900",
                 title: isPouringNow 
                     ? "Active Precipitation Detected" 
-                    : maxUpcomingRain >= 60 
+                    : isImminentRain 
                         ? `Heavy Rain Approaching (${maxUpcomingRain}%)`
-                        : "High Rain Probability",
+                        : "Rain Advisory",
                 desc: isPouringNow 
                     ? `Precipitation recorded (${current.precipitation} mm). Roads may be slick—carry an umbrella or waterproof gear.`
                     : peakRainSlot
