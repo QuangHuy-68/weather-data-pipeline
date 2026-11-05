@@ -57,6 +57,33 @@ export default function ChatAssistant({ current, hourly = [], daily = [], aqi, l
     const [isTyping, setIsTyping] = useState(false)
     const messagesEndRef = useRef(null)
 
+    const [isListening, setIsListening] = useState(false)
+    const handleVoiceInput = () => { 
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRevognition
+        if (!SpeechRecognition) {
+            alert("Your browser does not support Web Speech Recognition. Please try chrome or Edge.")
+            return
+        }
+
+        const recognition = new SpeechRecognition()
+        recognition.lang = 'vi-VN'
+        recognition.interingResults = false
+
+        recognition.onstart = () => setIsListening(true)
+        recognition.onend = () => setIsListening(false)
+        recognition.onerror = () => setIsListening(false)
+
+        recognition.onresult = (event) => {
+            const transcipt = event.result[0][0].transcript
+            if (transcript) {
+                setInput(transcript)
+                handleSend(transcript)
+            }
+        }
+
+        recognition.start()
+    }
+
     // Auto-scroll to latest message
     useEffect(() => {
         if (isOpen) {
@@ -867,6 +894,20 @@ Expert Guidance:
                                     : 'bg-slate-100 text-slate-800 placeholder-slate-400 border-slate-200 focus:border-sky-500 focus:bg-white'
                             }`}
                         />
+
+                        {/* Nút Voice Input Micro */}
+                        <button
+                            type="button"
+                            onClick={handleVoiceInput}
+                            className={`p-2 rounded-xl border text-xs transition-all ${
+                                isListening
+                                    ? 'bg-rose-500 text-white border-rose-400 animate-pulse'
+                                    : 'bg-slate-800/80 border-slate-700 text-slate-300 hover:text-white'
+                            }`}
+                            title="Speak to SkyBot"
+                        >
+                            {isListening ? "Listening..." : "🎙️"}
+                        </button>
 
                         <button 
                             type="submit"

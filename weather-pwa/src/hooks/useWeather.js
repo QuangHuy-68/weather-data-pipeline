@@ -35,7 +35,7 @@ export function useWeatherCurrent({ city = 'HCM', lat = null, lon = null, name =
         fetchWithRetry(targetLat, targetLon, locationName, 3)
 
         async function fetchWithRetry(latitude, longitude, locName, retriesLeft = 3) {
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation,weather_code,is_day&timezone=Asia%2FHo_Chi_Minh`
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation,weather_code,is_day,uv_index&timezone=Asia%2FHo_Chi_Minh`
 
             try {
                 const res = await fetch(url)
@@ -60,7 +60,8 @@ export function useWeatherCurrent({ city = 'HCM', lat = null, lon = null, name =
                         wind_speed: c.wind_speed_10m ?? 0, 
                         precipitation: c.precipitation ?? 0,
                         weather_code: c.weather_code ?? 0,
-                        is_day: c.is_day ?? 1
+                        is_day: c.is_day ?? 1,
+                        uv_index: c.uv_index ?? 0
                     })
                     setLoading(false)
                 }

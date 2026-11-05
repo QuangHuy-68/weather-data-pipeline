@@ -364,6 +364,35 @@ export default function Home() {
         if (speedKmh < 62) return "Strong breeze"
         return "Gale warning!"
     }
+    
+    const getMoonPhase = () => { 
+        const now = new Date()
+        let year = now.getFullYear()
+        let month = now.getMonth() + 1
+        const day = now.getDate()
+        if (month < 3) { year--; month += 12 }
+        const a = Math.floor(year / 100)
+        const b = Math.floor(a / 4)
+        const c = 2 - a + b
+        const e = Math.floor(365.25 * (year + 4716))
+        const f = Math.floor(30.6001 * (month + 1))
+        const jd = c + day + e + f - 1524.5
+        const daysSinceNew = (jd - 2451549.5) % 29.53058867
+        const phase = daysSinceNew < 0 ? daysSinceNew + 29.53058867 : daysSinceNew
+
+        if (phase < 1.84) return { name: "New Moon", icon: "🌑", illumiation: 0 }
+        if (phase < 5.53) return { name: "Waxing Crescent", icon: "🌒", illumiation: 25 }
+        if (phase < 9.22) return { name: "First Quarter", icon: "🌓", illumination: 50 }
+        if (phase < 12.91) return { name: "Waxing Gibbous", icon: "🌔", illumination: 75 }
+        if (phase < 16.61) return { name: "Full Moon", icon: "🌕", illumination: 100 }
+        if (phase < 20.30) return { name: "Waning Gibbous", icon: "🌖", illumination: 75 }
+        if (phase < 23.99) return { name: "Last Quarter", icon: "🌗", illumination: 50 }
+        return { name: "Waning Crescent", icon: "🌘", illumination: 25 }
+    }
+
+    const moon = getMoonPhase()
+    const uvVal = current?.uv_index ?? 0
+    const uvRating = uvVal >= 11 ? "Extreme" : uvVal >= 8 ? "Very High" : uvVal >= 6 ? "High" : uvVal >= 3 ? "Moderate" : "Low"
 
     // ── Nhiệt độ Cao / Thấp trong ngày từ dữ liệu daily
     const todayMax = daily?.[0]?.max_temperature ?? (current ? Math.round(current.temperature + 2) : 32)
@@ -696,6 +725,23 @@ export default function Home() {
                             </div>
                         )}
 
+                        {/* ⭐ Widget Tóm tắt Thời tiết Thông minh từ SkyBot ⭐ */}
+                        <div className={`rounded-2xl p-3.5 mb-4 border backdrop-blur-md flex items-start space-x-3 ${
+                            isDark ? 'bg-slate-900/60 border-sky-500/25' : 'bg-white/80 border-sky-200 shadow-sm'
+                        }`}>
+                            <span className="text-base mt-0.5">💡</span>
+                            <div className="flex-1 text-xs leading-relaxed">
+                                <span className="font-bold text-sky-400 block mb-0.5">SkyBot Daily AI Briefing</span>
+                                <p className={isDark ? "text-slate-300" : "text-slate-700"}>
+                                    {current?.precipitation > 0 
+                                        ? `Ongoing rain recorded in ${current?.location || 'your city'}. Roads are wet—carry an umbrella.` 
+                                        : hourly?.[0]?.rainProb >= 40 
+                                            ? `Rain is expected soon in ${current?.location || 'your area'}. Dry outdoor laundry before midday.` 
+                                            : `Clear and mild conditions across ${current?.location || 'your station'} today with peak temperatures around ${todayMax}°C.`}
+                                </p>
+                            </div>
+                        </div>
+
                         {/* ⭐ 24-Hour Hourly Forecast Timeline (Apple Weather Style) ⭐ */}
                         <HourlyForecast data={hourly} loading={loadingHourly} />
 
@@ -772,6 +818,41 @@ export default function Home() {
                                         : hourly?.[0]?.rainProb > 0 
                                             ? `Rain chance: ${hourly[0].rainProb}%` 
                                             : "No rain in past hour"}
+                                </p>
+                            </div>
+
+                            {/* Card 5: UV INDEX */}
+                            <div className={`rounded-2xl p-4 backdrop-blur-md transition-all duration-300 border ${
+                                isDark ? 'bg-slate-800/40 border-slate-700/60' : 'bg-white/80 border-slate-200/90 shadow-sm'
+                            }`}>
+                                <div className="flex items-center space-x-2 mb-2">
+                                    <span className="p-1 rounded-md bg-amber-400/10 text-amber-500 text-[10px] font-bold">
+                                        UV
+                                    </span>
+                                    <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}> UV Index </span>
+                                </div>
+                                <p className="text-2xl font-bold text-amber-500">{uvVal}</p>
+                                <p className={`text-[10px] mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                                    {uvRating} {uvVal >= 6 ? "— Sunscreen needed" : "— Low solar risk"}
+                                </p>
+                            </div>
+
+                            {/* Card 6: MOON PHASE & ASTRONOMY */}
+                            <div className={`rounded-2xl p-4 backdrop-blur-md transition-all duration-300 border ${
+                                isDark ? 'bg-slate-800/40 border-slate-700/60' : 'bg-white/80 border-slate-200/90 shadow-sm'
+                            }`}>
+                                <div className="flex items-center space-x-2 mb-2">
+                                    <span className="p-1 rounded-md bg-indigo-400/10 text-indigo-400 text-[10px] font-bold">
+                                        MOON
+                                    </span>
+                                    <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Astronomy</span>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <span className="text-xl">{moon.icon}</span>
+                                    <p className="text-sm font-bold text-indigo-400">{moon.name}</p>
+                                </div>
+                                <p className={`text-[10px] mt-1.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                                    Illumination: {moon.illumination}%
                                 </p>
                             </div>
                         </div>
