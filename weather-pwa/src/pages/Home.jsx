@@ -318,15 +318,7 @@ export default function Home() {
         }
 
         // 8. Trạng thái trời quang / lý tưởng (chỉ khi không có mưa, bão hoặc thời tiết cực đoan)
-        return {
-            type: "clear",
-            level: "CLEAR SKY",
-            levelBg: "bg-[#2f9bff] text-white font-medium",
-            icon: "☀️",
-            bg: "bg-white/85 border-white text-[#0a2850] shadow-md shadow-[#0a2850]/5",
-            title: "Clear Skies & Mild Sunshine",
-            desc: "The air is fresh, open, and clean—ideal conditions for outdoor activities."
-        }
+        return null
     }
 
     const alert = getWeatherAlert()

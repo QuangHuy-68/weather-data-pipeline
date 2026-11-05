@@ -158,7 +158,7 @@ export default function HourlyForecast({ data = [], loading = false }) {
 
                             {/* 3. Cột nước đo lượng mưa vi mô (Precipitation Micro-Bar) & Tỉ lệ % */}
                             <div className="h-4 flex items-center justify-center space-x-1 my-0.5">
-                                {item.rainProb > 0 ? (
+                                {item.rainProb > 20 ? (
                                     <>
                                         {/* Ống nước vi mô */}
                                         <div className={`w-1 h-3 rounded-full overflow-hidden flex flex-col justify-end ${
